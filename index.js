@@ -1,13 +1,27 @@
 // import express from 'express';
 const express = require("express");
+const mongoose = require("mongoose");
+const cookieSession = require("cookie-session");
+const passport = require("passport");
+const keys = require("./config/keys");
+require("./models/User");
+require("./services/passport");
+
+mongoose.connect(keys.mongoURI);
 
 // Listen to node and route http request to the route handler
 const app = express();
 
-app.get("/", (req, res) => {
-  res.send({ bye: "buddy" });
-});
+app.use(
+  cookieSession({
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    keys: [keys.cookieKey],
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
 
+require("./routes/authRoutes")(app);
 
 // In develpment use port 5000
 // In production use provided port from Heroku
