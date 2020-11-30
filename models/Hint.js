@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const hintSchema = new Schema({
+const HintSchema = new Schema({
     questionId: {
         type: Schema.Types.ObjectId,
         ref: 'questions',
@@ -13,4 +13,4 @@ const hintSchema = new Schema({
     }
 })
 
-mongoose.model('hints', hintSchema);
+module.exports = mongoose.model('Hint', HintSchema);

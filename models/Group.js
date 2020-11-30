@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const groupSchema = new Schema({
+const GroupSchema = new Schema({
     pinCode: {
         type: String,
         required: true,
@@ -32,4 +32,4 @@ const groupSchema = new Schema({
     }],
 })
 
-mongoose.model('groups', groupSchema);
+module.exports = mongoose.model('Group', GroupSchema);

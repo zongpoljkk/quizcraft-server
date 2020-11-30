@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const gameSchema = new Schema({
+const GameSchema = new Schema({
     mode: {
         type: String,
         required: true,
@@ -36,4 +36,4 @@ const gameSchema = new Schema({
     }  
 })
 
-mongoose.model('games', gameSchema);
+module.exports = mongoose.model('Game', GameSchema);
