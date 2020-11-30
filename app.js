@@ -24,12 +24,9 @@ app.use(
 // In develpment use port 5000
 // In production use provided port from Heroku
 const PORT = process.env.PORT || 5000;
-app.listen(PORT);
+app.listen(PORT, () => console.log('Server is running'));
 
-app.use('/practice', practiceRoutes);
 app.use('/question', questionRouter);
-
-app.listen(3000, () => console.log('Server is running'));
 
 // app.use((req, res, next) => {
 //   res.status(404).render('404', { pageTitle: ' Page Not Found'});
