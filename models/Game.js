@@ -26,8 +26,12 @@ const GameSchema = new Schema({
         ref: 'subjects',
         required: true,
     },
+    topic: {
+        type: String,
+        required: true,
+    },
     subtopic: {
-        type: Number,
+        type: String,
         required: true,
     },
     time: {

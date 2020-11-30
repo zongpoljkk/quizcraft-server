@@ -15,6 +15,10 @@ const ProblemSchema = new Schema({
         type: String,
         required: true,
     },
+    topic: {
+        type: String,
+        required: true,
+    },
     subtopic: {
         type: String,
         required: true,
