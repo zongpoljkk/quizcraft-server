@@ -21,7 +21,7 @@ const questionSchema = new Schema({
         required: true,
     },
     avgTime: {
-        type: Float32Array,
+        type: Schema.Types.Decimal128,
         required: true,
     }
 })

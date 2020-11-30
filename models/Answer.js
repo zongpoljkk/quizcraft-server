@@ -14,21 +14,3 @@ const answerSchema = new Schema({
 })
 
 mongoose.model('answers', answerSchema);
-
-
-
-const answersList = [];
-
-module.exports = class Answer {
-    constructor(s) {
-        this.solution = s;
-    }
-
-    save() {
-        answersList.push(this)
-    }
-
-    static fetchAll() {
-        return answersList;
-    }
-}

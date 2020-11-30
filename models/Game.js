@@ -31,7 +31,7 @@ const gameSchema = new Schema({
         required: true,
     },
     time: {
-        type: Float32Array,
+        type: Schema.Types.Decimal128,
         required: true,
     }  
 })
