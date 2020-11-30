@@ -21,3 +21,7 @@ exports.addProblem = (req, res, next) => {
         next();
     })
 }
+
+exports.getProblem = (req, res, next) => {
+    res.send('Not Implement: getProblem');
+}
