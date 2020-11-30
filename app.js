@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 const cookieSession = require('cookie-session');
 const keys = require('./config/keys');
 
-const practiceRoutes = require('./routes/practice');
 const questionRouter = require('./routes/question');
 
 mongoose.connect(keys.mongoURI, () => {
