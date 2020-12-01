@@ -42,11 +42,11 @@ const UserSchema = new Schema({
     },
     items: [{
         type: Schema.Types.ObjectId,
-        ref: 'items',  
+        ref: 'Item',  
     }],
     archievements: [{
         type: Schema.Types.ObjectId,
-        ref: 'archievements'
+        ref: 'Archievement'
     }],
     tips: [{
         type: String,

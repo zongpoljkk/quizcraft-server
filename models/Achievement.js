@@ -15,10 +15,6 @@ const AchievementSchema = new Schema({
         type: String,
         required: true,
     },
-    progress: {
-        type: Number,
-        required: true,
-    },
     goal: {
         type: Number,
         required: true,

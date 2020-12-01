@@ -6,21 +6,8 @@ const ProblemSchema = new Schema({
         type: String,
         required: true,
     },
-    // subjectId: {
-    //     type: Schema.Types.ObjectId,
-    //     ref: 'subjects',
-    //     required: true,
-    // },
-    topic: {
-        type: String,
-        required: true,
-    },
-    topic: {
-        type: String,
-        required: true,
-    },
-    subtopic: {
-        type: String,
+    subTopicId: {
+        type: Schema.Types.ObjectId,
         required: true,
     },
     difficulty: {
@@ -31,6 +18,7 @@ const ProblemSchema = new Schema({
     avgTime: {
         type: Schema.Types.Decimal128,
         required: true,
+        default: 0,
     }
 })
 

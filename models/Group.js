@@ -11,27 +11,18 @@ const GroupSchema = new Schema({
         type: Number,
         required: true,
     }, 
-    subjectId: {
+    subTopicId: {
         type: Schema.Types.ObjectId,
-        ref: 'subjects',
-        required: true,
-    },
-    topic: {
-        type: String,
-        required: true,
-    },
-    subtopic: {
-        type: String,
         required: true,
     },
     members: [{
         type: Schema.Types.ObjectId,
-        ref: 'users',
+        ref: 'User',
         required: true,
     }],
-    questions: [{
+    problems: [{
         type: Schema.Types.ObjectId,
-        ref: 'questions',
+        ref: 'Problem',
         required: true,
     }],
 })
