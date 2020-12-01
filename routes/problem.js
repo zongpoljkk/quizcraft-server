@@ -5,7 +5,7 @@ const problemController = require('../controllers/problem');
 const router = express.Router();
 
 router.get('/', problemController.getAllProblems)
-router.post('/addProblem', problemController.addProblem)
-router.post('/getProblem', problemController.getProblem)
+router.post('/add-problem', problemController.addProblem)
+router.post('/get-problem', problemController.getProblem)
 
 module.exports = router;
