@@ -2,9 +2,9 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const HintSchema = new Schema({
-    questionId: {
+    problemId: {
         type: Schema.Types.ObjectId,
-        ref: 'questions',
+        ref: 'Problem',
         required: true,
     }, 
     body: {

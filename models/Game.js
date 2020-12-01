@@ -7,36 +7,29 @@ const GameSchema = new Schema({
         required: true,
         enum: ['PRACTICE','QUIZ','CHALLENGE'],
     },
-    questionId: {
+    problemId: {
         type: Schema.Types.ObjectId,
-        ref: 'questions',
+        ref: 'Problem',
         required: true,
     },
     usedHint: {
         type: Boolean,
         required: true,
+        default: false,
     },
     userId: {
         type: Schema.Types.ObjectId,
-        ref: 'users',
+        ref: 'User',
         required: true,
     },
-    subjectId: {
+    subTopicId: {
         type: Schema.Types.ObjectId,
-        ref: 'subjects',
-        required: true,
-    },
-    topic: {
-        type: String,
-        required: true,
-    },
-    subtopic: {
-        type: String,
         required: true,
     },
     time: {
         type: Schema.Types.Decimal128,
         required: true,
+        default: 0,
     }  
 })
 
