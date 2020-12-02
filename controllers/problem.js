@@ -1,7 +1,7 @@
 const Problem = require('../models/Problem');
+const Subtopic = require('../models/Subtopic');
 
 exports.getAllProblems = (req, res, next) => {
-    // res.send('Not Implement: list problem');
     Problem.find().exec((err, problems) => {
         if(err) res.send(err);
         else if (!problems) res.send(400);
@@ -12,7 +12,6 @@ exports.getAllProblems = (req, res, next) => {
 
 // For testing
 exports.addProblem = (req, res, next) => {
-    // res.send('Not Implement: addProblem');
     const problem = new Problem(req.body);
     problem.save((err, newProblem) => {
         if(err) res.send(err);
@@ -23,5 +22,25 @@ exports.addProblem = (req, res, next) => {
 }
 
 exports.getProblem = (req, res, next) => {
-    res.send('Not Implement: getProblem');
+    const subtopicName = req.body.subtopicName;
+    const difficulty = req.body.difficulty;
+    Problem.aggregate([
+        { $lookup: {
+                from: 'subtopics',
+                localField: 'subtopicName',
+                foreignField: 'subtopicName',
+                as: 'subtopic'
+            }
+        }, 
+        { $match: {
+            difficulty: difficulty,
+            subtopicName: subtopicName 
+            } 
+        }
+    ]).exec((err, problem) => {
+        if(err) res.send(err);
+        else if (!problem) res.send(400);
+        else res.send(problem);
+        next();
+    });
 }

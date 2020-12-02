@@ -11,7 +11,7 @@ const GroupSchema = new Schema({
         type: Number,
         required: true,
     }, 
-    subTopicId: {
+    subtopicId: {
         type: Schema.Types.ObjectId,
         required: true,
     },

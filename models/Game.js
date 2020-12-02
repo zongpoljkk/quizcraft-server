@@ -22,8 +22,12 @@ const GameSchema = new Schema({
         ref: 'User',
         required: true,
     },
-    subTopicId: {
+    subtopicId: {
         type: Schema.Types.ObjectId,
+        required: true,
+    },
+    subtopicName: {
+        type: String,
         required: true,
     },
     time: {

@@ -5,6 +5,7 @@ const SubtopicSchema = new Schema({
     subtopicName: {
         type: String,
         required: true,
+        unique: true
     },
     subject: {
         type: String,
