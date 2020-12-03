@@ -20,20 +20,20 @@ const genarateTestSubtopic = async (subtopicName, difficulty) => {
             // template <a^m*a^n = a^(m+n)>
             const termNum = Math.floor(Math.random() * 5) + 1; //random 1-5
             const a = Math.floor(Math.random() * 10) + 1; //random 1-10
-            var degreeList = [];
+            // var degreeList = [];
             var degreeSum = 0;
             var problemBody = '';
             for(i=0; i<termNum; i++){
                 let temp = Math.floor(Math.random() * 100) + 1;
                 degreeSum += temp;
-                degreeList.push(temp);
+                // degreeList.push(temp);
                 if(i==0){
-                    problemBody+=String(a)+'^'+String(temp)
+                    problemBody+= `${a}^[${temp}]`;
                 }else {
-                    problemBody+='*'+String(a)+'^'+String(temp)
+                    problemBody+=`*${a}^[${temp}]`;
                 }   
             }
-            const answerBody = String(a)+'^'+String(degreeSum)
+            const answerBody = `${a}^${degreeSum}`;
             const problem = new Problem({body: problemBody, 
                                         subtopicName: subtopicName,
                                         difficulty: difficulty});
