@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { schema } = require('./Subtopic');
 const { Schema } = mongoose;
 
 const ProblemSchema = new Schema({
@@ -6,10 +7,10 @@ const ProblemSchema = new Schema({
         type: String,
         required: true,
     },
-    subtopicId: {
-        type: Schema.Types.ObjectId,
-        required: true,
-    },
+    // subtopicId: {
+    //     type: Schema.Types.ObjectId,
+    //     required: true,
+    // },
     subtopicName: {
         type: String,
         required: true,
@@ -23,7 +24,10 @@ const ProblemSchema = new Schema({
         type: Schema.Types.Decimal128,
         required: true,
         default: 0,
-    }
+    },
+    users: [{
+        type: Schema.Types.ObjectId,
+    }]
 })
 
 module.exports = mongoose.model('Problem', ProblemSchema);

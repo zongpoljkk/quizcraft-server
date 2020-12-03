@@ -1,5 +1,6 @@
 const Problem = require('../models/Problem');
 const Subtopic = require('../models/Subtopic');
+const { generate } = require('./problemGenerater');
 
 exports.getAllProblems = (req, res, next) => {
     Problem.find().exec((err, problems) => {
@@ -43,4 +44,10 @@ exports.getProblem = (req, res, next) => {
         else res.send(problem);
         next();
     });
+}
+
+// for testing
+exports.generateProblem = async (req, res, next) => {
+    const {newProblem, newAnswer, newHint} = await generate(req.body);
+    res.send({problem:newProblem, answer:newAnswer, hint:newHint});
 }
