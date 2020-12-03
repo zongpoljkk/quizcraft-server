@@ -22,7 +22,7 @@ exports.addProblem = (req, res, next) => {
     })
 }
 
-exports.getProblem = (req, res, next) => {
+exports.getProblems = (req, res, next) => {
     const subtopicName = req.body.subtopicName;
     const difficulty = req.body.difficulty;
     Problem.aggregate([
