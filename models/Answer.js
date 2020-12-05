@@ -10,6 +10,9 @@ const AnswerSchema = new Schema({
     body: {
         type: String,
         required: true,
+    },
+    solution: {
+        type: String
     }
 })
 

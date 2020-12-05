@@ -24,14 +24,14 @@ const baseSelector = () => {
     let a,b,c;
     switch(rand){
         case 1: //int
-            a = (Math.floor(Math.random() * 10) + 1)*(-1)**(Math.floor(Math.random() * 2)); //random (+-)[1,10]
+            a =  randInt(1,10,true)//random (+-)[1,10]
             break;
         case 2: //float
             a = (((Math.random() * 9) + 1).toFixed(2))*(-1)**(Math.floor(Math.random() * 2)); //random (+-)[1.00,10.00)
             break;
         case 3: //fraction
-            b = (Math.floor(Math.random() * 10) + 1)*(-1)**(Math.floor(Math.random() * 2)); //random (+-)[1,10]
-            c = (Math.floor(Math.random() * 10) + 1); //random (+-)[1,10]
+            b = randInt(1,10,true)//random (+-)[1,10]
+            c = randInt(2,10,false)//random [2,10]
             a = `(${b}/${c})`;
             break;
         case 4: //alphabet
@@ -61,29 +61,53 @@ const concat = (base, i, degree) => {
     }  
 }
 
+const randInt = (start,end,haveNegative) => {
+    if(haveNegative){
+        return (Math.floor(Math.random() * (end-start+1)) + start)*(-1)**(Math.floor(Math.random() * 2)); 
+    }else {
+        return Math.floor(Math.random() * (end-start+1)) + start; 
+    }
+}
+
+const diverse = (termNum) => {
+    let randList = Array.from({length: termNum}, () => Math.floor(Math.random() *2));
+    let sum = randList.reduce((a, b) => a + b, 0);
+    if(sum==0){
+        randList.push(1);
+        termNum+=1;
+    } else if(sum==termNum){
+        randList.push(0);
+        termNum+=1;
+    }
+    return [{randList, termNum}];
+}
+
 const genarateSubtopic2 = async (subtopicName, difficulty) => {
-    var termNum = Math.floor(Math.random() * 4) + 2; //random 2-5
+    var termNum = randInt(2,5,false); //random 2-5
     var problemBody = '';
     var answerBody;
     var hintBody;
-    var base, degree;
+    var solution;
+    var base, degree, randList, sum;
     var degreeSum = 0;
-    let isDivided = Math.floor(Math.random() * 2); //0 or 1
+    var isDivided = randInt(0,1,false); //0 or 1
+    var buttom = '';
+    var degreeSum2 = 0;
+    let problem, newProblem, problemId, answer, newAnswer, hint, newHint;
     switch(difficulty) {
         case EASY:
             // create problem
             base = baseSelector();
+            solution = base<0? `(${base})`: `${base}`;
             for(i=0; i<termNum; i++){
-                degree = (Math.floor(Math.random() * 51))*(-1)**(Math.floor(Math.random() * 2)); // (+,-)[0,50]
+                degree =  randInt(0,50,true); // (+,-)[0,50]
                 degreeSum += degree;
                 problemBody += concat(base,i,degree); 
             }
             if(isDivided) {
-                let buttom = '';
-                termNum = Math.floor(Math.random() * 4) + 2; //random 1-5
-                let degreeSum2 = 0;
+                termNum = randInt(1,5,false) //random 1-5
                 for(i=0; i<termNum; i++){
-                    degree = (Math.floor(Math.random() * 51))*(-1)**(Math.floor(Math.random() * 2)); // (+,-)[0,50]
+                    degree = randInt(0,50,true); // (+,-)[0,50]
                     degreeSum2 += degree;
                     buttom += concat(base,i,degree); 
                 }
@@ -92,130 +116,163 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
             }
 
             // create answer
-            if(base<0) {
-                answerBody = `(${base})^[${degreeSum}]`;
-            }else {
-                answerBody = `${base}^[${degreeSum}]`;
-            }
+            answerBody = base<0? `(${base})^[${degreeSum}]`: `${base}^[${degreeSum}]`;
 
             //create hint
-            hintBody = 'a^m*a^n = a^(m+n)|สมบัติการคูณของเลขยกกำลัง';
-            if(isDivided) hintBody += '\n(a^m)/(a^n) = a^(m-n)|สมบัติการหารของเลขยกกำลัง'
+            hintBody = `a^m*a^n = a^(m+n)|สมบัติการคูณของเลขยกกำลัง`;
+            if(isDivided) hintBody += `\n(a^m)/(a^n) = a^(m-n)|สมบัติการหารของเลขยกกำลัง`;
 
             //save to database
-            const problem = new Problem({body: problemBody, 
+            problem = new Problem({body: problemBody, 
                                         subtopicName: subtopicName,
                                         difficulty: difficulty});
-            const newProblem = await problem.save();
-            const problemId = newProblem._id;
-            const answer = new Answer({problemId:problemId, body:answerBody});
-            const newAnswer = await answer.save();
-            const hint = new Hint({problemId:problemId, body: hintBody});
-            const newHint = await hint.save();
+            newProblem = await problem.save();
+            problemId = newProblem._id;
+            answer = new Answer({problemId:problemId, body:answerBody});
+            newAnswer = await answer.save();
+            hint = new Hint({problemId:problemId, body: hintBody});
+            newHint = await hint.save();
             return {newProblem, newAnswer, newHint};
         case MEDIUM:
-            console.log('hello jaaa');
-            // opt1=> 49*7^[2],  opt2 => (1/2)^2*(0.5)^[3]
-            termNum = Math.floor(Math.random() * 4) + 3; //random 2-6
-            let opt = Math.floor(Math.random() * 2) + 1; //1,2
+            // opt1=> 49*7^[2],  opt2 => (1/2)^2*(0.5)^[3],  opt3 => (-3)^2*(3)^2
+            termNum = randInt(3,6,false); //random 3-6
+            let opt = randInt(1,3,false); //1,2,3
+            console.log(opt);
             switch(opt) {
                 case 1: //49*7^[2]
-                    base = (Math.floor(Math.random() * 24) + 2)*(-1)**(Math.floor(Math.random() * 2)); //random (+-)[2,25]
-                    let rand = Array.from({length: termNum}, () => Math.floor(Math.random() *2));
-                    let sum = rand.reduce((a, b) => a + b, 0);
-                    console.log(rand);
-                    if(sum==0){
-                        rand.push(1);
-                        termNum+=1;
-                    } else if(sum==termNum){
-                        rand.push(0);
-                        termNum+=1;
-                    }
-                    console.log(rand);
-                    console.log(sum);
+                    base = randInt(2,25,true); //random (+-)[2,25]
+                    [{randList, termNum}] = diverse(termNum);
                     for(i=0; i<termNum; i++){
-                        // let rand = Math.floor(Math.random() * 2);
-                        if(rand[i]) {
-                            degree = (Math.floor(Math.random() * 4)) + 2; //random [2,5]
+                        if(randList[i]) {
+                            degree = randInt(2,5,false); //random [2,5]
                         }
                         else {
-                            degree = (Math.floor(Math.random() * 51))*(-1)**(Math.floor(Math.random() * 2)); // (+,-)[0,50]
+                            degree = randInt(0,50,true); // (+,-)[0,50]
                         }
                         degreeSum += degree;
-                        if(rand[i]){
-                            problemBody += concat(base**degree,i,1)
+                        if(randList[i]){
+                            problemBody += concat(base**degree,i,1);
                         }
                         else problemBody += concat(base,i,degree); 
                     }
-                    // create answer
-                    if(base<0) {
-                        answerBody = `(${base})^[${degreeSum}]`;
-                    }else {
-                        answerBody = `${base}^[${degreeSum}]`;
+
+                    if(isDivided) {
+                        termNum = randInt(1,5,false); //random 1-5
+                        [{randList, termNum}] = diverse(termNum);
+                        for(i=0; i<termNum; i++){
+                            if(randList[i]) {
+                                degree = randInt(2,5,false); //random [2,5]
+                            }
+                            else {
+                                degree = randInt(0,50,true); // (+,-)[0,50]
+                            }
+                            degreeSum2 += degree;
+                            if(randList[i]){
+                                buttom += concat(base**degree,i,1)
+                            }
+                            else buttom += concat(base,i,degree); 
+                        }
+                        problemBody = `(${problemBody})/(${buttom})`;
+                        degreeSum -= degreeSum2;
                     }
-                    console.log(problemBody);
-                    console.log(answerBody);
+
+                    // create answer
+                    answerBody = base<0? `(${base})^[${degreeSum}]`: `${base}^[${degreeSum}]`;
+
+                    //create hint
+                    hintBody = `ลองเปลี่ยนเลขธรรมดาให้เป็นเลขยกกำลังที่ฐานเท่ากับเลขยกกำลังตัวอื่นดูสิ\na^m*a^n = a^(m+n)|สมบัติการคูณของเลขยกกำลัง`;
+                    if(isDivided) hintBody += `\n(a^m)/(a^n) = a^(m-n)|สมบัติการหารของเลขยกกำลัง`;
                     break;
 
                 case 2: //(1/2)^2*(0.5)^[3]
                     let bList = [2,4,5,10,20,25,50,100]
                     let b = bList[Math.floor(Math.random() * bList.length)];
-                    let a = (Math.floor(Math.random() * (b-1)) + 1)*(-1)**(Math.floor(Math.random() * 2)); //random (+-)[1,100]
+                    let a = randInt(1,100,true); //random (+-)[1,100]
                     let fraction = `(${a}/${b})`;
                     let decimal = a/b;
+                    
+                    [{randList, termNum}] = diverse(termNum);
+                    
                     for(i=0; i<termNum; i++){
-                        let rand = Math.floor(Math.random() * 2);
-                        base = rand? fraction: decimal;
-                        degree = (Math.floor(Math.random() * 51))*(-1)**(Math.floor(Math.random() * 2)); // (+,-)[0,50]
+                        base = randList[i]? fraction: decimal;
+                        degree = randInt(0,50,true); // (+,-)[0,50]
                         degreeSum += degree;
                         problemBody += concat(base,i,degree); 
                     }
-                    // create answer
-                    if(base<0) {
-                        answerBody = `(${base})^[${degreeSum}]`;
-                    }else {
-                        answerBody = `${base}^[${degreeSum}]`;
+
+                    if(isDivided) {
+                        termNum = randInt(1,5,false); //random 1-5
+                        [{randList, termNum}] = diverse(termNum);
+                        for(i=0; i<termNum; i++){
+                            base = randList[i]? fraction: decimal;
+                            degree = randInt(0,50,true); // (+,-)[0,50]
+                            degreeSum2 += degree;
+                            buttom += concat(base,i,degree); 
+                        }
+                        problemBody = `(${problemBody})/(${buttom})`;
+                        degreeSum -= degreeSum2;
                     }
-                    console.log(problemBody);
-                    console.log(answerBody);
+
+                    // create answer
+                    answerBody = base<0? `(${base})^[${degreeSum}]`: `${base}^[${degreeSum}]`;
+
+                    //create hint
+                    hintBody = `ถ้าสังเกตดี ๆ เศษส่วนกับทศนิยมเท่ากันนะ\na^m*a^n = a^(m+n)|สมบัติการคูณของเลขยกกำลัง`;
+                    if(isDivided) hintBody += `\n(a^m)/(a^n) = a^(m-n)|สมบัติการหารของเลขยกกำลัง`;
+                    break;
+                
+                case 3: // (-3)^2*(3)^2
+                    let base1 = randInt(2,25,false); //random [2,25]
+                    let base2 = (-1)*base1; //(-base1)
+                    let isLessThanZero = 0;
+                 
+                    [{randList, termNum}] = diverse(termNum);
+                  
+                    for(i=0; i<termNum; i++){
+                        base = randList[i]? base1: base2;
+                        degree = randInt(0,50,true); // (+,-)[0,50]
+                        if(base<0 & degree%2!=0) { //พจน์นี้ติดลบ
+                            isLessThanZero = isLessThanZero? 0:1;
+                        }
+                        degreeSum += degree;
+                        problemBody += concat(base,i,degree); 
+                    }
+
+                    if(isDivided) {
+                        termNum = randInt(1,5,false); //random 1-5
+                        [{randList, termNum}] = diverse(termNum);
+                        for(i=0; i<termNum; i++){
+                            base = randList[i]? base1: base2;
+                            degree = randInt(0,50,true); // (+,-)[0,50]
+                            if(base<0 & degree%2!=0) { //พจน์นี้ติดลบ
+                                isLessThanZero = isLessThanZero? 0:1;
+                            }
+                            degreeSum2 += degree;
+                            buttom += concat(base,i,degree); 
+                        }
+                        problemBody = `(${problemBody})/(${buttom})`;
+                        degreeSum -= degreeSum2;
+                    }
+
+                    // create answer
+                    answerBody = isLessThanZero? `-${base1}^[${degreeSum}]`: `${base1}^[${degreeSum}]`;
+
+                    //create hint
+                    hintBody = `ถ้าเลขติดลบยกกำลังด้วยเลขคู่จะกลายเป็นค่าบวกนะ เช่น (-3)^[2] = 9 = 3^[2]\nแต่ถ้าเลขติดลบยกกำลังด้วยเลขคี่จะกลายเป็นค่าลบนะ เช่น (-3)^[3] = -27 = -(3^[3])\na^m*a^n = a^(m+n)|สมบัติการคูณของเลขยกกำลัง`;
+                    if(isDivided) hintBody += `\n(a^m)/(a^n) = a^(m-n)|สมบัติการหารของเลขยกกำลัง`;
                     break;
             }
-            // fraction= a/b
-            // let bList = [2,4,5,10,20,25,50,100]
-            // let b = bList[Math.floor(Math.random() * bList.length)];
-            // let a = (Math.floor(Math.random() * (b-1)) + 1)*(-1)**(Math.floor(Math.random() * 2)); //random (+-)[1,100]
-            // let fraction = `(${a}/${b})`;
-            // let decimal = a/b;
-            // // console.log(fraction);
-            // // console.log(decimal)
-            // problemBody = '';
-            // base = (Math.floor(Math.random() * 24) + 2)*(-1)**(Math.floor(Math.random() * 2)); //random (+-)[2,25]
-            // for(i=0; i<termNum; i++){
-            //     let rand = Math.floor(Math.random() * 2);
-            //     if(opt==2){
-            //         base = rand? fraction: decimal;
-            //     }
-            //     if(rand & opt==1) {
-            //         degree = (Math.floor(Math.random() * 4)) + 1; //random [1,5]
-            //     }
-            //     else {
-            //         degree = (Math.floor(Math.random() * 51))*(-1)**(Math.floor(Math.random() * 2)); // (+,-)[0,50]
-            //     }
-            //     degreeSum += degree;
-            //     if(rand & opt==1){
-            //         problemBody += concat(base**degree,i,1)
-            //     }
-            //     else problemBody += concat(base,i,degree); 
-            // }
-            // // create answer
-            // if(base<0) {
-            //     answerBody = `(${base})^[${degreeSum}]`;
-            // }else {
-            //     answerBody = `${base}^[${degreeSum}]`;
-            // }
-            // console.log(answerBody)
-            // console.log(problemBody);
-            return 'genarateTestSubtopic MEDIUM';
+            //save to database
+            problem = new Problem({body: problemBody, 
+                                        subtopicName: subtopicName,
+                                        difficulty: difficulty});
+            newProblem = await problem.save();
+            problemId = newProblem._id;
+            answer = new Answer({problemId:problemId, body:answerBody});
+            newAnswer = await answer.save();
+            hint = new Hint({problemId:problemId, body: hintBody});
+            newHint = await hint.save();
+            return {newProblem, newAnswer, newHint};
         case HARD: 
             return 'genarateTestSubtopic HARD';
         default:
