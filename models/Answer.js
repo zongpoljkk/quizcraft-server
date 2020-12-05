@@ -11,10 +11,9 @@ const AnswerSchema = new Schema({
     type: String,
     required: true,
   },
-//   userId: {
-//       type: Schema.Types.ObjectId,
-//       ref: 'User'
-//   }
+  solution: {
+    type: String,
+  },
 });
 
 module.exports = mongoose.model("Answer", AnswerSchema);
