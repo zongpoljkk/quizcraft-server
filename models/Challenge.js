@@ -1,40 +1,54 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const challengeSchema = new Schema({
+const ChallengeSchema = new Schema({
     user1Id: {
         type: Schema.Types.ObjectId,
-        ref: 'users',
+        ref: 'User',
         required: true,
     },
     user2Id: {
         type: Schema.Types.ObjectId,
-        ref: 'users',
+        ref: 'User',
         required: true,
     },
     whoTurn: {
         type: Number,
         required: true,
         enum: [1,2],
+        default: 1,
     },
-    questions: [{
+    problems: [{
         type: Schema.Types.ObjectId,
-        ref: 'questions',
+        ref: 'Problem',
         required: true,
     }],
     user1Score: {
         type: Number,
         required: true,
+        default: 0,
     },
     user2Score: {
         type: Number,
         required: true,
+        default: 0,
     },
-    currentQuestion: {
+    user1Time: {
+        type: Schema.Types.Decimal128,
+        required: true,
+        default: 0,
+    },
+    user2Time: {
+        type: Schema.Types.Decimal128,
+        required: true,
+        default: 0,
+    },
+    currentProblem: {
         type: Number,
         required: true,
         enum: [1,2,3,4,5],
+        default: 1,
     }
 })
 
-mongoose.model('challenges', challengeSchema);
+module.exports = mongoose.model('Challenge', ChallengeSchema);

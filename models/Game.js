@@ -1,39 +1,40 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const gameSchema = new Schema({
+const GameSchema = new Schema({
     mode: {
         type: String,
         required: true,
         enum: ['PRACTICE','QUIZ','CHALLENGE'],
     },
-    questionId: {
+    problemId: {
         type: Schema.Types.ObjectId,
-        ref: 'questions',
+        ref: 'Problem',
         required: true,
     },
     usedHint: {
         type: Boolean,
         required: true,
+        default: false,
     },
     userId: {
         type: Schema.Types.ObjectId,
-        ref: 'users',
+        ref: 'User',
         required: true,
     },
-    subjectId: {
+    subtopicId: {
         type: Schema.Types.ObjectId,
-        ref: 'subjects',
         required: true,
     },
-    subtopic: {
-        type: Number,
+    subtopicName: {
+        type: String,
         required: true,
     },
     time: {
-        type: Float32Array,
+        type: Schema.Types.Decimal128,
         required: true,
+        default: 0,
     }  
 })
 
-mongoose.model('games', gameSchema);
+module.exports = mongoose.model('Game', GameSchema);

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const userSchema = new Schema({
+const UserSchema = new Schema({
     name: {
         type: String,
         required: true,
@@ -42,15 +42,15 @@ const userSchema = new Schema({
     },
     items: [{
         type: Schema.Types.ObjectId,
-        ref: 'items',  
+        ref: 'Item',  
     }],
     archievements: [{
         type: Schema.Types.ObjectId,
-        ref: 'archievements'
+        ref: 'Archievement'
     }],
     tips: [{
         type: String,
     }]
 });
 
-mongoose.model('users', userSchema);
+module.exports = mongoose.model('User', UserSchema);

@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const hintSchema = new Schema({
-    questionId: {
+const HintSchema = new Schema({
+    problemId: {
         type: Schema.Types.ObjectId,
-        ref: 'questions',
+        ref: 'Problem',
         required: true,
     }, 
     body: {
@@ -13,4 +13,4 @@ const hintSchema = new Schema({
     }
 })
 
-mongoose.model('hints', hintSchema);
+module.exports = mongoose.model('Hint', HintSchema);

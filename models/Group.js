@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const groupSchema = new Schema({
+const GroupSchema = new Schema({
     pinCode: {
         type: String,
         required: true,
@@ -11,25 +11,20 @@ const groupSchema = new Schema({
         type: Number,
         required: true,
     }, 
-    subjectId: {
+    subtopicId: {
         type: Schema.Types.ObjectId,
-        ref: 'subjects',
-        required: true,
-    },
-    subtopic: {
-        type: Number,
         required: true,
     },
     members: [{
         type: Schema.Types.ObjectId,
-        ref: 'users',
+        ref: 'User',
         required: true,
     }],
-    questions: [{
+    problems: [{
         type: Schema.Types.ObjectId,
-        ref: 'questions',
+        ref: 'Problem',
         required: true,
     }],
 })
 
-mongoose.model('groups', groupSchema);
+module.exports = mongoose.model('Group', GroupSchema);

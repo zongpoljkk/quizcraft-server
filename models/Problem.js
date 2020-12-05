@@ -1,18 +1,17 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const questionSchema = new Schema({
+const ProblemSchema = new Schema({
     body: {
         type: String,
         required: true,
     },
-    subjectId: {
+    subtopicId: {
         type: Schema.Types.ObjectId,
-        ref: 'subjects',
         required: true,
     },
-    subtopic: {
-        type: Number,
+    subtopicName: {
+        type: String,
         required: true,
     },
     difficulty: {
@@ -21,9 +20,10 @@ const questionSchema = new Schema({
         required: true,
     },
     avgTime: {
-        type: Float32Array,
+        type: Schema.Types.Decimal128,
         required: true,
+        default: 0,
     }
 })
 
-mongoose.model('questions', questionSchema);
+module.exports = mongoose.model('Problem', ProblemSchema);

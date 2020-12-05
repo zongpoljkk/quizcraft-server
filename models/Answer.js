@@ -1,34 +1,20 @@
-// const answers = [];
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
-// module.exports = class Answer {
-//     constructor(s) {
-//         this.solution = s;
-//     }
-
-//     save() {
-//         answers.push(this)
-//     }
-
-//     static fetchAll() {
-//         return answers;
-//     }
-// }
-
-const mongoose = require('mongoose');
-
-const Schema = mongoose.Schema;
-
-const answerSchema = new Schema({
-    problem_id: {
-        type: String,
-        required: true,
-    },
-    content: {
-        type: String,
-        required: true,
-    }
-    // question_id: String,
-    // content: String,
+const AnswerSchema = new Schema({
+  problemId: {
+    type: Schema.Types.ObjectId,
+    ref: "Problem",
+    required: true,
+  },
+  body: {
+    type: String,
+    required: true,
+  },
+//   userId: {
+//       type: Schema.Types.ObjectId,
+//       ref: 'User'
+//   }
 });
 
-module.exports = mongoose.model('Answer', answerSchema);
+module.exports = mongoose.model("Answer", AnswerSchema);
