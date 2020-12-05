@@ -24,14 +24,15 @@ const baseSelector = () => {
     let a,b,c;
     switch(rand){
         case 1: //int
-            a =  randInt(1,10,true)//random (+-)[1,10]
+            a =  randInt(2,10,true)//random (+-)[2,10]
             break;
         case 2: //float
-            a = (((Math.random() * 9) + 1).toFixed(2))*(-1)**(Math.floor(Math.random() * 2)); //random (+-)[1.00,10.00)
+            a = (((Math.random() * 9) + 1.01).toFixed(2))*(-1)**(Math.floor(Math.random() * 2)); //random (+-)[1.01,10.00)
             break;
         case 3: //fraction
             b = randInt(1,10,true)//random (+-)[1,10]
             c = randInt(2,10,false)//random [2,10]
+            c = (c==b)? c+1 : c;
             a = `(${b}/${c})`;
             break;
         case 4: //alphabet
@@ -87,7 +88,7 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
     var problemBody = '';
     var answerBody;
     var hintBody;
-    var solution;
+    var solution, solutionButtom;
     var base, degree, randList, sum;
     var degreeSum = 0;
     var isDivided = randInt(0,1,false); //0 or 1
@@ -98,25 +99,48 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
         case EASY:
             // create problem
             base = baseSelector();
-            solution = base<0? `(${base})`: `${base}`;
+            solution = base<0? `(${base})^`: `${base}^`;
             for(i=0; i<termNum; i++){
                 degree =  randInt(0,50,true); // (+,-)[0,50]
                 degreeSum += degree;
-                problemBody += concat(base,i,degree); 
+                problemBody += concat(base,i,degree);
+                if(i==0){ //first
+                    solution += degree<0? `[((${degree})` : `[(${degree}`;
+                } else if(i==termNum-1) { //last
+                    solution += degree<0? `+(${degree}))]` : `+${degree})]` ;
+                } else { //middle
+                    solution += degree<0? `+(${degree})` : `+${degree}` ;
+                }
             }
             if(isDivided) {
                 termNum = randInt(1,5,false) //random 1-5
+                solutionButtom = base<0? `(${base})^`: `${base}^`;;
                 for(i=0; i<termNum; i++){
                     degree = randInt(0,50,true); // (+,-)[0,50]
                     degreeSum2 += degree;
                     buttom += concat(base,i,degree); 
+                    if(i==0){ //first
+                        solutionButtom += degree<0? `[((${degree})` : `[(${degree}`;
+                        if(termNum==1){solutionButtom += `)]`}
+                    } else if(i==termNum-1) { //last
+                        solutionButtom += degree<0? `+(${degree}))]` : `+${degree})]` ;
+                    } else { //middle
+                        solutionButtom += degree<0? `+(${degree})` : `+${degree}` ;
+                    }
                 }
                 problemBody = `(${problemBody})/(${buttom})`;
+                solution = `(${solution})/(${solutionButtom})`
+                solution += base<0? `\n((${base})^[${degreeSum}])/((${base})^[${degreeSum2}])` : `\n(${base}^[${degreeSum}])/(${base}^[${degreeSum2}])`;
+                solution += base<0? `\n(${base})^[(`: `\n${base}^[(`;
+                solution += degreeSum<0? `(${degreeSum})` : `${degreeSum}`;
+                solution += degreeSum2<0? `-(${degreeSum2}))]`: `-${degreeSum2})]`
                 degreeSum -= degreeSum2;
             }
 
             // create answer
             answerBody = base<0? `(${base})^[${degreeSum}]`: `${base}^[${degreeSum}]`;
+            solution += `\n${answerBody}`
+            console.log(solution)
 
             //create hint
             hintBody = `a^m*a^n = a^(m+n)|สมบัติการคูณของเลขยกกำลัง`;
@@ -128,7 +152,7 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
                                         difficulty: difficulty});
             newProblem = await problem.save();
             problemId = newProblem._id;
-            answer = new Answer({problemId:problemId, body:answerBody});
+            answer = new Answer({problemId:problemId, body:answerBody, solution:solution});
             newAnswer = await answer.save();
             hint = new Hint({problemId:problemId, body: hintBody});
             newHint = await hint.save();
