@@ -6,12 +6,8 @@ const ProblemSchema = new Schema({
         type: String,
         required: true,
     },
-    subtopicId: {
+    subTopicId: {
         type: Schema.Types.ObjectId,
-        required: true,
-    },
-    subtopicName: {
-        type: String,
         required: true,
     },
     difficulty: {
