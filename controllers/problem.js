@@ -49,8 +49,8 @@ exports.getProblems = (req, res, next) => {
 };
 
 exports.getProblemOutliers = (req, res, next) => {
-  const subtopicName = req.body.subtopicName;
-  const difficulty = req.body.difficulty;
+  const subtopicName = req.query.subtopicName;
+  const difficulty = req.query.difficulty;
   Problem.aggregate([
     {
       $lookup: {
@@ -124,10 +124,12 @@ exports.getProblemOutliers = (req, res, next) => {
         return problem[1] > maxValue;
       });
 
+      console.log(`sortedCopyProblems: ${sortedCopyProblems}`)
       console.log(filteredValues)
 
-      res.send(sortedCopyProblems);
+      res.send({outliers: filteredValues});
     }
+    next();
   });
 };
 

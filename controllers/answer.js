@@ -20,10 +20,10 @@ exports.getAnswer = (req, res, next) => {
   console.log("Got in to getAnswer");
   console.log(req.body.problemId);
   console.log("5fcb58f4c53dd068520072a3");
-  const userId = req.body.userId;
-  const problemId = req.body.problemId;
-  const userAnswer = req.body.userAnswer;
-  const topic = req.body.topic;
+  const problemId = req.params.problemId;
+  const userId = req.query.userId;
+  const userAnswer = req.query.userAnswer;
+  const topic = req.query.topic;
   Answer.findOne({ problemId: problemId })
     .populate("problemId", "difficulty")
     .exec((err, answer) => {
