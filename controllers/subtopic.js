@@ -20,7 +20,46 @@ exports.addSubtopic = (req, res, next) => {
     })
 }
 
-exports.getSubtopic = (req, res, next) => {
-    res.send('Not Implement: getSubtopic');
-//     const subtopicName = req.params.subtopicName;
+exports.getSubtopicByTopic = async (req,res) => {
+    await Subtopic.find({ topic: req.query.topic }, {subtopicName: 1}, (err, subtopics) => {
+        if (err) {
+            return res.status(400).json({ success: false, error: err })
+        }
+        if (!subtopics) {
+            return res
+                .status(200)
+                .json({ success: true, data: "no subtopics" })
+        }
+        return res.status(200).json({ success: true, data: subtopics })
+    }).catch(err => console.log(err))
 }
+
+
+exports.getAllSubjects = async (req,res) => {
+    await Subtopic.distinct("subject", (err, subjects) => {
+        if (err) {
+            return res.status(400).json({ success: false, error: err })
+        }
+        if (!subjects) {
+            return res
+                .status(200)
+                .json({ success: true, data: "no subjects" })
+        }
+        return res.status(200).json({ success: true, data: subjects })
+    }).catch(err => console.log(err))
+}
+
+exports.getTopicBySubject = async (req,res) => {
+    const subject = Subtopic.find({ subject: req.query.subject });
+    await subject.distinct( "topic", (err, topic) => {
+        if (err) {
+            return res.status(400).json({ success: false, error: err })
+        }
+        if (!topic) {
+            return res
+                .status(200)
+                .json({ success: true, data: "no topic" })
+        }
+        return res.status(200).json({ success: true, data: topic })
+    }).catch(err => console.log(err))
+  };
