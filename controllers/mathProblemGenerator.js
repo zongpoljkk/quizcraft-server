@@ -86,7 +86,8 @@ const diverse = (termNum) => {
 const plusDegreeString = (degreeList) => {
     let out = degreeList[0]<0? `(${degreeList[0]})` : `${degreeList[0]}`; 
     out += degreeList.slice(1,degreeList.length).reduce((prev,cur) => cur<0? prev+`+(${cur})` : prev+`+${cur}`, '');
-    out = `[(${out})]`;
+    if(degreeList.length == 1) out = `[${out}]`;
+    else out = `[(${out})]`;
     return out;
 }
 
@@ -143,7 +144,7 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
 
             // create answer
             answerBody = base<0? `(${base})^[${degreeSum}]`: `${base}^[${degreeSum}]`;
-            solution += `\n${answerBody}`
+            solution += `\n${answerBody}`;
 
             //create hint
             hintBody = `a^m*a^n = a^(m+n)|สมบัติการคูณของเลขยกกำลัง`;
@@ -169,6 +170,7 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
                 case 1: //49*7^[2]
                     base = randInt(2,25,true); //random (+-)[2,25]
                     [{randList, termNum}] = diverse(termNum);
+                    degreeList = [];
                     solution = '';
                     for(i=0; i<termNum; i++){
                         if(randList[i]) {
@@ -177,6 +179,7 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
                         else {
                             degree = randInt(0,50,true); // (+,-)[0,50]
                         }
+                        degreeList.push(degree);
                         degreeSum += degree;
                         if(randList[i]){
                             problemBody += concat(base**degree,i,1);
@@ -190,6 +193,7 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
                         termNum = randInt(1,5,false); //random 1-5
                         [{randList, termNum}] = diverse(termNum);
                         solutionButtom = '';
+                        degreeList2 = [];
                         for(i=0; i<termNum; i++){
                             if(randList[i]) {
                                 degree = randInt(2,5,false); //random [2,5]
@@ -197,6 +201,7 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
                             else {
                                 degree = randInt(0,50,true); // (+,-)[0,50]
                             }
+                            degreeList2.push(degree);
                             degreeSum2 += degree;
                             if(randList[i]){
                                 buttom += concat(base**degree,i,1)
@@ -207,7 +212,11 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
                         }
                         solution = `(${solution})/(${solutionButtom})`
                         problemBody = `(${problemBody})/(${buttom})`;
+                        solution += base<0? `\n((${base})^${plusDegreeString(degreeList)})/((${base})^${plusDegreeString(degreeList2)})` : `\n(${base}^${plusDegreeString(degreeList)})/(${base}^${plusDegreeString(degreeList2)})`;
+                        solution += base<0? `\n(${base})^${minusDegreeString([degreeSum,degreeSum2])}` : `\n${base}^${minusDegreeString([degreeSum,degreeSum2])}`;
                         degreeSum -= degreeSum2;
+                    }else {
+                        solution += base<0? `\n(${base})^${plusDegreeString(degreeList)}` : `\n${base}^${plusDegreeString(degreeList)}`;
                     }
 
                     // create answer
