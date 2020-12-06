@@ -7,6 +7,7 @@ const bodyParser = require("body-parser");
 
 const problemRouter = require('./routes/problem');
 const subtopicRouter = require('./routes/subtopic');
+const hintRouter = require('./routes/hint');
 
 mongoose.connect(keys.mongoURI, () => {
     console.log("Connected to db")
@@ -30,6 +31,7 @@ app.listen(PORT, () => console.log('Server is running'));
 
 app.use('/problem', problemRouter);
 app.use('/subtopic', subtopicRouter);
+app.use('/hint', hintRouter);
 
 // app.use((req, res, next) => {
 //   res.status(404).render('404', { pageTitle: ' Page Not Found'});
