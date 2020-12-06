@@ -114,6 +114,149 @@ const multipleExponentialString = (baseList,degreeList) => {
     return out;
 }
 
+const genSolutionSubtopic2 = (baseList,degreeList,baseList2,degreeList2) => {
+    //FYI: can combine only same base, can't combine (-3)*[4]*(3)*[4] 
+    let out = '';
+    let step1 = '', top = '', buttom = '';
+    let step2 = '', step3 = '', step4 = '';
+    let baseListTop = [], baseListButtom =[];
+    let degreeListTop = [], degreeListButtom = [];
+    let baseListOut = [], degreeListOut = [];
+    let index, base, degree,degree2;
+    let indexList = [];
+    // step1: combine with same base for top and buttom ex 2^[(2+1+(-5))]*3^[2]*(-3)*[((-2)+1)]
+    for(i=0; i<baseList.length; i++) {
+        base = baseList[i];
+        degree = degreeList[i];
+        if(!baseListTop.includes(base)){
+            baseListTop.push(base);
+            degreeListTop.push([degree]);
+        }else{
+            index = baseListTop.indexOf(base);
+            degreeListTop[index].push(degree);
+        }
+    }
+    for(i=0; i<baseListTop.length; i++) {
+        if(i==0){
+            top += baseListTop[i]<0? `(${baseListTop[i]})^${plusDegreeString(degreeListTop[i])}` 
+                                    :  `${baseListTop[i]}^${plusDegreeString(degreeListTop[i])}` ;
+        }else {
+            top += baseListTop[i]<0? `*(${baseListTop[i]})^${plusDegreeString(degreeListTop[i])}` 
+                                    :  `*${baseListTop[i]}^${plusDegreeString(degreeListTop[i])}` ;
+        }
+    }
+    step1 = top;
+    if(degreeList2){
+        for(i=0; i<baseList2.length; i++) {
+            base = baseList2[i];
+            degree = degreeList2[i];
+            if(!baseListButtom.includes(base)){
+                baseListButtom.push(base);
+                degreeListButtom.push([degree]);
+            }else{
+                index = baseListButtom.indexOf(base);
+                degreeListButtom[index].push(degree);
+            }
+        }
+        for(i=0; i<baseListButtom.length; i++) {
+            if(i==0){
+                buttom += baseListButtom[i]<0? `(${baseListButtom[i]})^${plusDegreeString(degreeListButtom[i])}` 
+                                        :  `${baseListButtom[i]}^${plusDegreeString(degreeListButtom[i])}` ;
+            }else {
+                buttom += baseListButtom[i]<0? `*(${baseListButtom[i]})^${plusDegreeString(degreeListButtom[i])}` 
+                                        :  `*${baseListButtom[i]}^${plusDegreeString(degreeListButtom[i])}` ;
+            }
+        }
+        step1 = `(${top})/(${buttom})`;
+    }
+    out += step1;
+    // step2: combine with same base ex 2^[]*3[]*(-3)^[]
+    //add degree
+    degreeListTop.forEach((e,i) => {
+        degreeListTop[i] = e.reduce((prev,cur) => prev+cur,0);
+    });
+    top = multipleExponentialString(baseListTop,degreeListTop);
+    baseListOut = baseListTop;
+    degreeListOut = degreeListTop;
+    if(baseList2){
+        degreeListButtom.forEach((e,i) => {
+            degreeListButtom[i] = e.reduce((prev,cur) => prev+cur,0);
+        });
+        buttom = multipleExponentialString(baseListButtom,degreeListButtom);
+        step2 = `(${top})/(${buttom})`
+    } else {
+        step2 = top;
+    }
+    out += `\n${step2}`;
+    //step3: combine top and buttom ex 2^[(-2)-(-2)]*3^[2]*(-3)*[((-1)-2)]
+    top = '';
+    if(baseList2){
+        let mark = Array.from({length: baseListButtom.length}, () => 0);
+        let baseListTemp = [];
+        let degreeListTemp = [];
+        for(i=0; i<baseListTop.length ;i++) {
+            base = baseListTop[i];
+            degree = degreeListTop[i];
+            if(i==0){
+                if(baseListButtom.includes(base)){
+                    index = baseListButtom.indexOf(base);
+                    mark[index] = 1;
+                    degree2 = degreeListButtom[index];
+                    top += base<0? `(${base})^${minusDegreeString([degree,degree2])}`
+                                    : `${base}^${minusDegreeString([degree,degree2])}`;
+                    if(!baseListTemp.includes(base)){
+                        baseListTemp.push(base);
+                        degreeListTemp.push(degree-degree2);
+                    }
+                } else {
+                    top += concat(base,i,degree);
+                    if(!baseListTemp.includes(base)){
+                        baseListTemp.push(base);
+                        degreeListTemp.push(degree);
+                    }
+                }
+            }else {
+                if(baseListButtom.includes(base)){
+                    index = baseListButtom.indexOf(base);
+                    mark[index] = 1;
+                    degree2 = degreeListButtom[index];
+                    top += base<0? `*(${base})^${minusDegreeString([degree,degree2])}`
+                                    : `*${base}^${minusDegreeString([degree,degree2])}`;
+                    if(!baseListTemp.includes(base)){
+                        baseListTemp.push(base);
+                        degreeListTemp.push(degree-degree2);
+                    }
+                } else {
+                    top += concat(base,i,degree);
+                    if(!baseListTemp.includes(base)){
+                        baseListTemp.push(base);
+                        degreeListTemp.push(degree);
+                    }
+                }
+            }
+        }
+        mark.forEach((e,i) => {
+            if(!e){
+                base = baseListButtom[i]
+                degree = degreeListButtom[i]
+                top += concat(base,1,degree*(-1));
+                if(!baseListTemp.includes(base)){
+                    baseListTemp.push(base);
+                    degreeListTemp.push(degree*(-1));
+                }
+            }  
+        })
+        step3 = top;
+        out += `\n${step3}`;
+        step4 = multipleExponentialString(baseListTemp,degreeListTemp);
+        out += `\n${step4}`;
+        baseListOut = baseListTemp;
+        degreeListOut = degreeListTemp;
+
+    }
+    return [out,baseListOut,degreeListOut];
+}
+
 const genarateSubtopic2 = async (subtopicName, difficulty) => {
     var termNum = randInt(2,5,false); //random 2-5
     var problemBody = '';
@@ -313,10 +456,13 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
                     let isLessThanZero = 0;
                  
                     [{randList, termNum}] = diverse(termNum);
-                  
+                    degreeList = [];
+                    baseList = [];
                     for(i=0; i<termNum; i++){
                         base = randList[i]? base1: base2;
+                        baseList.push(base);
                         degree = randInt(0,50,true); // (+,-)[0,50]
+                        degreeList.push(degree);
                         if(base<0 & degree%2!=0) { //พจน์นี้ติดลบ
                             isLessThanZero = isLessThanZero? 0:1;
                         }
@@ -327,9 +473,13 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
                     if(isDivided) {
                         termNum = randInt(1,5,false); //random 1-5
                         [{randList, termNum}] = diverse(termNum);
+                        degreeList2 = [];
+                        baseList2 = [];
                         for(i=0; i<termNum; i++){
                             base = randList[i]? base1: base2;
+                            baseList2.push(base);
                             degree = randInt(0,50,true); // (+,-)[0,50]
+                            degreeList2.push(degree);
                             if(base<0 & degree%2!=0) { //พจน์นี้ติดลบ
                                 isLessThanZero = isLessThanZero? 0:1;
                             }
@@ -339,9 +489,27 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
                         problemBody = `(${problemBody})/(${buttom})`;
                         degreeSum -= degreeSum2;
                     }
+                    //create solution
+                    if(isDivided){
+                        [solution,baseList,degreeList] = genSolutionSubtopic2(baseList,degreeList,baseList2,degreeList2)
+                    }else {
+                        [solution,baseList,degreeList] = genSolutionSubtopic2(baseList,degreeList)
+                    }
+                    baseList.forEach((e,i) => {
+                        if(e<0){
+                            degree = degreeList[i];
+                            if(degree%2==0){
+                                baseList[i] = e*(-1);
+                            } else {
+                                baseList[i] = `(-1)*${e*(-1)}`;
+                            }
+                        }
+                    })
+                    solution += `\n${multipleExponentialString(baseList,degreeList)}`;
 
                     // create answer
                     answerBody = isLessThanZero? `-${base1}^[${degreeSum}]`: `${base1}^[${degreeSum}]`;
+                    solution += `\n${answerBody}`;
 
                     //create hint
                     hintBody = `ถ้าเลขติดลบยกกำลังด้วยเลขคู่จะกลายเป็นค่าบวกนะ เช่น (-3)^[2] = 9 = 3^[2]\nแต่ถ้าเลขติดลบยกกำลังด้วยเลขคี่จะกลายเป็นค่าลบนะ เช่น (-3)^[3] = -27 = -(3^[3])\na^m*a^n = a^(m+n)|สมบัติการคูณของเลขยกกำลัง`;
