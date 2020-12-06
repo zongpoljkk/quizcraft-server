@@ -27,5 +27,5 @@ exports.getHintByProblemId = (req, res, next) => {
     }
     else return res.status(200).json({ success: true, data: hint })
     next();
-});
+  });
 }
