@@ -27,7 +27,7 @@ exports.getSubtopicByTopic = async (req,res) => {
         }
         if (!subtopics) {
             return res
-                .status(200)
+                .status(404)
                 .json({ success: true, data: "no subtopics" })
         }
         return res.status(200).json({ success: true, data: subtopics })
@@ -42,7 +42,7 @@ exports.getAllSubjects = async (req,res) => {
         }
         if (!subjects) {
             return res
-                .status(200)
+                .status(404)
                 .json({ success: true, data: "no subjects" })
         }
         return res.status(200).json({ success: true, data: subjects })
@@ -57,7 +57,7 @@ exports.getTopicBySubject = async (req,res) => {
         }
         if (!topic) {
             return res
-                .status(200)
+                .status(404)
                 .json({ success: true, data: "no topic" })
         }
         return res.status(200).json({ success: true, data: topic })
