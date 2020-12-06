@@ -102,15 +102,28 @@ const minusDegreeString = (degreeList) => {
     return out;
 }
 
+const multipleExponentialString = (baseList,degreeList) => {
+    let out = '';
+    for(i=0; i<baseList.length; i++) {
+        if(i==0){
+            out += baseList[i]<0? `(${baseList[i]})^[${degreeList[i]}]` : `${baseList[i]}^[${degreeList[i]}]`;
+        }else{
+            out += baseList[i]<0? `*(${baseList[i]})^[${degreeList[i]}]` : `*${baseList[i]}^[${degreeList[i]}]`;
+        }
+    }
+    return out;
+}
+
 const genarateSubtopic2 = async (subtopicName, difficulty) => {
     var termNum = randInt(2,5,false); //random 2-5
     var problemBody = '';
     var answerBody;
     var hintBody;
-    var solution, solutionButtom;
+    var solution = '', solutionButtom = '';
     var base, degree, randList, baseList, degreeList;
     var baseList2, degreeList2
     var degreeSum = 0;
+    var degreeOut = 0;
     var isDivided = randInt(0,1,false); //0 or 1
     var buttom = '';
     var degreeSum2 = 0;
@@ -230,7 +243,6 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
                     // create answer
                     answerBody = base<0? `(${base})^[${degreeSum}]`: `${base}^[${degreeSum}]`;
                     solution += `\n${answerBody}`;
-                    console.log(solution);
 
                     //create hint
                     hintBody = `ลองเปลี่ยนเลขธรรมดาให้เป็นเลขยกกำลังที่ฐานเท่ากับเลขยกกำลังตัวอื่นดูสิ\na^m*a^n = a^(m+n)|สมบัติการคูณของเลขยกกำลัง`;
@@ -245,29 +257,50 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
                     let decimal = a/b;
                     
                     [{randList, termNum}] = diverse(termNum);
-                    
+                    degreeList = [];
+                    baseList = [];
                     for(i=0; i<termNum; i++){
                         base = randList[i]? fraction: decimal;
+                        baseList.push(base);
                         degree = randInt(0,50,true); // (+,-)[0,50]
+                        degreeList.push(degree);
                         degreeSum += degree;
                         problemBody += concat(base,i,degree); 
                     }
+                    degreeOut = degreeSum;
 
                     if(isDivided) {
                         termNum = randInt(1,5,false); //random 1-5
                         [{randList, termNum}] = diverse(termNum);
+                        degreeList2 = [];
+                        baseList2 = [];
                         for(i=0; i<termNum; i++){
                             base = randList[i]? fraction: decimal;
+                            baseList2.push(base);
                             degree = randInt(0,50,true); // (+,-)[0,50]
+                            degreeList2.push(degree);
                             degreeSum2 += degree;
                             buttom += concat(base,i,degree); 
                         }
                         problemBody = `(${problemBody})/(${buttom})`;
-                        degreeSum -= degreeSum2;
+                        degreeOut = degreeSum-degreeSum2;
+                    }  
+                    // create solution
+                    baseList = Array.from({length: baseList.length}, () => base);
+                    if(isDivided){
+                        baseList2 = Array.from({length: baseList2.length}, () => base);
+                        solution =  `(${multipleExponentialString(baseList,degreeList)})/(${multipleExponentialString(baseList2,degreeList2)})`;
+                        solution += base<0? `\n((${base})^${plusDegreeString(degreeList)})/((${base})^${plusDegreeString(degreeList2)})` 
+                                        :  `\n(${base}^${plusDegreeString(degreeList)})/(${base}^${plusDegreeString(degreeList2)})`;
+                        solution += `\n(${multipleExponentialString([base],[degreeSum])})/(${multipleExponentialString([base],[degreeSum2])})`;
+                        solution += base<0? `\n(${base})^${minusDegreeString([degreeSum,degreeSum2])}` : `\n${base}^${minusDegreeString([degreeSum,degreeSum2])}`;
+                    }else{
+                        solution = `${multipleExponentialString(baseList,degreeList)}`;
+                        solution += base<0? `\n(${base})^${plusDegreeString(degreeList)}` :  `\n${base}^${plusDegreeString(degreeList)}`;
                     }
-
                     // create answer
-                    answerBody = base<0? `(${base})^[${degreeSum}]`: `${base}^[${degreeSum}]`;
+                    answerBody = base<0? `(${base})^[${degreeOut}]`: `${base}^[${degreeOut}]`;
+                    solution += `\n${answerBody}`;
 
                     //create hint
                     hintBody = `ถ้าสังเกตดี ๆ เศษส่วนกับทศนิยมเท่ากันนะ\na^m*a^n = a^(m+n)|สมบัติการคูณของเลขยกกำลัง`;
