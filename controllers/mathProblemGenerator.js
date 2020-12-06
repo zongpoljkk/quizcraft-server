@@ -84,10 +84,14 @@ const diverse = (termNum) => {
 }
 
 const plusDegreeString = (degreeList) => {
-    let out = degreeList[0]<0? `(${degreeList[0]})` : `${degreeList[0]}`; 
-    out += degreeList.slice(1,degreeList.length).reduce((prev,cur) => cur<0? prev+`+(${cur})` : prev+`+${cur}`, '');
-    if(degreeList.length == 1) out = `[${out}]`;
-    else out = `[(${out})]`;
+    let out;
+    if(degreeList.length==1){
+        out = `[${degreeList[0]}]`
+    }else {
+        out = degreeList[0]<0? `(${degreeList[0]})` : `${degreeList[0]}`; 
+        out += degreeList.slice(1,degreeList.length).reduce((prev,cur) => cur<0? prev+`+(${cur})` : prev+`+${cur}`, '');
+        out = `[(${out})]`;
+    }
     return out;
 }
 
@@ -161,6 +165,7 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
             hint = new Hint({problemId:problemId, body: hintBody});
             newHint = await hint.save();
             return {newProblem, newAnswer, newHint};
+
         case MEDIUM:
             // opt1=> 49*7^[2],  opt2 => (1/2)^2*(0.5)^[3],  opt3 => (-3)^2*(3)^2
             termNum = randInt(3,6,false); //random 3-6
@@ -212,7 +217,10 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
                         }
                         solution = `(${solution})/(${solutionButtom})`
                         problemBody = `(${problemBody})/(${buttom})`;
-                        solution += base<0? `\n((${base})^${plusDegreeString(degreeList)})/((${base})^${plusDegreeString(degreeList2)})` : `\n(${base}^${plusDegreeString(degreeList)})/(${base}^${plusDegreeString(degreeList2)})`;
+                        solution += base<0? `\n((${base})^${plusDegreeString(degreeList)})/((${base})^${plusDegreeString(degreeList2)})` 
+                                            : `\n(${base}^${plusDegreeString(degreeList)})/(${base}^${plusDegreeString(degreeList2)})`;
+                        solution += base<0? `\n((${base})^${plusDegreeString([degreeSum])})/((${base})^${plusDegreeString([degreeSum2])})`
+                                            : `\n(${base}^${plusDegreeString([degreeSum])})/(${base}^${plusDegreeString([degreeSum2])})`;
                         solution += base<0? `\n(${base})^${minusDegreeString([degreeSum,degreeSum2])}` : `\n${base}^${minusDegreeString([degreeSum,degreeSum2])}`;
                         degreeSum -= degreeSum2;
                     }else {
