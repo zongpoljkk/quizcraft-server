@@ -2,7 +2,7 @@ const math = require("mathjs");
 
 const Answer = require("../models/Answer");
 const User = require("../models/User");
-const Problem = require("../models/Problem");
+// const Problem = require("../models/Problem");
 
 // const validateComputation = (expression1, expression2) => {
 //   gen1 = expression1.toString().replace(/[^0-9,+,*]+/g, "");
@@ -28,18 +28,15 @@ exports.getAnswer = (req, res, next) => {
     .populate("problemId", "difficulty")
     .exec((err, answer) => {
       console.log(answer);
-      if (err) {
-        console.log(`errrrror`);
-        res.send(err);
-      } else if (!answer) {
-        res.send(400);
+      // if (err) {
+      //   console.log(`errrrror`);
+      //   res.status(500).send({ error: err });
+      // } 
+      if (!answer) {
+        res.status(400).send("The answer with the given id was not found");
         return;
       } else {
         console.log("Not Error");
-        // if (topic === "computation") {
-        //   if (validateComputation(userAnswer, answer.body)) {
-        //   }
-        // }
         if (
           userAnswer === answer.body ||
           (topic === "computation" &&
@@ -54,19 +51,18 @@ exports.getAnswer = (req, res, next) => {
                   user.coin += 10;
                   break;
                 case "MEDIUM":
-                  user.coin += 30;
+                  user.coin += 20;
                   break;
                 case "HARD":
-                  user.coin += 50;
+                  user.coin += 30;
                   break;
               }
-              // user.coin += 10;
               user.save();
             });
 
           res.send({ correct: true, solution: answer.solution });
         } else {
-          res.send(false);
+          res.send({ correct: false, solution: answer.solution });
         }
       }
 
