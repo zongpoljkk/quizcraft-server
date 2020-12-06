@@ -522,11 +522,12 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
                                         difficulty: difficulty});
             newProblem = await problem.save();
             problemId = newProblem._id;
-            answer = new Answer({problemId:problemId, body:answerBody});
+            answer = new Answer({problemId:problemId, body:answerBody, solution:solution});
             newAnswer = await answer.save();
             hint = new Hint({problemId:problemId, body: hintBody});
             newHint = await hint.save();
             return {newProblem, newAnswer, newHint};
+            
         case HARD: 
             return 'genarateTestSubtopic HARD';
         default:
