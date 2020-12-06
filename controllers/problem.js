@@ -1,6 +1,6 @@
 const Problem = require('../models/Problem');
 const Subtopic = require('../models/Subtopic');
-const { mathGenerate } = require('./mathProblemGenerater');
+const { mathGenerate } = require('./mathProblemGenerator');
 
 exports.getAllProblems = (req, res, next) => {
     Problem.find().exec((err, problems) => {

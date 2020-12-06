@@ -83,13 +83,28 @@ const diverse = (termNum) => {
     return [{randList, termNum}];
 }
 
+const plusDegreeString = (degreeList) => {
+    let out = degreeList[0]<0? `(${degreeList[0]})` : `${degreeList[0]}`; 
+    out += degreeList.slice(1,degreeList.length).reduce((prev,cur) => cur<0? prev+`+(${cur})` : prev+`+${cur}`, '');
+    out = `[(${out})]`;
+    return out;
+}
+
+const minusDegreeString = (degreeList) => {
+    let out = degreeList[0]<0? `(${degreeList[0]})` : `${degreeList[0]}`; 
+    out += degreeList.slice(1,degreeList.length).reduce((prev,cur) => cur<0? prev+`-(${cur})` : prev+`-${cur}`, '');
+    out = `[(${out})]`;
+    return out;
+}
+
 const genarateSubtopic2 = async (subtopicName, difficulty) => {
     var termNum = randInt(2,5,false); //random 2-5
     var problemBody = '';
     var answerBody;
     var hintBody;
     var solution, solutionButtom;
-    var base, degree, randList, sum;
+    var base, degree, randList, baseList, degreeList;
+    var baseList2, degreeList2
     var degreeSum = 0;
     var isDivided = randInt(0,1,false); //0 or 1
     var buttom = '';
@@ -100,47 +115,35 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
             // create problem
             base = baseSelector();
             solution = base<0? `(${base})^`: `${base}^`;
+            degreeList = []
             for(i=0; i<termNum; i++){
                 degree =  randInt(0,50,true); // (+,-)[0,50]
+                degreeList.push(degree);
                 degreeSum += degree;
                 problemBody += concat(base,i,degree);
-                if(i==0){ //first
-                    solution += degree<0? `[((${degree})` : `[(${degree}`;
-                } else if(i==termNum-1) { //last
-                    solution += degree<0? `+(${degree}))]` : `+${degree})]` ;
-                } else { //middle
-                    solution += degree<0? `+(${degree})` : `+${degree}` ;
-                }
             }
+            solution += plusDegreeString(degreeList);
             if(isDivided) {
                 termNum = randInt(1,5,false) //random 1-5
                 solutionButtom = base<0? `(${base})^`: `${base}^`;;
+                degreeList2 = [];
                 for(i=0; i<termNum; i++){
                     degree = randInt(0,50,true); // (+,-)[0,50]
+                    degreeList2.push(degree);
                     degreeSum2 += degree;
                     buttom += concat(base,i,degree); 
-                    if(i==0){ //first
-                        solutionButtom += degree<0? `[((${degree})` : `[(${degree}`;
-                        if(termNum==1){solutionButtom += `)]`}
-                    } else if(i==termNum-1) { //last
-                        solutionButtom += degree<0? `+(${degree}))]` : `+${degree})]` ;
-                    } else { //middle
-                        solutionButtom += degree<0? `+(${degree})` : `+${degree}` ;
-                    }
                 }
+                solutionButtom+=plusDegreeString(degreeList2);
                 problemBody = `(${problemBody})/(${buttom})`;
                 solution = `(${solution})/(${solutionButtom})`
                 solution += base<0? `\n((${base})^[${degreeSum}])/((${base})^[${degreeSum2}])` : `\n(${base}^[${degreeSum}])/(${base}^[${degreeSum2}])`;
-                solution += base<0? `\n(${base})^[(`: `\n${base}^[(`;
-                solution += degreeSum<0? `(${degreeSum})` : `${degreeSum}`;
-                solution += degreeSum2<0? `-(${degreeSum2}))]`: `-${degreeSum2})]`
+                solution += base<0? `\n(${base})^${minusDegreeString([degreeSum,degreeSum2])}` : `\n${base}^${minusDegreeString([degreeSum,degreeSum2])}`;
                 degreeSum -= degreeSum2;
             }
 
             // create answer
             answerBody = base<0? `(${base})^[${degreeSum}]`: `${base}^[${degreeSum}]`;
             solution += `\n${answerBody}`
-            console.log(solution)
 
             //create hint
             hintBody = `a^m*a^n = a^(m+n)|สมบัติการคูณของเลขยกกำลัง`;
@@ -166,6 +169,7 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
                 case 1: //49*7^[2]
                     base = randInt(2,25,true); //random (+-)[2,25]
                     [{randList, termNum}] = diverse(termNum);
+                    solution = '';
                     for(i=0; i<termNum; i++){
                         if(randList[i]) {
                             degree = randInt(2,5,false); //random [2,5]
@@ -178,11 +182,14 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
                             problemBody += concat(base**degree,i,1);
                         }
                         else problemBody += concat(base,i,degree); 
+                        
+                        solution += concat(base,i,degree);
                     }
 
                     if(isDivided) {
                         termNum = randInt(1,5,false); //random 1-5
                         [{randList, termNum}] = diverse(termNum);
+                        solutionButtom = '';
                         for(i=0; i<termNum; i++){
                             if(randList[i]) {
                                 degree = randInt(2,5,false); //random [2,5]
@@ -195,13 +202,18 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
                                 buttom += concat(base**degree,i,1)
                             }
                             else buttom += concat(base,i,degree); 
+
+                            solutionButtom += concat(base,i,degree);
                         }
+                        solution = `(${solution})/(${solutionButtom})`
                         problemBody = `(${problemBody})/(${buttom})`;
                         degreeSum -= degreeSum2;
                     }
 
                     // create answer
                     answerBody = base<0? `(${base})^[${degreeSum}]`: `${base}^[${degreeSum}]`;
+                    solution += `\n${answerBody}`;
+                    console.log(solution);
 
                     //create hint
                     hintBody = `ลองเปลี่ยนเลขธรรมดาให้เป็นเลขยกกำลังที่ฐานเท่ากับเลขยกกำลังตัวอื่นดูสิ\na^m*a^n = a^(m+n)|สมบัติการคูณของเลขยกกำลัง`;
