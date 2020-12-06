@@ -1,3 +1,4 @@
+const { max } = require("mathjs");
 const Problem = require("../models/Problem");
 const Subtopic = require("../models/Subtopic");
 
@@ -47,7 +48,7 @@ exports.getProblems = (req, res, next) => {
   });
 };
 
-exports.putProblems = (req, res, next) => {
+exports.getProblemOutliers = (req, res, next) => {
   const subtopicName = req.body.subtopicName;
   const difficulty = req.body.difficulty;
   Problem.aggregate([
@@ -80,33 +81,76 @@ exports.putProblems = (req, res, next) => {
         return sum + +problem.avgTime.toString();
       }, 0);
       const avgUserTime = sumUserTime / problems.length;
-      console.log(problems);
+      //   console.log(problems);
       console.log(avgUserTime);
-      // Mock Time
-      const ceilTime = avgUserTime * 1.5;
-      //   const problemId = req.body.problemId;
-      //   console.log(problemId);
-      problems.forEach((problem) => {
-        Problem.findById(problem._id)
-          .select("id avgTime difficulty")
-          .exec((err, problem) => {
-            console.log(problem);
-            if (!problem) {
-              res
-                .status(400)
-                .send("The problem with the given id was not found");
-              return;
-            } else {
-              console.log("huay");
-              if (problem.avgTime > ceilTime) {
-                problem.difficulty = "HARD";
-                problem.save();
-              }
-              //   res.send(problem);
-            }
-          });
+
+      // TODO: filter outliers
+      // Copy the values, rather than operating on references to existing values
+      let copyProblems = [];
+      for (let problem in problems) {
+        console.log(+problems[problem].avgTime.toString());
+        copyProblems.push([problems[problem]._id, +problems[problem].avgTime.toString()]);
+      }
+
+      // Then sort
+      const sortedCopyProblems = copyProblems.sort((a, b) => {
+        return a[1] - b[1];
       });
-      res.send("Success");
+
+        console.log(`sortedCopyProblems.length: ${sortedCopyProblems.length}`);
+
+      /* Then find a generous IQR. This is generous because if (values.length / 4)
+       * is not an int, then really you should average the two elements on either
+       * side to find q1.
+       */
+      console.log(Math.floor(3/4))
+      console.log(0.75*3)
+      const q1 = (sortedCopyProblems[Math.floor(sortedCopyProblems.length / 4)])[1];
+      // Likewise for q3.
+      const q3 = (sortedCopyProblems[Math.ceil(sortedCopyProblems.length * (3 / 4))])[1];
+      const iqr = q3 - q1;
+
+
+      console.log(`q3: ${q3}`)
+      console.log(`q1: ${q1}`)
+      console.log(`iqr: ${iqr}`)
+      // Then find min and max values
+      const maxValue = q3 + iqr * 1.5;
+      console.log(`maxValue: ${maxValue}`)
+      const minValue = q1 - iqr * 1.5;
+
+      // Then filter anything beyond or beneath these values.
+      const filteredValues = sortedCopyProblems.filter( (problem) => {
+        return problem[1] > maxValue;
+      });
+
+      console.log(filteredValues)
+
+      res.send(sortedCopyProblems);
     }
   });
 };
+
+// const ceilTime = avgUserTime * 1.5;
+// //   const problemId = req.body.problemId;
+// //   console.log(problemId);
+// problems.forEach((problem) => {
+//   Problem.findById(problem._id)
+//     .select("id avgTime difficulty")
+//     .exec((err, problem) => {
+//       console.log(problem);
+//       if (!problem) {
+//         res
+//           .status(400)
+//           .send("The problem with the given id was not found");
+//         return;
+//       } else {
+//         console.log("huay");
+//         if (problem.avgTime > ceilTime) {
+//           problem.difficulty = "HARD";
+//           problem.save();
+//         }
+//         //   res.send(problem);
+//       }
+//     });
+// });
