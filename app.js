@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const cookieSession = require('cookie-session');
 const keys = require('./config/keys');
 const bodyParser = require("body-parser");
+const cors = require('cors')
 
 const problemRouter = require('./routes/problem');
 const subtopicRouter = require('./routes/subtopic');
@@ -23,6 +24,10 @@ app.use(
     keys: [keys.cookieKey],
   })
 );
+
+app.use(cors({
+  origin: 'http://localhost:3000'
+}));
 
 // In develpment use port 5000
 // In production use provided port from Heroku
