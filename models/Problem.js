@@ -33,7 +33,11 @@ const ProblemSchema = new Schema({
   },
   choices: [{
     type: String
-  }]
+  }],
+  title: {
+    type:String,
+    required: true
+  }
 });
 
 module.exports = mongoose.model("Problem", ProblemSchema);

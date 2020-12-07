@@ -8,10 +8,9 @@ const ENG = "ภาษาอังกฤษ";
 
 exports.getAllProblems = (req, res, next) => {
   Problem.find().exec((err, problems) => {
-    if (err) res.send(err);
-    else if (!problems) res.send(400);
-    else res.send(problems);
-    next();
+    if (err) return res.status(500).json({ success: false, error: err });
+    else if (!problems) return res.status(400).json({ success: false, data: "no data" });
+    else return res.status(200).json({ success: true, data: problems });
   });
 };
 
@@ -19,10 +18,9 @@ exports.getAllProblems = (req, res, next) => {
 exports.addProblem = (req, res, next) => {
   const problem = new Problem(req.body);
   problem.save((err, newProblem) => {
-    if (err) res.send(err);
-    else if (!newProblem) res.send(400);
-    else res.send(newProblem);
-    next();
+    if (err) return res.status(500).json({ success: false, error: err });
+    else if (!newProblem) return res.status(400).json({ success: false, data: "no data" });
+    else return res.status(200).json({ success: true, data: newProblem });
   });
 };
 
@@ -45,21 +43,20 @@ exports.getProblems = (req, res, next) => {
       },
     },
   ]).exec((err, problem) => {
-    if (err) return res.status(400).json({ success: false, error: err });
-    else if (!problem) return res.status(404);
+    if (err) return res.status(500).json({ success: false, error: err });
+    else if (!problem) return res.status(400).json({ success: false, data: "no data" });
     else return res.status(200).json({ success: true, data: problem });
-    next();
   });
 };
 
 // for testing
 exports.generateProblem = async (req, res, next) => {
   try{
-      const [{ problem, answer, hint }] = await mathGenerate(req.body);
-      return res.send({ problem, answer, hint});
-    } catch (err) {
-      return res.status(400).json({ success: false, error: err });
-    }
+    const [{ problem, answer, hint }] = await mathGenerate(req.body);
+    return res.send({ problem, answer, hint});
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err });
+  }
 };
 
 exports.getProblemForUser = async (req, res, next) => {
@@ -105,13 +102,8 @@ exports.addProblemAnswerHint = async (req, res, next) => {
     await newProblem.save();
     await newAnswer.save();
     await newHint.save();
-    return res
-      .status(200)
-      .json({
-        success: true,
-        data: { problem: newProblem, answer: newAnswer, hint: newHint },
-      });
-  } catch (err) {
-    return res.status(400).json({ success: false, error: err });
+    return res.status(200).json({ success: true, data: {problem:newProblem,answer:newAnswer,hint:newHint} })
+  }catch (err) {
+    return res.status(500).json({ success: false, error: err });
   }
 };

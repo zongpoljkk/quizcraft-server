@@ -15,7 +15,7 @@ const mathGenerate = ({ subtopicName, difficulty }) => {
     case "สัญกรณ์วิทยาศาสตร์":
       return genarateSubtopic3(subtopicName, difficulty);
     default:
-      return "Hello";
+      return "Default";
   }
 };
 
@@ -300,7 +300,7 @@ const genSolutionSubtopic2 = (baseList, degreeList, baseList2, degreeList2) => {
 
 const genarateSubtopic2 = async (subtopicName, difficulty) => {
   var termNum = randInt(2, 5, false); //random 2-5
-  var problemBody = "";
+  var problemBody = "", problemTitle = "จงทำเลขยกกำลังต่อไปนี้ให้เป็นรูปอย่างง่าย";
   var answerBody;
   var hintBody;
   var solution = "",
@@ -312,7 +312,7 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
   var isDivided = randInt(0, 1, false); //0 or 1
   var buttom = "";
   var degreeSum2 = 0;
-  let problem, problemId, answer, hint;
+  let problem, problemId, answer, hint, newProblem,newAnswer,newHint;
   switch (difficulty) {
     case EASY:
       // create problem
@@ -349,7 +349,6 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
             : `\n${base}^${minusDegreeString([degreeSum, degreeSum2])}`;
         degreeSum -= degreeSum2;
       }
-
       // create answer
       answerBody =
         base < 0 ? `(${base})^[${degreeSum}]` : `${base}^[${degreeSum}]`;
@@ -366,6 +365,7 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
         subtopicName: subtopicName,
         difficulty: difficulty,
         answerType: "MATH_INPUT",
+        title: problemTitle,
       });
       problemId = problem._id;
       answer = new Answer({
@@ -376,11 +376,12 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
       hint = new Hint({ problemId: problemId, body: hintBody });
       //save to database
       try{
-        await problem.save();
-        await answer.save();
-        await hint.save();
-        return [{ problem, answer, hint }];
+        newProblem = await problem.save();
+        newAnswer = await answer.save();
+        newHint = await hint.save();
+        return [{ problem:newProblem, answer:newAnswer, hint:newHint }];
       }catch (err) {
+        console.log(err)
         return err;
       }
 
@@ -633,6 +634,7 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
         subtopicName: subtopicName,
         difficulty: difficulty,
         answerType: "MATH_INPUT",
+        title: problemTitle,
       });
       problemId = problem._id;
       answer = new Answer({
@@ -648,6 +650,7 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
         await hint.save();
         return [{ problem, answer, hint }];
       }catch (err) {
+        console.log(err)
         return err;
       }
 
