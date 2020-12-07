@@ -300,7 +300,7 @@ const genSolutionSubtopic2 = (baseList, degreeList, baseList2, degreeList2) => {
 
 const genarateSubtopic2 = async (subtopicName, difficulty) => {
   var termNum = randInt(2, 5, false); //random 2-5
-  var problemBody = "";
+  var problemBody = "", problemTitle = "จงทำเลขยกกำลังต่อไปนี้ให้เป็นรูปอย่างง่าย";
   var answerBody;
   var hintBody;
   var solution = "",
@@ -365,6 +365,7 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
         subtopicName: subtopicName,
         difficulty: difficulty,
         answerType: "MATH_INPUT",
+        title: problemTitle,
       });
       problemId = problem._id;
       answer = new Answer({
@@ -633,6 +634,7 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
         subtopicName: subtopicName,
         difficulty: difficulty,
         answerType: "MATH_INPUT",
+        title: problemTitle,
       });
       problemId = problem._id;
       answer = new Answer({
