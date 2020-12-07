@@ -365,13 +365,13 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
         body: problemBody,
         subtopicName: subtopicName,
         difficulty: difficulty,
+        answerType: "MATH_INPUT",
       });
       problemId = problem._id;
       answer = new Answer({
         problemId: problemId,
         body: answerBody,
         solution: solution,
-        answerType: "MATH_INPUT",
       });
       hint = new Hint({ problemId: problemId, body: hintBody });
       //save to database
@@ -379,7 +379,7 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
         await problem.save();
         await answer.save();
         await hint.save();
-        return { problem, answer, hint };
+        return [{ problem, answer, hint }];
       }catch (err) {
         return err;
       }
@@ -632,13 +632,13 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
         body: problemBody,
         subtopicName: subtopicName,
         difficulty: difficulty,
+        answerType: "MATH_INPUT",
       });
       problemId = problem._id;
       answer = new Answer({
         problemId: problemId,
         body: answerBody,
         solution: solution,
-        answerType: "MATH_INPUT",
       });
       hint = new Hint({ problemId: problemId, body: hintBody });
       //save to database
@@ -646,7 +646,7 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
         await problem.save();
         await answer.save();
         await hint.save();
-        return { problem, answer, hint };
+        return [{ problem, answer, hint }];
       }catch (err) {
         return err;
       }
