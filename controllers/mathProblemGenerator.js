@@ -15,7 +15,7 @@ const mathGenerate = ({ subtopicName, difficulty }) => {
     case "สัญกรณ์วิทยาศาสตร์":
       return genarateSubtopic3(subtopicName, difficulty);
     default:
-      return "Hello";
+      return "Default";
   }
 };
 
