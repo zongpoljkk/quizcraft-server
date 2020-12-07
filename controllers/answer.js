@@ -18,8 +18,6 @@ exports.getAnswer = (req, res, next) => {
   // answer.save();
   console.log(math.evaluate("2^4"));
   console.log("Got in to getAnswer");
-  console.log(req.body.problemId);
-  console.log("5fcb58f4c53dd068520072a3");
   const problemId = req.params.problemId;
   const userId = req.query.userId;
   const userAnswer = req.query.userAnswer;
@@ -28,11 +26,11 @@ exports.getAnswer = (req, res, next) => {
     .populate("problemId", "difficulty")
     .exec((err, answer) => {
       console.log(answer);
-      // if (err) {
-      //   console.log(`errrrror`);
-      //   res.status(500).send({ error: err });
-      // } 
-      if (!answer) {
+      if (err) {
+        console.log(`errrrror`);
+        res.status(500).send({ error: err });
+      } 
+      else if (!answer) {
         res.status(400).send("The answer with the given id was not found");
         return;
       } else {

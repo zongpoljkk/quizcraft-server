@@ -105,6 +105,7 @@ exports.getProblemOutliers = (req, res, next) => {
        */
       console.log(Math.floor(3/4))
       console.log(0.75*3)
+      // TODO: Check if sortedCopyProblems length >= 4
       const q1 = (sortedCopyProblems[Math.floor(sortedCopyProblems.length / 4)])[1];
       // Likewise for q3.
       const q3 = (sortedCopyProblems[Math.ceil(sortedCopyProblems.length * (3 / 4))])[1];
