@@ -31,7 +31,7 @@ const ProblemSchema = new Schema({
     required: true,
     enum: ["MATH_INPUT","SELECT_ONE","RADIO_CHOICE"],
   },
-  choice: [{
+  choices: [{
     type: String
   }]
 });
