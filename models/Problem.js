@@ -15,7 +15,7 @@ const ProblemSchema = new Schema({
     enum: ["EASY", "MEDIUM", "HARD"],
     required: true,
   },
-  avgTime: [
+  times: [
     {
       type: Schema.Types.Decimal128,
       required: true,
