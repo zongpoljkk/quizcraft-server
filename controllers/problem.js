@@ -65,7 +65,9 @@ exports.getProblemForUser = async (req, res, next) => {
   const subject = req.body.subject;
   const subtopicName = req.body.subtopicName;
   const difficulty = req.body.difficulty;
-  const problem = Problem.findOne();
+  const query;
+  const problem = Problem.findOne({});
+
   //have to send
   res.send("TODO");
 };
