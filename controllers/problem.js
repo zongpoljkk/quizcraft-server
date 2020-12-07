@@ -76,7 +76,7 @@ exports.addProblemAnswerHint = async (req, res, next) => {
 
   const newProblem = new Problem(problem);
   const newAnswer = new Answer({problemId:newProblem._id,body:answerBody,solution});
-  const newHint = new Answer({problemId:newProblem._id, body:hintBody});
+  const newHint = new Hint({problemId:newProblem._id, body:hintBody});
   try {
     await newProblem.save();
     await newAnswer.save();
