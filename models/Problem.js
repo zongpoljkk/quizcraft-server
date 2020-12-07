@@ -20,11 +20,10 @@ const ProblemSchema = new Schema({
         enum: ['EASY','MEDIUM','HARD'],
         required: true,
     },
-    avgTime: {
+    avgTime: [{
         type: Schema.Types.Decimal128,
         required: true,
-        default: 0,
-    },
+    }],
     users: [{
         type: Schema.Types.ObjectId,
     }]
