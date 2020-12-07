@@ -11,10 +11,18 @@ const SubtopicSchema = new Schema({
     type: String,
     required: true,
   },
+  subjectImg: {
+    type: String,
+    default: null,
+  },
   topic: {
     type: String,
     required: true,
   },
+  topicImg: {
+    type: String,
+    default: null,
+  }
 })
 
 
