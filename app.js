@@ -29,9 +29,9 @@ app.use(
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log('Server is running'));
 
-app.use('/problem', problemRouter);
-app.use('/subtopic', subtopicRouter);
-app.use('/hint', hintRouter);
+app.use('/api/problem', problemRouter);
+app.use('/api/subtopic', subtopicRouter);
+app.use('/api/hint', hintRouter);
 
 // app.use((req, res, next) => {
 //   res.status(404).render('404', { pageTitle: ' Page Not Found'});
