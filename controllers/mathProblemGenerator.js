@@ -326,7 +326,6 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
             // opt1=> 49*7^[2],  opt2 => (1/2)^2*(0.5)^[3],  opt3 => (-3)^2*(3)^2
             termNum = randInt(3,6,false); //random 3-6
             let opt = randInt(1,3,false); //1,2,3
-            console.log(opt);
             switch(opt) {
                 case 1: //49*7^[2]
                     base = randInt(2,25,true); //random (+-)[2,25]
@@ -527,7 +526,7 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
             hint = new Hint({problemId:problemId, body: hintBody});
             newHint = await hint.save();
             return {newProblem, newAnswer, newHint};
-            
+
         case HARD: 
             return 'genarateTestSubtopic HARD';
         default:

@@ -39,9 +39,9 @@ exports.getProblems = (req, res, next) => {
             } 
         }
     ]).exec((err, problem) => {
-        if(err) res.send(err);
-        else if (!problem) res.send(400);
-        else res.send(problem);
+        if(err) return res.status(400).json({ success: false, error: err })
+        else if (!problem) return res.status(404);
+        else return res.status(200).json({ success: true, data: problem })
         next();
     });
 }
@@ -50,4 +50,11 @@ exports.getProblems = (req, res, next) => {
 exports.generateProblem = async (req, res, next) => {
     const {newProblem, newAnswer, newHint} = await mathGenerate(req.body);
     res.send({problem:newProblem, answer:newAnswer, hint:newHint});
+}
+
+exports.getProblemForUser = async (req, res, next) => {
+    const subtopicName = req.body.subtopicName;
+    const difficulty = req.body.difficulty;
+    const userId = req.body.userId;
+    res.send('TODO');
 }
