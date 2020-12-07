@@ -53,7 +53,7 @@ exports.getProblems = (req, res, next) => {
 // for testing
 exports.generateProblem = async (req, res, next) => {
   try{
-    const { problem, answer, hint } = await mathGenerate(req.body);
+    const [{ problem, answer, hint }] = await mathGenerate(req.body);
     return res.send({ problem, answer, hint});
   } catch (err) {
     return res.status(400).json({ success: false, error: err });

@@ -312,7 +312,7 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
   var isDivided = randInt(0, 1, false); //0 or 1
   var buttom = "";
   var degreeSum2 = 0;
-  let problem, problemId, answer, hint;
+  let problem, problemId, answer, hint, newProblem,newAnswer,newHint;
   switch (difficulty) {
     case EASY:
       // create problem
@@ -349,7 +349,6 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
             : `\n${base}^${minusDegreeString([degreeSum, degreeSum2])}`;
         degreeSum -= degreeSum2;
       }
-
       // create answer
       answerBody =
         base < 0 ? `(${base})^[${degreeSum}]` : `${base}^[${degreeSum}]`;
@@ -365,22 +364,23 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
         body: problemBody,
         subtopicName: subtopicName,
         difficulty: difficulty,
+        answerType: "MATH_INPUT",
       });
       problemId = problem._id;
       answer = new Answer({
         problemId: problemId,
         body: answerBody,
         solution: solution,
-        answerType: "MATH_INPUT",
       });
       hint = new Hint({ problemId: problemId, body: hintBody });
       //save to database
       try{
-        await problem.save();
-        await answer.save();
-        await hint.save();
-        return { problem, answer, hint };
+        newProblem = await problem.save();
+        newAnswer = await answer.save();
+        newHint = await hint.save();
+        return [{ problem:newProblem, answer:newAnswer, hint:newHint }];
       }catch (err) {
+        console.log(err)
         return err;
       }
 
@@ -632,13 +632,13 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
         body: problemBody,
         subtopicName: subtopicName,
         difficulty: difficulty,
+        answerType: "MATH_INPUT",
       });
       problemId = problem._id;
       answer = new Answer({
         problemId: problemId,
         body: answerBody,
         solution: solution,
-        answerType: "MATH_INPUT",
       });
       hint = new Hint({ problemId: problemId, body: hintBody });
       //save to database
@@ -646,8 +646,9 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
         await problem.save();
         await answer.save();
         await hint.save();
-        return { problem, answer, hint };
+        return [{ problem, answer, hint }];
       }catch (err) {
+        console.log(err)
         return err;
       }
 
