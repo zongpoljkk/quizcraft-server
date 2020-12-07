@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { schema } = require("./Subtopic");
 const { Schema } = mongoose;
 
 const ProblemSchema = new Schema({
@@ -27,6 +26,14 @@ const ProblemSchema = new Schema({
       type: Schema.Types.ObjectId,
     },
   ],
+  answerType: {
+    type: String,
+    required: true,
+    enum: ["MATH_INPUT","SELECT_ONE","RADIO_CHOICE"],
+  },
+  choice: [{
+    type: String
+  }]
 });
 
 module.exports = mongoose.model("Problem", ProblemSchema);

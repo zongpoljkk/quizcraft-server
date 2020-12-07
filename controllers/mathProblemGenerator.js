@@ -371,6 +371,7 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
         problemId: problemId,
         body: answerBody,
         solution: solution,
+        answerType: "MATH_INPUT",
       });
       hint = new Hint({ problemId: problemId, body: hintBody });
       //save to database
@@ -637,6 +638,7 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
         problemId: problemId,
         body: answerBody,
         solution: solution,
+        answerType: "MATH_INPUT",
       });
       hint = new Hint({ problemId: problemId, body: hintBody });
       //save to database
