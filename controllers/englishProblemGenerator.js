@@ -11,7 +11,7 @@ const englishGenerate = ({ subtopicName, difficulty }) => {
     case "แกรมมาร์":
       return genarateGrammar(subtopicName, difficulty);
     default:
-      return "Hello";
+      return "Default";
   }
 };
 
