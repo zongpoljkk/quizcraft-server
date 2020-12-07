@@ -37,7 +37,7 @@ exports.getAnswer = (req, res, next) => {
         console.log("Not Error");
         if (
           userAnswer === answer.body ||
-          (topic === "computation" &&
+          (topic === "การดำเนินการของเลขยกกำลัง" &&
             math.evaluate(userAnswer) === math.evaluate(answer.body))
         ) {
           console.log("Torb took");

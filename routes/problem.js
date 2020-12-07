@@ -8,5 +8,6 @@ router.get('/', problemController.getAllProblems)
 router.get('/get-problem-outliers', problemController.getProblemOutliers)
 router.post('/add-problem', problemController.addProblem)
 router.post('/get-problems', problemController.getProblems)
+router.put('/put-difficulty-index', problemController.putDifficultyIndex)
 
 module.exports = router;
