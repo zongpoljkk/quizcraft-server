@@ -9,10 +9,16 @@ const alphabet = "abcdefghijklmnopqrstuvwxyz";
 const englishGenerate = ({ subtopicName, difficulty }) => {
   switch (subtopicName) {
     case "แกรมมาร์":
-      return genarateSubtopic1(subtopicName, difficulty);
+      return genarateGrammar(subtopicName, difficulty);
     default:
       return "Hello";
   }
 };
 
-const genarateSubtopic1 = (subtopicName, difficulty) => {};
+const genarateGrammar = (subtopicName, difficulty) => {
+  var out = '';
+  switch (difficulty) {
+    case EASY:
+      break;
+  }
+};

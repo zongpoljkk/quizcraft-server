@@ -312,7 +312,7 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
   var isDivided = randInt(0, 1, false); //0 or 1
   var buttom = "";
   var degreeSum2 = 0;
-  let problem, newProblem, problemId, answer, newAnswer, hint, newHint;
+  let problem, problemId, answer, hint;
   switch (difficulty) {
     case EASY:
       // create problem
@@ -360,23 +360,28 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
       if (isDivided)
         hintBody += `\n(a^m)/(a^n) = a^(m-n)|สมบัติการหารของเลขยกกำลัง`;
 
-      //save to database
+      //create model
       problem = new Problem({
         body: problemBody,
         subtopicName: subtopicName,
         difficulty: difficulty,
       });
-      newProblem = await problem.save();
-      problemId = newProblem._id;
+      problemId = problem._id;
       answer = new Answer({
         problemId: problemId,
         body: answerBody,
         solution: solution,
       });
-      newAnswer = await answer.save();
       hint = new Hint({ problemId: problemId, body: hintBody });
-      newHint = await hint.save();
-      return { newProblem, newAnswer, newHint };
+      //save to database
+      try{
+        await problem.save();
+        await answer.save();
+        await hint.save();
+        return { problem, answer, hint };
+      }catch (err) {
+        return err;
+      }
 
     case MEDIUM:
       // opt1=> 49*7^[2],  opt2 => (1/2)^2*(0.5)^[3],  opt3 => (-3)^2*(3)^2
@@ -620,23 +625,29 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
             hintBody += `\n(a^m)/(a^n) = a^(m-n)|สมบัติการหารของเลขยกกำลัง`;
           break;
       }
-      //save to database
+
+      //create model
       problem = new Problem({
         body: problemBody,
         subtopicName: subtopicName,
         difficulty: difficulty,
       });
-      newProblem = await problem.save();
-      problemId = newProblem._id;
+      problemId = problem._id;
       answer = new Answer({
         problemId: problemId,
         body: answerBody,
         solution: solution,
       });
-      newAnswer = await answer.save();
       hint = new Hint({ problemId: problemId, body: hintBody });
-      newHint = await hint.save();
-      return { newProblem, newAnswer, newHint };
+      //save to database
+      try{
+        await problem.save();
+        await answer.save();
+        await hint.save();
+        return { problem, answer, hint };
+      }catch (err) {
+        return err;
+      }
 
     case HARD:
       return "genarateTestSubtopic HARD";
