@@ -53,8 +53,29 @@ exports.generateProblem = async (req, res, next) => {
 }
 
 exports.getProblemForUser = async (req, res, next) => {
-    const subtopicName = req.body.subtopicName;
-    const difficulty = req.body.difficulty;
-    const userId = req.body.userId;
-    res.send('TODO');
-}
+  const userId = req.body.userId;
+  const subject = req.body.subject;
+  const subtopicName = req.body.subtopicName;
+  const difficulty = req.body.difficulty;
+  res.send("TODO");
+};
+
+// For testing: Mock database
+exports.addProblemAnswerHint = async (req, res, next) => {
+  const problem = req.body.problem;
+  const answerBody = req.body.answer.body;
+  const solution = req.body.answer.solution;
+  const hintBody = req.body.hint.body;
+
+  const newProblem = new Problem(problem);
+  const newAnswer = new Answer({problemId:newProblem._id,body:answerBody,solution});
+  const newHint = new Answer({problemId:newProblem._id, body:hintBody});
+  try {
+    await newProblem.save();
+    await newAnswer.save();
+    await newHint.save();
+    return res.status(200).json({ success: true, data: {problem:newProblem,answer:newAnswer,hint:newHint} })
+  }catch (err) {
+    return res.status(400).json({ success: false, error: err });
+  }
+};
