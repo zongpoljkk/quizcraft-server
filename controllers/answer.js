@@ -14,7 +14,7 @@ const User = require("../models/User");
 //   }
 // };
 
-exports.getAnswer = (req, res, next) => {
+exports.getAnswer = async (req, res, next) => {
   // answer.save();
   console.log(math.evaluate("2^4"));
   console.log("Got in to getAnswer");
@@ -37,7 +37,6 @@ exports.getAnswer = (req, res, next) => {
         return;
       } else {
         console.log("Not Error");
-        // console.log(math.evaluate())
         if (
           userAnswer === answer.body ||
           (topic === "การดำเนินการของเลขยกกำลัง" &&
@@ -47,7 +46,7 @@ exports.getAnswer = (req, res, next) => {
           const user = User.findById(userId)
             .exec()
             .then((user) => {
-              console.log(`user ${user}`);
+              console.log(`user: ${user}`);
               console.log(
                 `answer.problem.difficulty: ${answer.problemId.difficulty}`
               );
@@ -63,19 +62,50 @@ exports.getAnswer = (req, res, next) => {
                   break;
               }
               user.save();
+              console.log({
+                correct: true,
+                solution: answer.solution,
+                user: user,
+              });
+              const returnedSolution = {
+                correct: true,
+                solution: answer.solution,
+                user: user,
+              };
+              req.correct = returnedSolution.correct;
+              req.solution = returnedSolution.solution;
+              req.user = returnedSolution.user._id;
+              next();
+              // res.send({
+              //   correct: true,
+              //   solution: answer.solution,
+              //   user: user,
+              // });
             });
-
-          // res.send({ correct: true, solution: answer.solution });
-          // res.send({});
-          return { correct: true, solution: answer.solution };
         } else {
           // res.send({ correct: false, solution: answer.solution });
           // res.send({});
-          return { correct: false, solution: answer.solution };
+          const user = User.findById(userId)
+            .exec()
+            .then((user) => {
+              const returnedSolution = {
+                correct: false,
+                solution: answer.solution,
+                user: user,
+              };
+              req.correct = returnedSolution.correct;
+              req.solution = returnedSolution.solution;
+              req.user = returnedSolution.user._id;
+              next();
+              // res.send({
+              //   correct: false,
+              //   solution: answer.solution,
+              //   user: user,
+              // });
+            });
         }
       }
-
-      next();
+      // next();
     });
 
   // res.json(answer);

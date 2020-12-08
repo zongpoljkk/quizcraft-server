@@ -35,9 +35,9 @@ app.use(cors({
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log('Server is running'));
 
+app.use("/api/practice", practiceRouter);
 app.use('/api/problem', problemRouter);
 app.use('/api/subtopic', subtopicRouter);
-app.use("/api/practice", practiceRouter);
 app.use('/api/hint', hintRouter);
 
 // app.use((req, res, next) => {

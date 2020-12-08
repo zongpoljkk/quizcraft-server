@@ -150,12 +150,19 @@ exports.getProblemOutliers = (req, res, next) => {
 
 exports.putDifficultyIndex = async (req, res, next) => {
   const problemId = req.query.problemId;
+  const userTime = req.query.userTime;
+  const correct = req.correct;
+  const solution = req.solution;
+  const user = req.user;
+  console.log(`correct: ${correct}`);
+  console.log(`solution : ${solution}`);
+  console.log(`user: ${user}`);
   // ? get and check answer first
-  const returnedSolution = await getAnswer(req, res, next);
-  console.log(`returnedSolution: ${returnedSolution}`);
+  // const returnedSolution = await getAnswer(req, res, next);
+
   Problem.findById(problemId)
     // .select("_id, times, difficulty")
-    .exec((err, problem) => {
+    .exec(async (err, problem) => {
       if (err) res.status(500).send("Internal Server Error");
       else if (!problem)
         res
@@ -164,14 +171,25 @@ exports.putDifficultyIndex = async (req, res, next) => {
       else {
         next();
       }
-      console.log(problem.toJSON());
+
+      // const returnedSolution = await getAnswer(req, res, next);
+
+      // getAnswer(req, res, next).then((returnedSolution) => {ƒ
+      // console.log(`returnedSolution: ${returnedSolution}`);
+      problem.times = [...problem.times, userTime];
+      problem.users = [...problem.users, user];
+      // });
+      // update problem times and user Array
+
+      console.log("kao index");
+      // console.log(problem.toJSON());
       // console.log(problem.toJSON().users)
       // console.log(problem.toJSON().times)
       const sumUserTime = problem.toJSON().times.reduce((sum, time) => {
         return sum + +time.toString();
       }, 0);
       const avgUserTime = sumUserTime / problem.toJSON().times.length;
-      console.log(avgUserTime);
+      console.log(`avgUserTime: ${avgUserTime}`);
 
       // TODO: filter outliers
       // Copy the values, rather than operating on references to existing values
@@ -184,8 +202,6 @@ exports.putDifficultyIndex = async (req, res, next) => {
       const sortedCopyTimes = copyTimes.sort((a, b) => {
         return a - b;
       });
-
-      console.log(sortedCopyTimes);
 
       const q1 = sortedCopyTimes[Math.floor(sortedCopyTimes.length / 4)];
       // Likewise for q3.
@@ -255,7 +271,10 @@ exports.putDifficultyIndex = async (req, res, next) => {
       res.send({
         old_difficulty: current_difficulty,
         new_difficulty: new_difficulty,
+        correct: correct,
+        solution: solution,
       });
+      // });
       next();
     });
 };
