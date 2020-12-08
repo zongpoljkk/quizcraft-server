@@ -64,6 +64,7 @@ exports.getProblemForUser = async (req, res, next) => {
   const subject = req.body.subject;
   const subtopicName = req.body.subtopicName;
   const difficulty = req.body.difficulty;
+  var answer;
   var problem = await Problem.findOneAndUpdate({subtopicName:subtopicName, difficulty:difficulty,users:{$ne:userId}}, 
                                                 { $push: { users: userId } }, {projection:{users:0,times:0,subtopicName:0,difficulty:0}});
 	if (problem == null) { //generate problem
@@ -72,8 +73,9 @@ exports.getProblemForUser = async (req, res, next) => {
 				try{
 					await mathGenerate({subtopicName,difficulty});
 					problem = await Problem.findOneAndUpdate({subtopicName:subtopicName, difficulty:difficulty,users:{$ne:userId}}, 
-						{ $push: { users: userId } }, {projection:{users:0, times:0, subtopicName:0, difficulty:0}});
-					return res.status(200).json({ success: true, data: problem });
+            { $push: { users: userId } }, {projection:{users:0, times:0, subtopicName:0, difficulty:0}});
+          answer = await Answer.findOne({problemId:problem._id});
+					return res.status(200).json({ success: true, data: {problem, correctAnswer: answer.body}  });
 				} catch (err) {
 					return res.status(400).json({ success: false, error: err });
 				}
@@ -84,7 +86,8 @@ exports.getProblemForUser = async (req, res, next) => {
 				return res.status(404).json({ success: false, error: "Problem out of stock" });
 		}
 	}else{
-		return res.status(200).json({ success: true, data: problem });
+    answer = await Answer.findOne({problemId:problem._id});
+		return res.status(200).json({ success: true, data: {problem, correctAnswer: answer.body} });
 	}
 };
 
