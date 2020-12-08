@@ -8,7 +8,7 @@ const alphabet = "abcdefghijklmnopqrstuvwxyz";
 
 const englishGenerate = ({ subtopicName, difficulty }) => {
   switch (subtopicName) {
-    case "แกรมมาร์":
+    case "Grammar":
       return genarateGrammar(subtopicName, difficulty);
     default:
       return "Default";
