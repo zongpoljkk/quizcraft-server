@@ -3,6 +3,7 @@ const Subtopic = require("../models/Subtopic");
 const Answer = require("../models/Answer");
 const Hint = require("../models/Hint");
 const { mathGenerate } = require("./mathProblemGenerator");
+const { getAnswer } = require("./answer");
 const MATH = "คณิตศาสตร์";
 const ENG = "ภาษาอังกฤษ";
 
@@ -147,8 +148,11 @@ exports.getProblemOutliers = (req, res, next) => {
   });
 };
 
-exports.putDifficultyIndex = (req, res, next) => {
+exports.putDifficultyIndex = async (req, res, next) => {
   const problemId = req.query.problemId;
+  // ? get and check answer first
+  const returnedSolution = await getAnswer(req, res, next);
+  console.log(`returnedSolution: ${returnedSolution}`);
   Problem.findById(problemId)
     // .select("_id, times, difficulty")
     .exec((err, problem) => {
@@ -218,21 +222,28 @@ exports.putDifficultyIndex = (req, res, next) => {
       const EASY_CEIL = 13;
       const MEDIUM_CEIL = 150;
 
-      // if (problem.difficulty === "EASY") {
-      //   if (avgProblemTime > EASY_CEIL) {
-
-      //     res.send({ over: true });
-      //     return;
-      //   }
-      // }
-
       const current_difficulty = problem.difficulty;
 
       switch (problem.difficulty) {
         case "EASY":
-          if (avgProblemTime > EASY_CEIL) {
-            if (avgProblemTime > MEDIUM_CEIL) {
+          if (avgProblemTime >= EASY_CEIL) {
+            if (avgProblemTime >= MEDIUM_CEIL) {
               problem.difficulty = "HARD";
+            } else {
+              problem.difficulty = "MEDIUM";
+            }
+          }
+          break;
+        case "MEDIUM":
+          if (avgProblemTime >= MEDIUM_CEIL) {
+            problem.difficulty = "HARD";
+          } else if (avgProblemTime < EASY_CEIL) {
+            problem.difficulty = "EASY";
+          }
+        case "HARD":
+          if (avgProblemTime < MEDIUM_CEIL) {
+            if (avgProblemTime < EASY_CEIL) {
+              problem.difficulty = "EASY";
             } else {
               problem.difficulty = "MEDIUM";
             }
@@ -264,6 +275,7 @@ exports.getProblemForUser = async (req, res, next) => {
   const subject = req.body.subject;
   const subtopicName = req.body.subtopicName;
   const difficulty = req.body.difficulty;
+  var answer;
   var problem = await Problem.findOneAndUpdate(
     {
       subtopicName: subtopicName,
@@ -295,7 +307,11 @@ exports.getProblemForUser = async (req, res, next) => {
               },
             }
           );
-          return res.status(200).json({ success: true, data: problem });
+          answer = await Answer.findOne({ problemId: problem._id });
+          return res.status(200).json({
+            success: true,
+            data: { problem, correctAnswer: answer.body },
+          });
         } catch (err) {
           return res.status(400).json({ success: false, error: err });
         }
@@ -310,7 +326,10 @@ exports.getProblemForUser = async (req, res, next) => {
           .json({ success: false, error: "Problem out of stock" });
     }
   } else {
-    return res.status(200).json({ success: true, data: problem });
+    answer = await Answer.findOne({ problemId: problem._id });
+    return res
+      .status(200)
+      .json({ success: true, data: { problem, correctAnswer: answer.body } });
   }
 };
 

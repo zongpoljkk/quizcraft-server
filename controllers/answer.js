@@ -18,23 +18,26 @@ exports.getAnswer = (req, res, next) => {
   // answer.save();
   console.log(math.evaluate("2^4"));
   console.log("Got in to getAnswer");
-  const problemId = req.params.problemId;
+  const problemId = req.query.problemId;
   const userId = req.query.userId;
   const userAnswer = req.query.userAnswer;
   const topic = req.query.topic;
+  console.log(`problemId: ${problemId}`);
   Answer.findOne({ problemId: problemId })
     .populate("problemId", "difficulty")
     .exec((err, answer) => {
-      console.log(answer);
+      console.log(`answer: ${answer}`);
       if (err) {
         console.log(`errrrror`);
         res.status(500).send({ error: err });
-      } 
-      else if (!answer) {
-        res.status(400).send("The answer with the given id was not found");
+      } else if (!answer) {
+        res
+          .status(400)
+          .send("The answer with the given problem id was not found");
         return;
       } else {
         console.log("Not Error");
+        // console.log(math.evaluate())
         if (
           userAnswer === answer.body ||
           (topic === "การดำเนินการของเลขยกกำลัง" &&
@@ -44,6 +47,10 @@ exports.getAnswer = (req, res, next) => {
           const user = User.findById(userId)
             .exec()
             .then((user) => {
+              console.log(`user ${user}`);
+              console.log(
+                `answer.problem.difficulty: ${answer.problemId.difficulty}`
+              );
               switch (answer.problemId.difficulty) {
                 case "EASY":
                   user.coin += 10;
@@ -58,9 +65,13 @@ exports.getAnswer = (req, res, next) => {
               user.save();
             });
 
-          res.send({ correct: true, solution: answer.solution });
+          // res.send({ correct: true, solution: answer.solution });
+          // res.send({});
+          return { correct: true, solution: answer.solution };
         } else {
-          res.send({ correct: false, solution: answer.solution });
+          // res.send({ correct: false, solution: answer.solution });
+          // res.send({});
+          return { correct: false, solution: answer.solution };
         }
       }
 
