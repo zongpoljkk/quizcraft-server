@@ -1,13 +1,9 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const ProblemSchema = new Schema({
   body: {
     type: String,
-    required: true,
-  },
-  subtopicId: {
-    type: Schema.Types.ObjectId,
     required: true,
   },
   subtopicName: {
@@ -16,14 +12,32 @@ const ProblemSchema = new Schema({
   },
   difficulty: {
     type: String,
-    enum: ['EASY','MEDIUM','HARD'],
+    enum: ["EASY", "MEDIUM", "HARD"],
     required: true,
   },
-  avgTime: {
-    type: Schema.Types.Decimal128,
+  times: [
+    {
+      type: Schema.Types.Decimal128,
+      required: true,
+    },
+  ],
+  users: [
+    {
+      type: Schema.Types.ObjectId,
+    },
+  ],
+  answerType: {
+    type: String,
     required: true,
-    default: 0,
+    enum: ["MATH_INPUT","SELECT_ONE","RADIO_CHOICE"],
+  },
+  choices: [{
+    type: String
+  }],
+  title: {
+    type:String,
+    required: true
   }
-})
+});
 
-module.exports = mongoose.model('Problem', ProblemSchema);
+module.exports = mongoose.model("Problem", ProblemSchema);
