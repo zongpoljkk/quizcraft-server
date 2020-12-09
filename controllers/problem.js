@@ -177,7 +177,9 @@ exports.putDifficultyIndex = async (req, res, next) => {
       // getAnswer(req, res, next).then((returnedSolution) => {ƒ
       // console.log(`returnedSolution: ${returnedSolution}`);
       problem.times = [...problem.times, userTime];
-      problem.users = [...problem.users, user];
+      if (!problem.users.includes(user)) {
+        problem.users = [...problem.users, user];
+      }
       // });
       // update problem times and user Array
 
@@ -273,6 +275,7 @@ exports.putDifficultyIndex = async (req, res, next) => {
         new_difficulty: new_difficulty,
         correct: correct,
         solution: solution,
+        user: user,
       });
       // });
       next();
