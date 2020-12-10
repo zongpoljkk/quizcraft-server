@@ -9,6 +9,7 @@ const cors = require('cors')
 const problemRouter = require('./routes/problem');
 const subtopicRouter = require('./routes/subtopic');
 const hintRouter = require('./routes/hint');
+const userRouter = require('./routes/user');
 
 mongoose.connect(keys.mongoURI, () => {
     console.log("Connected to db")
@@ -37,6 +38,7 @@ app.listen(PORT, () => console.log('Server is running'));
 app.use('/api/problem', problemRouter);
 app.use('/api/subtopic', subtopicRouter);
 app.use('/api/hint', hintRouter);
+app.use('/api/user', userRouter);
 
 // app.use((req, res, next) => {
 //   res.status(404).render('404', { pageTitle: ' Page Not Found'});

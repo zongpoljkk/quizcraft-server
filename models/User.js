@@ -8,6 +8,7 @@ const UserSchema = new Schema({
   },
   username: {
     type: String,
+    unique: true
   },
   school: {
     type: String,
@@ -47,9 +48,6 @@ const UserSchema = new Schema({
   archievements: [{
     type: Schema.Types.ObjectId,
     ref: 'Archievement'
-  }],
-  tips: [{
-    type: String,
   }]
 });
 
