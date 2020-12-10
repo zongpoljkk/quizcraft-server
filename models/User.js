@@ -42,12 +42,22 @@ const UserSchema = new Schema({
     required: true,
   },
   items: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Item',  
+    itemID: {
+      type: Schema.Types.ObjectId,
+      ref: 'Item'
+    },
+    amount: {
+      type: Number,
+    }
   }],
-  archievements: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Archievement'
+  achievements: [{
+    achievementID:{
+      type: Schema.Types.ObjectId,
+      ref: 'Achievement'
+    },
+    score: {
+      type: Number,
+    }
   }]
 });
 
