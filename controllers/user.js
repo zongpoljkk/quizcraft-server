@@ -1,4 +1,6 @@
+const Item = require("../models/Item");
 const User = require("../models/User");
+const { getAllItems } = require("./item");
 
 //Add user for testing
 exports.addUser = (req, res, next) => {
@@ -26,13 +28,13 @@ exports.getAllUsers = async (req, res) => {
 };
 
 exports.getProfileByUID = async (req, res) => {
-  var mongoose = require('mongoose');
+  var mongoose = require("mongoose");
   const _id = req.query._id;
   await User.aggregate(
     [
       {
         $match: {
-          _id: mongoose.Types.ObjectId(_id)
+          _id: mongoose.Types.ObjectId(_id),
         },
       },
       {
@@ -40,15 +42,41 @@ exports.getProfileByUID = async (req, res) => {
           from: "items",
           localField: "items.itemID",
           foreignField: "_id",
-          as: "items",
+          as: "fromItems",
         },
       },
       {
-        $lookup: {
-          from: "achievements",
-          localField: "achievements.achievementID",
-          foreignField: "_id",
-          as: "achievements",
+        $addFields: {
+          itemInfos: {
+            $map: {
+              input: "$items",
+              as: "item",
+              in: {
+                $mergeObjects: [
+                  "$$item",
+                  {
+                    $arrayElemAt: [
+                      {
+                        $filter: {
+                          input: "$fromItems",
+                          as: "fromItem",
+                          cond: { $eq: ["$$fromItem._id", "$$item.itemID"] },
+                        },
+                      },
+                      0,
+                    ],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          items: 0,
+          fromItems: 0,
+          achievements: 0,
         },
       },
     ],
