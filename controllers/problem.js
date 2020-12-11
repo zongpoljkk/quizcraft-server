@@ -2,7 +2,7 @@ const Problem = require("../models/Problem");
 const Subtopic = require("../models/Subtopic");
 const Answer = require("../models/Answer");
 const Hint = require("../models/Hint");
-const { mathGenerate } = require("./mathProblemGenerator");
+const { mathGenerate } = require("./mathProblem/mathProblemGenerator");
 
 exports.getAllProblems = (req, res, next) => {
   Problem.find().exec((err, problems) => {
