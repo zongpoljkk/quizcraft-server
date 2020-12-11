@@ -3,6 +3,8 @@ const Subtopic = require("../models/Subtopic");
 const Answer = require("../models/Answer");
 const Hint = require("../models/Hint");
 const { mathGenerate } = require("./mathProblem/mathProblemGenerator");
+const MATH = "คณิตศาสตร์";
+const ENG = "ภาษาอังกฤษ";
 
 exports.getAllProblems = (req, res, next) => {
   Problem.find().exec((err, problems) => {
@@ -58,13 +60,38 @@ exports.generateProblem = async (req, res, next) => {
 };
 
 exports.getProblemForUser = async (req, res, next) => {
+  const userId = req.body.userId;
+  const subject = req.body.subject;
   const subtopicName = req.body.subtopicName;
   const difficulty = req.body.difficulty;
-  const userId = req.body.userId;
-  res.send("TODO");
+  var answer;
+  var problem = await Problem.findOneAndUpdate({subtopicName:subtopicName, difficulty:difficulty,users:{$ne:userId}}, 
+                                                { $push: { users: userId } }, {projection:{users:0,times:0,subtopicName:0,difficulty:0}});
+	if (problem == null) { //generate problem
+		switch (subject) {
+			case MATH:
+				try{
+					await mathGenerate({subtopicName,difficulty});
+					problem = await Problem.findOneAndUpdate({subtopicName:subtopicName, difficulty:difficulty,users:{$ne:userId}}, 
+            { $push: { users: userId } }, {projection:{users:0, times:0, subtopicName:0, difficulty:0}});
+          answer = await Answer.findOne({problemId:problem._id});
+					return res.status(200).json({ success: true, data: {problem, correctAnswer: answer.body}  });
+				} catch (err) {
+					return res.status(400).json({ success: false, error: err });
+				}
+			case ENG: 
+				//TODO: Generate problem
+				return res.status(404).json({ success: false, error: "Problem out of stock" });
+			default:
+				return res.status(404).json({ success: false, error: "Problem out of stock" });
+		}
+	}else{
+    answer = await Answer.findOne({problemId:problem._id});
+		return res.status(200).json({ success: true, data: {problem, correctAnswer: answer.body} });
+	}
 };
 
-// For testing
+// For testing: Mock database
 exports.addProblemAnswerHint = async (req, res, next) => {
   const problem = req.body.problem;
   const answerBody = req.body.answer.body;
