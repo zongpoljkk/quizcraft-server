@@ -1,18 +1,19 @@
 // import express from 'express';
-const express = require('express');
-const mongoose = require('mongoose');
-const cookieSession = require('cookie-session');
-const keys = require('./config/keys');
+const express = require("express");
+const mongoose = require("mongoose");
+const cookieSession = require("cookie-session");
+const keys = require("./config/keys");
 const bodyParser = require("body-parser");
-const cors = require('cors')
+const cors = require("cors");
 
-const problemRouter = require('./routes/problem');
-const subtopicRouter = require('./routes/subtopic');
-const practiceRouter = require('./routes/practice');
-const hintRouter = require('./routes/hint');
+const problemRouter = require("./routes/problem");
+const leaderboardRouter = require("./routes/leaderBoard");
+const subtopicRouter = require("./routes/subtopic");
+const practiceRouter = require("./routes/practice");
+const hintRouter = require("./routes/hint");
 
 mongoose.connect(keys.mongoURI, () => {
-    console.log("Connected to db")
+  console.log("Connected to db");
 });
 
 // Listen to node and route http request to the route handler
@@ -26,19 +27,22 @@ app.use(
   })
 );
 
-app.use(cors({
-  origin: 'http://localhost:3000'
-}));
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+  })
+);
 
 // In develpment use port 5000
 // In production use provided port from Heroku
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log('Server is running'));
+app.listen(PORT, () => console.log("Server is running"));
 
 app.use("/api/practice", practiceRouter);
-app.use('/api/problem', problemRouter);
-app.use('/api/subtopic', subtopicRouter);
-app.use('/api/hint', hintRouter);
+app.use("/api/leader-board", leaderboardRouter);
+app.use("/api/problem", problemRouter);
+app.use("/api/subtopic", subtopicRouter);
+app.use("/api/hint", hintRouter);
 
 // app.use((req, res, next) => {
 //   res.status(404).render('404', { pageTitle: ' Page Not Found'});
