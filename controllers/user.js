@@ -25,26 +25,14 @@ exports.getAllUsers = async (req, res) => {
     .catch((err) => console.log(err));
 };
 
-// exports.getProfileByUID = (req, res) => {
-//   User.findOne({ _id: req.query._id }, (err, user) => {
-//     if(err) {
-//       return res.status(500).json({ success: false, error: err })
-//     }
-//     else if (!user) {
-//       return res
-//         .status(400)
-//         .json({ success: false, error: `User not found` })
-//     }
-//     else return res.status(200).json({ success: true, data: user })
-//   });
-// }
-
 exports.getProfileByUID = async (req, res) => {
+  var mongoose = require('mongoose');
+  const _id = req.query._id;
   await User.aggregate(
     [
       {
         $match: {
-          username: req.query.username //should be id
+          _id: mongoose.Types.ObjectId(_id)
         },
       },
       {
