@@ -122,6 +122,7 @@ exports.EditUsername = async (req, res) => {
       })
       .catch((error) => {
         return res.status(404).json({
+          success: false,
           error,
           message: "Username not updated!",
         });
