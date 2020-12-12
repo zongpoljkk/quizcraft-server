@@ -89,7 +89,7 @@ exports.getProfileByUID = async (req, res) => {
     })
 };
 
-exports.EditUsername = async (req, res) => {
+exports.editUsername = async (req, res) => {
   const body = req.body;
   if (!body) {
     return res.status(400).json({
