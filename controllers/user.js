@@ -1,6 +1,5 @@
 const Item = require("../models/Item");
 const User = require("../models/User");
-const { getAllItems } = require("./item");
 
 //Add user for testing
 exports.addUser = (req, res, next) => {
@@ -90,4 +89,42 @@ exports.getProfileByUID = async (req, res) => {
       return res.status(200).json({ success: true, data: user });
     }
   ).catch((err) => console.log(err));
+};
+
+exports.EditUsername = async (req, res) => {
+  const body = req.body;
+  if (!body) {
+    return res.status(400).json({
+      success: false,
+      error: "You must provide a body to update",
+    });
+  }
+
+  User.findOne({ _id: req.body._id }, (err, user) => {
+    if (err) {
+      return res.status(404).json({
+        err,
+        message: "User not found!",
+      });
+    }
+    user.username = body.username;
+
+    user
+      .save()
+      .then(() => {
+        var newUsername = new User({ _id: user.id, username: user.username });
+        newUsername.save();
+        return res.status(200).json({
+          success: true,
+          data: { _id: user._id, username: user.username },
+        });
+      })
+      .catch((error) => {
+        return res.status(404).json({
+          success: false,
+          error,
+          message: "Username not updated!",
+        });
+      });
+  });
 };
