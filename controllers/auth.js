@@ -1,7 +1,57 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const config = require("../config/keys")
+const config = require("../config/keys");
+const passport = require("passport");
+const OAuth2Strategy = require("passport-oauth2");
+const axios = require('axios');
+
+const tokenURL = "https://www.mycourseville.com/api/oauth/access_token";
+const userURL = "https://www.mycourseville.com/api/v1/users/me"
+
+exports.loginViaMCV = async (req, res) => {
+  //redirect
+  var accessToken;
+  var refreshToken;
+  const code = req.query.code;
+  const data = {
+    grant_type: "authorization_code",
+    client_id: config.mcvClientId,
+    client_secret: config.mcvClientSecret,
+    redirect_uri: "http://localhost:5000/api/auth/mcv-callback",
+    code: code
+  }
+  const headers = {
+    accept: "application/json"
+  }
+  await axios.post(tokenURL, data, {headers: headers}
+    ).then((res) => {
+      accessToken = res.access_token;
+      refreshToken = res.refresh_token;
+    })
+  
+  //get info from mcv
+  const requestHeader = {
+    Authorization: `Bearer ${accessToken}`,
+  }
+  let response = await axios.get(userURL, {headers: requestHeader});
+  console.log(response)
+  // passport.use(new OAuth2Strategy({
+  //   authorizationURL: "https://www.mycourseville.com/api/oauth/authorize",
+  //   tokenURL: "https://www.mycourseville.com/api/oauth/access_token",
+  //   clientID: config.mcvClientId,
+  //   clientSecret: config.mcvClientSecret,
+  //   callbackURL: "http://localhost:3000"
+  // },
+  // (access_token, refreshToken, profile, cb) => {
+  //   //TODO
+  //   //example
+  //   // User.findOrCreate({ exampleId: profile.id }, function (err, user) {
+  //   //   return cb(err, user);
+  //   // });
+  // }
+  // ));
+}
 
 exports.register = async (req,res) => {
   //Hash password
@@ -35,6 +85,7 @@ exports.register = async (req,res) => {
     }
   });
 }
+
 
 exports.login = async (req,res) => {
   try {
