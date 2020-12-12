@@ -9,6 +9,10 @@ const UserSchema = new Schema({
   username: {
     type: String,
   },
+  password: {
+    type: String,
+    select: false,
+  },
   school: {
     type: String,
     required: true,
@@ -21,14 +25,17 @@ const UserSchema = new Schema({
     type: String,
     required: true,
     enum: ['BRONZE','SILVER','GOLD','DIAMOND'],
+    default: 'BRONZE',
   },
   level: {
     type: Number,
     required: true,
+    default: 1,
   },
   coin: {
     type: Number,
     required: true,
+    default: 0,
   },
   photo: {
     type: String,
@@ -39,6 +46,7 @@ const UserSchema = new Schema({
   streak: {
     type: Number,
     required: true,
+    default: 0,
   },
   items: [{
     type: Schema.Types.ObjectId,
@@ -50,7 +58,13 @@ const UserSchema = new Schema({
   }],
   tips: [{
     type: String,
-  }]
+  }],
+  role: {
+    type: String,
+    required: true,
+    enum: ['ADMIN','USER'],
+    default: 'USER',
+  }
 });
 
 module.exports = mongoose.model('User', UserSchema);
