@@ -128,3 +128,27 @@ exports.EditUsername = async (req, res) => {
       });
   });
 };
+
+exports.usedItem = async (req, res) => {
+  const body = req.body;
+  if (!body) {
+    return res.status(400).json({
+      success: false,
+      error: "You must provide a body to update",
+    });
+  }
+
+  User.findOneAndUpdate(
+    { _id: req.body.userId, "items.itemID": req.body.itemId },
+    { $inc: { "items.$.amount" : -1 } }, 
+    { returnNewDocument: true }, 
+    (err, user) => {
+      if (err) {
+        return res.status(500).json({ success: false, error: err });
+      }
+      if (!user) {
+        return res.status(400).json({ success: false, data: "no data" });
+      }
+      return res.status(200).json({ success: true, data: user });
+  });
+};
