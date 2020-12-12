@@ -23,7 +23,6 @@ exports.getAllUsers = async (req, res) => {
       }
       return res.status(200).json({ success: true, data: users });
     })
-    .catch((err) => console.log(err));
 };
 
 exports.getProfileByUID = async (req, res) => {
@@ -87,8 +86,7 @@ exports.getProfileByUID = async (req, res) => {
         return res.status(400).json({ success: false, data: "no users" });
       }
       return res.status(200).json({ success: true, data: user });
-    }
-  ).catch((err) => console.log(err));
+    })
 };
 
 exports.EditUsername = async (req, res) => {
@@ -100,7 +98,7 @@ exports.EditUsername = async (req, res) => {
     });
   }
 
-  User.findOne({ _id: req.body._id }, (err, user) => {
+  User.findOne({ _id: req.body.userId }, (err, user) => {
     if (err) {
       return res.status(404).json({
         err,
@@ -112,17 +110,17 @@ exports.EditUsername = async (req, res) => {
     user
       .save()
       .then(() => {
-        var newUsername = new User({ _id: user.id, username: user.username });
+        var newUsername = new User({ _id: user._id, username: user.username });
         newUsername.save();
         return res.status(200).json({
           success: true,
-          data: { _id: user._id, username: user.username },
+          data: {  userId: user._id, username: user.username },
         });
       })
-      .catch((error) => {
+      .catch((err) => {
         return res.status(404).json({
           success: false,
-          error,
+          err,
           message: "Username not updated!",
         });
       });
