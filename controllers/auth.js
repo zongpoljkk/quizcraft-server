@@ -36,6 +36,9 @@ exports.loginViaMCV = async (req, res) => {
   }
   let response = await axios.get(userURL, {headers: requestHeader});
   console.log(response)
+  //response contain user data such as id that will be map to smartSchoolAccount in User schema
+  //have to check that user already have in database or not if not create and save then sign token to user
+
   // passport.use(new OAuth2Strategy({
   //   authorizationURL: "https://www.mycourseville.com/api/oauth/authorize",
   //   tokenURL: "https://www.mycourseville.com/api/oauth/access_token",
@@ -85,7 +88,6 @@ exports.register = async (req,res) => {
     }
   });
 }
-
 
 exports.login = async (req,res) => {
   try {
