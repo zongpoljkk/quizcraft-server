@@ -13,12 +13,11 @@ exports.getLeaderBoard = async (req, res, next) => {
         res.status(400).send("The user with the given userId was not found");
         return;
       }
-      console.log(user);
       const classroom = user.class;
       const school = user.school;
       // * Same School * //
       User.find({ school: school })
-        .select("_id username level")
+        .select("_id username level class")
         .exec((err, users) => {
           if (err) {
             res.status(500).send({ error: err });
@@ -28,12 +27,22 @@ exports.getLeaderBoard = async (req, res, next) => {
           }
 
           let copyUsers = users.slice(0);
-          const sortedUsers = copyUsers.sort((a, b) => {
+          const bySchool = copyUsers.sort((a, b) => {
             return b.level - a.level;
           });
-          console.log(sortedUsers);
+          console.log(bySchool);
 
-          res.send(sortedUsers);
+          const classroomUsers = copyUsers.filter((user) => {
+            return user.class === classroom;
+          });
+
+          const byClassroom = classroomUsers.sort((a, b) => {
+            return b.level - a.level;
+          });
+
+          console.log(byClassroom);
+
+          res.send(bySchool);
         });
 
       // res.send(user);
