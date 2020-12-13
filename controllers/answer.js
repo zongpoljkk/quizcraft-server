@@ -58,15 +58,28 @@ exports.getAnswer = async (req, res, next) => {
               const levelDictionary = new Object();
 
               for (const i of Array(levels).keys()) {
-                console.log(i);
                 const old_xp = Math.round(A * Math.exp(B * i));
                 const new_xp = Math.round(A * Math.exp(B * (i + 1)));
-                console.log(new_xp - old_xp);
                 levelDictionary[i + 1] = new_xp - old_xp;
               }
 
               console.log(levelDictionary);
 
+              // Compare user exp if it exceeds the limit of his/her level
+              console.log(user.level);
+              console.log(user.exp);
+              console.log(levelDictionary[parseInt(user.level)]);
+              let level_up;
+              if (user.exp >= levelDictionary[parseInt(user.level)]) {
+                if (user.level == 40) {
+                } else {
+                  level_up = true;
+                  user.exp -= levelDictionary[parseInt(user.level)];
+                  user.level += 1;
+                }
+              } else {
+                level_up = false;
+              }
               user.save();
               const returnedSolution = {
                 correct: true,
@@ -76,6 +89,7 @@ exports.getAnswer = async (req, res, next) => {
               req.correct = returnedSolution.correct;
               req.solution = returnedSolution.solution;
               req.user = returnedSolution.user._id;
+              req.level_up = level_up;
               next();
             });
         } else {
@@ -90,6 +104,7 @@ exports.getAnswer = async (req, res, next) => {
               req.correct = returnedSolution.correct;
               req.solution = returnedSolution.solution;
               req.user = returnedSolution.user._id;
+              req.level_up = level_up;
               next();
             });
         }

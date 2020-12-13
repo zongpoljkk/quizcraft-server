@@ -58,6 +58,7 @@ exports.putDifficultyIndex = async (req, res, next) => {
   const correct = req.correct;
   const solution = req.solution;
   const user = req.user;
+  const level_up = req.level_up;
 
   Problem.findById(problemId).exec(async (err, problem) => {
     if (err) res.status(500).send("Internal Server Error");
@@ -124,6 +125,7 @@ exports.putDifficultyIndex = async (req, res, next) => {
     switch (problem.difficulty) {
       case "EASY":
         earned_coins = 10;
+        earned_exp = 10;
         if (avgProblemTime >= EASY_CEIL) {
           if (avgProblemTime >= MEDIUM_CEIL) {
             problem.difficulty = "HARD";
@@ -134,6 +136,7 @@ exports.putDifficultyIndex = async (req, res, next) => {
         break;
       case "MEDIUM":
         earned_coins = 20;
+        earned_exp = 20;
         if (avgProblemTime >= MEDIUM_CEIL) {
           problem.difficulty = "HARD";
         } else if (avgProblemTime < EASY_CEIL) {
@@ -141,6 +144,7 @@ exports.putDifficultyIndex = async (req, res, next) => {
         }
       case "HARD":
         earned_coins = 30;
+        earned_exp = 30;
         if (avgProblemTime < MEDIUM_CEIL) {
           if (avgProblemTime < EASY_CEIL) {
             problem.difficulty = "EASY";
@@ -159,6 +163,8 @@ exports.putDifficultyIndex = async (req, res, next) => {
       solution: solution,
       user: user,
       earned_coins: earned_coins,
+      earned_exp: earned_exp,
+      level_up: level_up,
     });
     // });
     next();
