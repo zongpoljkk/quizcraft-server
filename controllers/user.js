@@ -1,86 +1,129 @@
-const User = require("../models/User");
+const Item = require("../models/Item");
 
-exports.getLeaderBoard = async (req, res, next) => {
-  const userId = req.query.userId;
-  console.log(userId);
+//Add user for testing
+exports.addUser = (req, res, next) => {
+  const user = new User(req.body);
+  user.save((err, newUser) => {
+    if (err) res.send(err);
+    else if (!newUser) res.send(400);
+    else res.send(newUser);
+    next();
+  });
+};
 
-  // ? Global ? //
-  User.find({})
-    .select("_id, username level class")
+exports.getAllUsers = async (req, res) => {
+  await User.find()
     .exec((err, users) => {
       if (err) {
-        res.status(500).send({ error: err });
-      } else if (!users) {
-        res.status(400).send("Unable to get all users");
-        return;
+        return res.status(500).json({ success: false, error: err });
       }
+      if (!users.length) {
+        return res.status(400).json({ success: false, data: "no users" });
+      }
+      return res.status(200).json({ success: true, data: users });
+    })
+    .catch((err) => console.log(err));
+};
 
-      let copyUsers = users.slice(0);
-      const byAll = copyUsers.sort((a, b) => {
-        return b.level - a.level;
-      });
-      const indexGlobal = byAll.findIndex((user) => {
-        return user._id == userId;
-      });
+exports.getProfileByUID = async (req, res) => {
+  var mongoose = require("mongoose");
+  const _id = req.query._id;
+  await User.aggregate(
+    [
+      {
+        $match: {
+          _id: mongoose.Types.ObjectId(_id),
+        },
+      },
+      {
+        $lookup: {
+          from: "items",
+          localField: "items.itemID",
+          foreignField: "_id",
+          as: "fromItems",
+        },
+      },
+      {
+        $addFields: {
+          itemInfos: {
+            $map: {
+              input: "$items",
+              as: "item",
+              in: {
+                $mergeObjects: [
+                  "$$item",
+                  {
+                    $arrayElemAt: [
+                      {
+                        $filter: {
+                          input: "$fromItems",
+                          as: "fromItem",
+                          cond: { $eq: ["$$fromItem._id", "$$item.itemID"] },
+                        },
+                      },
+                      0,
+                    ],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          items: 0,
+          fromItems: 0,
+          achievements: 0,
+        },
+      },
+    ],
+    (err, user) => {
+      if (err) {
+        return res.status(500).json({ success: false, error: err });
+      }
+      if (!user.length) {
+        return res.status(400).json({ success: false, data: "no users" });
+      }
+      return res.status(200).json({ success: true, data: user });
+    }
+  ).catch((err) => console.log(err));
+};
 
-      User.findById(userId)
-        .select("_id school class")
-        .exec((err, user) => {
-          if (err) {
-            res.status(500).send({ error: err });
-          } else if (!user) {
-            res
-              .status(400)
-              .send("The user with the given userId was not found");
-            return;
-          }
-          const classroom = user.class;
-          const school = user.school;
-
-          // * Same School * //
-          User.find({ school: school })
-            .select("_id username level class")
-            .exec((err, users) => {
-              if (err) {
-                res.status(500).send({ error: err });
-              } else if (!user) {
-                res
-                  .status(400)
-                  .send("The user with the given school name was not found");
-                return;
-              }
-
-              let copyUsers = users.slice(0);
-              const bySchool = copyUsers.sort((a, b) => {
-                return b.level - a.level;
-              });
-
-              const indexSchool = bySchool.findIndex((user) => {
-                return user._id == userId;
-              });
-
-              const classroomUsers = copyUsers.filter((user) => {
-                return user.class === classroom;
-              });
-
-              const byClassroom = classroomUsers.sort((a, b) => {
-                return b.level - a.level;
-              });
-
-              const indexClassroom = byClassroom.findIndex((user) => {
-                return user._id == userId;
-              });
-
-              res.send({
-                byAll: byAll,
-                bySchool: bySchool,
-                byClassroom: byClassroom,
-                indexGlobal: indexGlobal,
-                indexSchool: indexSchool,
-                indexClassroom: indexClassroom,
-              });
-              next();
-            });
-        });
+exports.EditUsername = async (req, res) => {
+  const body = req.body;
+  if (!body) {
+    return res.status(400).json({
+      success: false,
+      error: "You must provide a body to update",
     });
+  }
+
+  User.findOne({ _id: req.body._id }, (err, user) => {
+    if (err) {
+      return res.status(404).json({
+        err,
+        message: "User not found!",
+      });
+    }
+    user.username = body.username;
+
+    user
+      .save()
+      .then(() => {
+        var newUsername = new User({ _id: user.id, username: user.username });
+        newUsername.save();
+        return res.status(200).json({
+          success: true,
+          data: { _id: user._id, username: user.username },
+        });
+      })
+      .catch((error) => {
+        return res.status(404).json({
+          success: false,
+          error,
+          message: "Username not updated!",
+        });
+      });
+  });
 };
