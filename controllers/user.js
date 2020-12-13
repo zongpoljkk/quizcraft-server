@@ -128,3 +128,33 @@ exports.EditUsername = async (req, res) => {
       });
   });
 };
+
+exports.getAmountOfItems = (req, res) => {
+  const userId = req.query.userId;
+  User.findById(userId)
+    .select("_id items")
+    .exec((err, user) => {
+      if (err) {
+        return res.status(500).json({ error: err });
+      } else if (!user) {
+        return res.status(400).json("Unable to find user with the given id");
+      }
+      let hint = 0;
+      let skip = 0;
+      let refresh = 0;
+      user.items.forEach((item) => {
+        switch (item.name) {
+          case "Hint":
+            hint++;
+            break;
+          case "Skip":
+            skip++;
+            break;
+          case "Refresh":
+            refresh++;
+            break;
+        }
+      });
+      res.send({ hint: hint, skip: skip, refresh: refresh });
+    });
+};
