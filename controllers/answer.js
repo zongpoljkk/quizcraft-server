@@ -63,12 +63,7 @@ exports.getAnswer = async (req, res, next) => {
                 levelDictionary[i + 1] = new_xp - old_xp;
               }
 
-              console.log(levelDictionary);
-
               // Compare user exp if it exceeds the limit of his/her level
-              console.log(user.level);
-              console.log(user.exp);
-              console.log(levelDictionary[parseInt(user.level)]);
               let level_up;
               if (user.exp >= levelDictionary[parseInt(user.level)]) {
                 if (user.level == 40) {
