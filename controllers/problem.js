@@ -53,9 +53,9 @@ exports.getProblems = (req, res, next) => {
   });
 };
 
-exports.putDifficultyIndex = async (req, res, next) => {
-  const problemId = req.query.problemId;
-  const userTime = req.query.userTime;
+exports.checkAnswerAndUpdateDifficulty = async (req, res, next) => {
+  const problemId = req.body.problemId;
+  const userTime = req.body.userTime;
   const correct = req.correct;
   const solution = req.solution;
   const user = req.user;

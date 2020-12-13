@@ -4,11 +4,11 @@ const { use } = require("passport");
 const Answer = require("../models/Answer");
 const User = require("../models/User");
 
-exports.getAnswer = async (req, res, next) => {
-  const problemId = req.query.problemId;
-  const userId = req.query.userId;
-  const userAnswer = req.query.userAnswer;
-  const subtopic = req.query.subtopic;
+exports.checkAnswer = async (req, res, next) => {
+  const problemId = req.body.problemId;
+  const userId = req.body.userId;
+  const userAnswer = req.body.userAnswer;
+  const subtopic = req.body.subtopic;
   Answer.findOne({ problemId: problemId })
     .populate("problemId", "difficulty")
     .exec((err, answer) => {
