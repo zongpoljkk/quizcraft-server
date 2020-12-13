@@ -2,8 +2,7 @@ const Problem = require("../models/Problem");
 const Subtopic = require("../models/Subtopic");
 const Answer = require("../models/Answer");
 const Hint = require("../models/Hint");
-const { mathGenerate } = require("./mathProblemGenerator");
-const { getAnswer } = require("./answer");
+const { mathGenerate } = require("./mathProblem/mathProblemGenerator");
 const MATH = "คณิตศาสตร์";
 const ENG = "ภาษาอังกฤษ";
 
@@ -123,8 +122,12 @@ exports.putDifficultyIndex = async (req, res, next) => {
 
     const current_difficulty = problem.difficulty;
 
+    // Dealing with returned earned coin
+    let earned_coins = 0;
+
     switch (problem.difficulty) {
       case "EASY":
+        earned_coins = 10;
         if (avgProblemTime >= EASY_CEIL) {
           if (avgProblemTime >= MEDIUM_CEIL) {
             problem.difficulty = "HARD";
@@ -134,12 +137,14 @@ exports.putDifficultyIndex = async (req, res, next) => {
         }
         break;
       case "MEDIUM":
+        earned_coins = 20;
         if (avgProblemTime >= MEDIUM_CEIL) {
           problem.difficulty = "HARD";
         } else if (avgProblemTime < EASY_CEIL) {
           problem.difficulty = "EASY";
         }
       case "HARD":
+        earned_coins = 30;
         if (avgProblemTime < MEDIUM_CEIL) {
           if (avgProblemTime < EASY_CEIL) {
             problem.difficulty = "EASY";
@@ -157,6 +162,7 @@ exports.putDifficultyIndex = async (req, res, next) => {
       correct: correct,
       solution: solution,
       user: user,
+      earned_coins: earned_coins,
     });
     // });
     next();
