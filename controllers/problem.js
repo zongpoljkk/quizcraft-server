@@ -70,10 +70,6 @@ exports.putDifficultyIndex = async (req, res, next) => {
       next();
     }
 
-    // const returnedSolution = await getAnswer(req, res, next);
-
-    // getAnswer(req, res, next).then((returnedSolution) => {ƒ
-    // console.log(`returnedSolution: ${returnedSolution}`);
     problem.times = [...problem.times, userTime];
     if (!problem.users.includes(user)) {
       problem.users = [...problem.users, user];

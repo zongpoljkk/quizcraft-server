@@ -1,5 +1,4 @@
 const math = require("mathjs");
-const { use } = require("passport");
 
 const Answer = require("../models/Answer");
 const User = require("../models/User");
@@ -26,9 +25,10 @@ exports.getAnswer = async (req, res, next) => {
           (subtopic === "การดำเนินการของเลขยกกำลัง" &&
             math.evaluate(userAnswer) === math.evaluate(answer.body))
         ) {
-          const user = User.findById(userId)
+          User.findById(userId)
             .exec()
             .then((user) => {
+              // console.log(user);
               switch (answer.problemId.difficulty) {
                 case "EASY":
                   user.coin += 10;

@@ -46,7 +46,7 @@ const UserSchema = new Schema({
   }],
   archievements: [{
     type: Schema.Types.ObjectId,
-    ref: 'Archievement'
+    ref: 'Achievement'
   }],
   tips: [{
     type: String,
