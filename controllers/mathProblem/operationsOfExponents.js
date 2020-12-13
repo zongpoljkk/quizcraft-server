@@ -1,23 +1,11 @@
-const Problem = require("../models/Problem");
-const Answer = require("../models/Answer");
-const Hint = require("../models/Hint");
+const Problem = require("../../models/Problem");
+const Answer = require("../../models/Answer");
+const Hint = require("../../models/Hint");
 const EASY = "EASY";
 const MEDIUM = "MEDIUM";
 const HARD = "HARD";
 const alphabet = "abcdefghijklmnopqrstuvwxyz";
 
-const mathGenerate = ({ subtopicName, difficulty }) => {
-  switch (subtopicName) {
-    case "ความหมายของเลขยกกำลัง":
-      return "Not Implement";
-    case "การดำเนินการของเลขยกกำลัง":
-      return genarateSubtopic2(subtopicName, difficulty);
-    case "สัญกรณ์วิทยาศาสตร์":
-      return genarateSubtopic3(subtopicName, difficulty);
-    default:
-      return "Default";
-  }
-};
 
 const baseSelector = () => {
   let rand = Math.floor(Math.random() * 4) + 1; //choose base
@@ -298,7 +286,7 @@ const genSolutionSubtopic2 = (baseList, degreeList, baseList2, degreeList2) => {
   return [out, baseListOut, degreeListOut];
 };
 
-const genarateSubtopic2 = async (subtopicName, difficulty) => {
+const generateOperationsOfExponents = async (subtopicName, difficulty) => {
   var termNum = randInt(2, 5, false); //random 2-5
   var problemBody = "", problemTitle = "จงทำเลขยกกำลังต่อไปนี้ให้เป็นรูปอย่างง่าย";
   var answerBody;
@@ -655,21 +643,11 @@ const genarateSubtopic2 = async (subtopicName, difficulty) => {
       }
 
     case HARD:
+      termNum = randInt(3, 6, false);
       return "genarateTestSubtopic HARD";
     default:
       return "genarateTestSubtopic default";
   }
 };
 
-const genarateSubtopic3 = async (subtopicName, difficulty) => {
-  switch (difficulty) {
-    case EASY:
-      return "Not Implement";
-    case MEDIUM:
-      return "Not Implement";
-    case HARD:
-      return "Not Implement";
-  }
-};
-
-module.exports = { mathGenerate };
+module.exports = {generateOperationsOfExponents};
