@@ -139,9 +139,16 @@ exports.usedItem = async (req, res) => {
   }
 
   User.findOneAndUpdate(
-    { _id: req.body.userId, "items.itemID": req.body.itemId },
+    { _id: req.body.userId, 
+      items: {
+        $elemMatch: { 
+          itemID: req.body.itemId,
+          amount: { $gt: 0 }
+        }
+      }
+    },
     { $inc: { "items.$.amount" : -1 } }, 
-    { returnNewDocument: true }, 
+    { new: true },
     (err, user) => {
       if (err) {
         return res.status(500).json({ success: false, error: err });
@@ -149,6 +156,6 @@ exports.usedItem = async (req, res) => {
       if (!user) {
         return res.status(400).json({ success: false, data: "no data" });
       }
-      return res.status(200).json({ success: true, data: user });
+      return res.status(200).json({ success: true, data: user.items });
   });
 };
