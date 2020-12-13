@@ -18,7 +18,11 @@ const AchievementSchema = new Schema({
   goal: {
     type: Number,
     required: true,
-  }
+  },
+  image: {
+    type: String,
+    default: null
+  },
 })
 
 module.exports = mongoose.model('Achievement', AchievementSchema);
