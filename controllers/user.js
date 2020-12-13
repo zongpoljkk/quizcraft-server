@@ -26,7 +26,14 @@ exports.getLeaderBoard = async (req, res, next) => {
             res.status(400).send("The school name was not found");
             return;
           }
-          res.send(users);
+
+          let copyUsers = users.slice(0);
+          const sortedUsers = copyUsers.sort((a, b) => {
+            return b.level - a.level;
+          });
+          console.log(sortedUsers);
+
+          res.send(sortedUsers);
         });
 
       // res.send(user);
