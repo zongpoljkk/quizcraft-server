@@ -29,17 +29,44 @@ exports.getAnswer = async (req, res, next) => {
           const user = User.findById(userId)
             .exec()
             .then((user) => {
+              // * Handle Earned coins * //
               switch (answer.problemId.difficulty) {
                 case "EASY":
+                  user.exp += 10;
                   user.coin += 10;
                   break;
                 case "MEDIUM":
+                  user.exp += 20;
                   user.coin += 20;
                   break;
                 case "HARD":
+                  user.exp += 30;
                   user.coin += 30;
                   break;
               }
+
+              // * Handle Level up * //
+              const levels = 40;
+              const exp_for_first_level = 100;
+              const exp_for_last_level = 100000;
+
+              const B =
+                Math.log(exp_for_last_level / exp_for_first_level) /
+                (levels - 1);
+              const A = exp_for_first_level / (Math.exp(B) - 1.0);
+
+              const levelDictionary = new Object();
+
+              for (const i of Array(levels).keys()) {
+                console.log(i);
+                const old_xp = Math.round(A * Math.exp(B * i));
+                const new_xp = Math.round(A * Math.exp(B * (i + 1)));
+                console.log(new_xp - old_xp);
+                levelDictionary[i + 1] = new_xp - old_xp;
+              }
+
+              console.log(levelDictionary);
+
               user.save();
               const returnedSolution = {
                 correct: true,
