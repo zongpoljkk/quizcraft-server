@@ -6,7 +6,6 @@ const { verifyRegister, authJwt } = require('../middlewares');
 const router = express.Router();
 
 router.post('/register', [verifyRegister],authController.register)
-router.get('/mcv-callback', authController.getCode)
 router.post('/login-via-mcv',authController.loginViaMCV)
 
 module.exports = router;

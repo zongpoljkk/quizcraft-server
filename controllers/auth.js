@@ -29,7 +29,7 @@ exports.loginViaMCV = async (req, res) => {
     grant_type: "authorization_code",
     client_id: config.mcvClientId,
     client_secret: config.mcvClientSecret,
-    redirect_uri: "http://localhost:5000/api/auth/mcv-callback",
+    redirect_uri: "http://localhost:3000/oauth/mcv-callback",
     code: code
   }
   await axios.post(tokenURL, data
@@ -87,14 +87,6 @@ exports.loginViaMCV = async (req, res) => {
     console.log('Cannot get data from MCVplatefrom');
     return res.status(400).json({ success: false, error: "Something went wrong!" });
   }
-}
-
-//for tesing
-exports.getCode = async (req, res) => {
-  //redirect
-  const code = req.query.code;
-  console.log("code",code);
-  return res.redirect('http://localhost:3000/login');
 }
 
 //for testing
