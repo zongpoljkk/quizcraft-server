@@ -98,9 +98,9 @@ exports.editUsername = async (req, res) => {
     });
   }
 
-  const regex = RegExp('^(?=[a-zA-Zก-๛_\d]*[a-zA-Zก-๛])[.-a-zA-Zก-๛0-9_\d]{5,12}$');
+  const regex = RegExp('^(?=[a-zA-Zก-๛_\d]*[a-zA-Zก-๛])[-a-zA-Zก-๛0-9_\d]{5,12}$');
   const usernameValidate = regex.test(body.username);
- 
+
   if (body.username == null || body.username == "" || body.username == " ") {
     return res.status(400).json({
       success: false,
@@ -115,11 +115,11 @@ exports.editUsername = async (req, res) => {
     });
   }
 
-  User.find({ username: req.body.username },(err, user) => {
+  User.findOne({ username: req.body.username },(err, user) => {
     if (err) {
       return res.status(500).json({ success: false, error: err });
     }
-    if (!user.length && usernameValidate) {
+    if (!user && usernameValidate) {
       User.findOneAndUpdate(
         { _id: req.body.userId },
         { username : req.body.username }, 
