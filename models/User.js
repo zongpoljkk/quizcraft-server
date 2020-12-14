@@ -52,22 +52,29 @@ const UserSchema = new Schema({
     default: 0,
   },
   items: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Item',  
-  }],
-  archievements: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Archievement'
-  }],
-  tips: [{
-    type: String,
+    itemID: {
+      type: Schema.Types.ObjectId,
+      ref: 'Item'
+    },
+    amount: {
+      type: Number,
+    }
   }],
   role: {
     type: String,
     required: true,
     enum: ['ADMIN','USER'],
     default: 'USER',
-  }
+  },
+  achievements: [{
+    achievementID:{
+      type: Schema.Types.ObjectId,
+      ref: 'Achievement'
+    },
+    score: {
+      type: Number,
+    }
+  }]
 });
 
 module.exports = mongoose.model('User', UserSchema);
