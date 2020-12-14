@@ -5,7 +5,6 @@ const cookieSession = require('cookie-session');
 const keys = require('./config/keys');
 const bodyParser = require("body-parser");
 const cors = require('cors');
-const passport = require("passport");
 
 const problemRouter = require('./routes/problem');
 const subtopicRouter = require('./routes/subtopic');
