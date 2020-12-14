@@ -7,13 +7,15 @@ const OAuth2Strategy = require("passport-oauth2");
 const axios = require('axios');
 
 const tokenURL = "https://www.mycourseville.com/api/oauth/access_token";
-const userURL = "https://www.mycourseville.com/api/v1/users/me"
+const userURL = "https://www.mycourseville.com/api/v1/public/users/me"
 
 exports.loginViaMCV = async (req, res) => {
   //redirect
   var accessToken;
   var refreshToken;
+  var mcvUserInfo;
   const code = req.query.code;
+  console.log("code",code)
   const data = {
     grant_type: "authorization_code",
     client_id: config.mcvClientId,
@@ -24,36 +26,33 @@ exports.loginViaMCV = async (req, res) => {
   const headers = {
     accept: "application/json"
   }
-  await axios.post(tokenURL, data, {headers: headers}
+  await axios.post(tokenURL, data
     ).then((res) => {
-      accessToken = res.access_token;
-      refreshToken = res.refresh_token;
-    })
+      accessToken = res.data.access_token;
+      refreshToken = res.data.refresh_token;
+      console.log("accessToken",accessToken)
+      console.log("refreshToken",refreshToken)
+    }).catch((err) => {
+      console.log("err post token")
+    });
   
   //get info from mcv
   const requestHeader = {
     Authorization: `Bearer ${accessToken}`,
   }
-  let response = await axios.get(userURL, {headers: requestHeader});
-  console.log(response)
-  //response contain user data such as id that will be map to smartSchoolAccount in User schema
-  //have to check that user already have in database or not if not create and save then sign token to user
-
-  // passport.use(new OAuth2Strategy({
-  //   authorizationURL: "https://www.mycourseville.com/api/oauth/authorize",
-  //   tokenURL: "https://www.mycourseville.com/api/oauth/access_token",
-  //   clientID: config.mcvClientId,
-  //   clientSecret: config.mcvClientSecret,
-  //   callbackURL: "http://localhost:3000"
-  // },
-  // (access_token, refreshToken, profile, cb) => {
-  //   //TODO
-  //   //example
-  //   // User.findOrCreate({ exampleId: profile.id }, function (err, user) {
-  //   //   return cb(err, user);
-  //   // });
-  // }
-  // ));
+  console.log(requestHeader)
+  await axios.get(userURL, {headers: requestHeader}
+    ).then((res) => {
+      mcvUserInfo = res.data;
+    }).catch((err)=> {
+    console.log('err get mcv user info')
+  });
+  console.log("mcvUserInfo",mcvUserInfo)
+  //mcvUserInfo contain user data such as id that will be map to smartSchoolAccount in User schema
+  //have to check that user already have in database or not, if not create and save, if in database, get user, then sign token to user
+  //todo 
+  //redirect to homepage
+  return res.redirect('http://localhost:3000')
 }
 
 exports.register = async (req,res) => {
