@@ -50,7 +50,6 @@ exports.loginViaMCV = async (req, res) => {
     }).catch((err)=> {
     console.log('err get mcv user info')
   });
-  console.log("mcvUserInfo",mcvUserInfo)
   
   //login or createUser
   if(mcvUserInfo.status == 'success'){
@@ -74,7 +73,6 @@ exports.loginViaMCV = async (req, res) => {
         smartSchoolAccount: mcvUserInfo.user.id,
         username: `quizcraft${num}`
       });
-      console.log(user)
       user.save((err, newUser) => {
         if (err) return res.status(500).json({ success: false, error: err });
         else if (!newUser) return res.status(400).json({ success: false, error: "Cannot add new user" });
@@ -91,7 +89,7 @@ exports.loginViaMCV = async (req, res) => {
   }
 }
 
-
+//for tesing
 exports.getCode = async (req, res) => {
   //redirect
   const code = req.query.code;
@@ -135,24 +133,3 @@ exports.register = async (req,res) => {
   });
 }
 
-//for testing but now password field is gone
-exports.login = async (req,res) => {
-  try {
-    const user = await User.findOne({username: req.body.username}).select("+password");
-    if (user) {
-      const validPass = await bcrypt.compare(req.body.password, user.password);
-      if (!validPass) return res.status(400).json({ success: false, error: "Wrong username or password" });
-      
-      //Create and assign token
-      const token = jwt.sign({userId: user._id, role: user.role}, config.secret, {
-        expiresIn: 14400 // 4 hours
-      });
-      return res.header("auth-token",token).status(200).json({ success: true, token: token});
-    } else {
-      return res.status(400).json({ success: false, err: "Wrong username or password" });
-    }
-  } 
-  catch (err) {
-    return res.status(500).json({ success: false, error: err });
-  }
-}
