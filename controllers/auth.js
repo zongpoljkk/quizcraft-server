@@ -99,9 +99,6 @@ exports.getCode = async (req, res) => {
 
 //for testing
 exports.register = async (req,res) => {
-  //Hash password
-  const salt = await bcrypt.genSalt(10);
-  const hashPassword = await bcrypt.hash(req.body.password, salt);
   var user;
   //Create User
   if (req.body.role) {
@@ -109,7 +106,6 @@ exports.register = async (req,res) => {
       firstname: req.body.firstname,
       lastname: req.body.lastname,
       username:req.body.username,
-      password: hashPassword,
       school: req.body.school,
       class: req.body.class,
       role: req.body.role,
@@ -119,7 +115,6 @@ exports.register = async (req,res) => {
       firstname: req.body.firstname,
       lastname: req.body.lastname,
       username:req.body.username,
-      password: hashPassword,
       school: req.body.school,
       class: req.body.class,
     });
