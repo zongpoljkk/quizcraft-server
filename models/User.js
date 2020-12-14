@@ -74,7 +74,12 @@ const UserSchema = new Schema({
     score: {
       type: Number,
     }
-  }]
+  }],
+  lastLogin: {
+    type: Date,
+    required: true,
+    default: Date.now
+  }
 });
 
 module.exports = mongoose.model('User', UserSchema);

@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const config = require("../config/keys");
 const axios = require('axios');
+const { updateStreak } = require("./user")
 
 const tokenURL = "https://www.mycourseville.com/api/oauth/access_token";
 const userURL = "https://www.mycourseville.com/api/v1/public/users/me";
@@ -78,6 +79,8 @@ exports.loginViaMCV = async (req, res) => {
         else if (!newUser) return res.status(400).json({ success: false, error: "Cannot add new user" });
       });
     }
+    //update streak
+    updateStreak(user._id);
     //Create and assign token
     const token = jwt.sign({userId: user._id, role: user.role}, config.secret, {
       expiresIn: 14400 // 4 hours
