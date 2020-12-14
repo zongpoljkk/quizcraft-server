@@ -1,21 +1,30 @@
 const User = require("../models/User");
+const Counter = require("../models/Counter");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const config = require("../config/keys");
-const passport = require("passport");
-const OAuth2Strategy = require("passport-oauth2");
 const axios = require('axios');
 
 const tokenURL = "https://www.mycourseville.com/api/oauth/access_token";
-const userURL = "https://www.mycourseville.com/api/v1/public/users/me"
+const userURL = "https://www.mycourseville.com/api/v1/public/users/me";
+
+const getNextSequenceValue = async (field) => {
+  var sequence = await Counter.findOneAndUpdate({
+    field: field
+  },{
+    $inc: {
+      sequenceValue:1
+    }
+  });
+  return `${sequence.sequenceValue}`;
+}
 
 exports.loginViaMCV = async (req, res) => {
-  //redirect
+  const code = req.body.code;
   var accessToken;
   var refreshToken;
   var mcvUserInfo;
-  const code = req.query.code;
-  console.log("code",code)
+  var user;
   const data = {
     grant_type: "authorization_code",
     client_id: config.mcvClientId,
@@ -23,24 +32,18 @@ exports.loginViaMCV = async (req, res) => {
     redirect_uri: "http://localhost:5000/api/auth/mcv-callback",
     code: code
   }
-  const headers = {
-    accept: "application/json"
-  }
   await axios.post(tokenURL, data
     ).then((res) => {
       accessToken = res.data.access_token;
       refreshToken = res.data.refresh_token;
-      console.log("accessToken",accessToken)
-      console.log("refreshToken",refreshToken)
     }).catch((err) => {
       console.log("err post token")
     });
-  
+
   //get info from mcv
   const requestHeader = {
     Authorization: `Bearer ${accessToken}`,
   }
-  console.log(requestHeader)
   await axios.get(userURL, {headers: requestHeader}
     ).then((res) => {
       mcvUserInfo = res.data;
@@ -48,13 +51,55 @@ exports.loginViaMCV = async (req, res) => {
     console.log('err get mcv user info')
   });
   console.log("mcvUserInfo",mcvUserInfo)
-  //mcvUserInfo contain user data such as id that will be map to smartSchoolAccount in User schema
-  //have to check that user already have in database or not, if not create and save, if in database, get user, then sign token to user
-  //todo 
-  //redirect to homepage
-  return res.redirect('http://localhost:3000')
+  
+  //login or createUser
+  if(mcvUserInfo.status == 'success'){
+    try {
+      user = await User.findOne({smartSchoolAccount:mcvUserInfo.user.id});
+    } catch (err) {
+      return res.status(500).json({succes: false, error:err});
+    }
+    if (!user) {
+      let inc = await getNextSequenceValue('username');
+      let num = '';
+      if (inc.length < 4) {
+        for(i=0; i<4-inc.length; i++) {
+          num += '0';
+        }
+        num += inc;
+      }
+      user = new User({
+        firstname: mcvUserInfo.user.firstname_th,
+        lastname: mcvUserInfo.user.lastname_th,
+        smartSchoolAccount: mcvUserInfo.user.id,
+        username: `quizcraft${num}`
+      });
+      console.log(user)
+      user.save((err, newUser) => {
+        if (err) return res.status(500).json({ success: false, error: err });
+        else if (!newUser) return res.status(400).json({ success: false, error: "Cannot add new user" });
+      });
+    }
+    //Create and assign token
+    const token = jwt.sign({userId: user._id, role: user.role}, config.secret, {
+      expiresIn: 14400 // 4 hours
+    });
+    return res.header("auth-token",token).status(200).json({ success: true, token: token});
+  } else {
+    console.log('Cannot get data from MCVplatefrom');
+    return res.status(400).json({ success: false, error: "Something went wrong!" });
+  }
 }
 
+
+exports.getCode = async (req, res) => {
+  //redirect
+  const code = req.query.code;
+  console.log("code",code);
+  return res.redirect('http://localhost:3000/login');
+}
+
+//for testing
 exports.register = async (req,res) => {
   //Hash password
   const salt = await bcrypt.genSalt(10);
@@ -63,7 +108,8 @@ exports.register = async (req,res) => {
   //Create User
   if (req.body.role) {
     user = new User({
-      name: req.body.name,
+      firstname: req.body.firstname,
+      lastname: req.body.lastname,
       username:req.body.username,
       password: hashPassword,
       school: req.body.school,
@@ -72,7 +118,8 @@ exports.register = async (req,res) => {
     });
   } else {
     user = new User({
-      name: req.body.name,
+      firstname: req.body.firstname,
+      lastname: req.body.lastname,
       username:req.body.username,
       password: hashPassword,
       school: req.body.school,
@@ -88,6 +135,7 @@ exports.register = async (req,res) => {
   });
 }
 
+//for testing but now password field is gone
 exports.login = async (req,res) => {
   try {
     const user = await User.findOne({username: req.body.username}).select("+password");

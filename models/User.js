@@ -2,24 +2,26 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const UserSchema = new Schema({
-  name: {
+  firstname: {
+    type: String,
+    required: true,
+  },
+  lastname: {
     type: String,
     required: true,
   },
   username: {
     type: String,
-  },
-  password: {
-    type: String,
-    select: false,
+    required: true,
+    unique: true,
   },
   school: {
     type: String,
-    required: true,
+    default: null,
   },
   class: {
     type: String,
-    required: true,
+    default: null,
   },
   rank: {
     type: String,
@@ -42,6 +44,7 @@ const UserSchema = new Schema({
   },
   smartSchoolAccount: {
     type: String,
+    required: true,
   },
   streak: {
     type: Number,
