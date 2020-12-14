@@ -89,44 +89,6 @@ exports.getProfileByUID = async (req, res) => {
     })
 };
 
-// exports.editUsername = async (req, res) => {
-//   const body = req.body;
-//   if (!body) {
-//     return res.status(400).json({
-//       success: false,
-//       error: "You must provide a body to update",
-//     });
-//   }
-
-//   User.findOne({ _id: req.body.userId }, (err, user) => {
-//     if (err) {
-//       return res.status(404).json({
-//         err,
-//         message: "User not found!",
-//       });
-//     }
-//     user.username = body.username;
-
-//     user
-//       .save()
-//       .then(() => {
-//         var newUsername = new User({ _id: user._id, username: user.username });
-//         newUsername.save();
-//         return res.status(200).json({
-//           success: true,
-//           data: {  userId: user._id, username: user.username },
-//         });
-//       })
-//       .catch((err) => {
-//         return res.status(404).json({
-//           success: false,
-//           err,
-//           message: "Username not updated!",
-//         });
-//       });
-//   });
-// };
-
 exports.editUsername = async (req, res) => {
   const body = req.body;
   if (!body) {
@@ -136,11 +98,28 @@ exports.editUsername = async (req, res) => {
     });
   }
 
+  const regex = RegExp('^(?=[a-zA-Zก-๛_\d]*[a-zA-Zก-๛])[-a-zA-Zก-๛0-9_\d]{5,12}$');
+  const usernameValidate = regex.test(body.username);
+ 
+  if (body.username == null || body.username == "" || body.username == " ") {
+    return res.status(400).json({
+      success: false,
+      error: "Username cannot be blank!",
+    });
+  }
+
+  if (!usernameValidate) {
+    return res.status(400).json({
+      success: false,
+      error: "Username format is not correct!",
+    });
+  }
+
   User.find({ username: req.body.username },(err, user) => {
     if (err) {
       return res.status(500).json({ success: false, error: err });
     }
-    if (!user.length) {
+    if (!user.length && usernameValidate) {
       User.findOneAndUpdate(
         { _id: req.body.userId },
         { username : req.body.username }, 
@@ -150,13 +129,13 @@ exports.editUsername = async (req, res) => {
             return res.status(500).json({ success: false, error: err });
           }
           if (!user) {
-            return res.status(400).json({ success: false, data: "no data" });
+            return res.status(400).json({ success: false, error: "no data" });
           }
           return res.status(200).json({ success: true, data: { userId: user._id, username: user.username } });
       });
     }
     else{
-      return res.status(200).json({ success: false, data: "already have this username!" });
+      return res.status(200).json({ success: false, error: "already have this username!" });
     }
 });
 };
