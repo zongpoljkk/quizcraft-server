@@ -98,7 +98,7 @@ exports.editUsername = async (req, res) => {
     });
   }
 
-  const regex = RegExp('^(?=[a-zA-Zก-๛_\d]*[a-zA-Zก-๛])[-a-zA-Zก-๛0-9_\d]{5,12}$');
+  const regex = RegExp('^(?=[a-zA-Zก-๛_\d]*[a-zA-Zก-๛])[.-a-zA-Zก-๛0-9_\d]{5,12}$');
   const usernameValidate = regex.test(body.username);
  
   if (body.username == null || body.username == "" || body.username == " ") {
@@ -135,7 +135,7 @@ exports.editUsername = async (req, res) => {
       });
     }
     else{
-      return res.status(200).json({ success: false, error: "already have this username!" });
+      return res.status(400).json({ success: false, error: "already have this username!" });
     }
 });
 };
