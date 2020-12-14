@@ -145,10 +145,24 @@ exports.changeProfilePicture = (req, res, next) => {
       }
       console.log(user);
       console.log(req.body);
-      user.photo = fs.readFileSync(req.file.path);
+      console.log(req.file);
+      console.log(user.photo);
+      user.photo = req.file;
+      // user.photo = fs.readFileSync(req.file.path);
+      // console.log(user.photo);
       // user.photo = fs.readFileSync(req.files.userPhoto);
-      user.photo.contentType = `image/jpg`;
+      // user.photo.contentType = `image/jpg`;
       user.save();
       res.status(201).send("Upload succeeded");
     });
+};
+
+exports.getProfilePicture = (req, res, next) => {
+  const userId = req.query.userId;
+  User.findById(userId)
+    .select("_id, photo")
+    .exec((err, user) => {
+      res.send(user);
+    });
+  // res.send("Getting profile picture");
 };

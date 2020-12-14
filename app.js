@@ -36,14 +36,14 @@ app.use(
 );
 
 // To upload image to server side
-app.use(
-  multer({
-    dest: `./uploads/`,
-    rename: function (fieldname, filename) {
-      return filename;
-    },
-  }).single("image")
-);
+// app.use(
+//   multer({
+//     dest: `./uploads/`,
+//     rename: function (fieldname, filename) {
+//       return filename;
+//     },
+//   }).single("image")
+// );
 // Create storage engine
 // const storage = new GridFsStorage({
 //   url: keys.mongoURI,
