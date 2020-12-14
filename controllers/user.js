@@ -40,8 +40,8 @@ exports.getProfileByUID = async (req, res) => {
       {
         $lookup: {
           from: "items",
-          localField: "items.itemID",
-          foreignField: "_id",
+          localField: "items.itemName",
+          foreignField: "name",
           as: "fromItems",
         },
       },
@@ -60,7 +60,7 @@ exports.getProfileByUID = async (req, res) => {
                         $filter: {
                           input: "$fromItems",
                           as: "fromItem",
-                          cond: { $eq: ["$$fromItem._id", "$$item.itemID"] },
+                          cond: { $eq: ["$$fromItem.name", "$$item.itemName"] },
                         },
                       },
                       0,
@@ -77,6 +77,13 @@ exports.getProfileByUID = async (req, res) => {
           items: 0,
           fromItems: 0,
           achievements: 0,
+          __v: 0,
+          "itemInfos.name":0,
+          "itemInfos.price":0,
+          "itemInfos.description":0,
+          "itemInfos.__v":0,
+          "itemInfos._id": 0,
+          "levelInfo._id": 0,
         },
       },
     ],
@@ -85,7 +92,7 @@ exports.getProfileByUID = async (req, res) => {
         return res.status(500).json({ success: false, error: err });
       }
       if (!user.length) {
-        return res.status(400).json({ success: false, data: "no users" });
+        return res.status(400).json({ success: false, error: "no users" });
       }
       return res.status(200).json({ success: true, data: user });
     }
