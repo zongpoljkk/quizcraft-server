@@ -1,3 +1,6 @@
+const e = require("express");
+const fs = require(`fs`);
+
 const Item = require("../models/Item");
 const User = require("../models/User");
 
@@ -127,4 +130,25 @@ exports.EditUsername = async (req, res) => {
         });
       });
   });
+};
+
+exports.changeProfilePicture = (req, res, next) => {
+  // console.log(req);
+  const userId = req.body.userId;
+  User.findById(userId)
+    .select("_id photo")
+    .exec((err, user) => {
+      if (err) {
+        res.status(500).send("Internal Server Error");
+      } else if (!user) {
+        res.status(400).send("Unable to find user with the given ID");
+      }
+      console.log(user);
+      console.log(req.body);
+      user.photo = fs.readFileSync(req.file.path);
+      // user.photo = fs.readFileSync(req.files.userPhoto);
+      user.photo.contentType = `image/jpg`;
+      user.save();
+      res.status(201).send("Upload succeeded");
+    });
 };
