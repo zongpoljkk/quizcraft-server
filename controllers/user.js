@@ -95,7 +95,7 @@ exports.getProfileByUID = async (req, res) => {
     })
 };
 
-exports.EditUsername = async (req, res) => {
+exports.editUsername = async (req, res) => {
   const body = req.body;
   if (!body) {
     return res.status(400).json({
@@ -104,31 +104,44 @@ exports.EditUsername = async (req, res) => {
     });
   }
 
-  User.findOne({ _id: req.body._id }, (err, user) => {
+  const regex = RegExp('^(?=[a-zA-Zก-๛_\d]*[a-zA-Zก-๛])[-a-zA-Zก-๛0-9_\d]{5,12}$');
+  const usernameValidate = regex.test(body.username);
+
+  if (body.username == null || body.username.trim().length == 0 ){
+    return res.status(400).json({
+      success: false,
+      error: "Username cannot be blank!",
+    });
+  }
+
+  if (!usernameValidate) {
+    return res.status(400).json({
+      success: false,
+      error: "Username format is not correct!",
+    });
+  }
+
+  User.findOne({ username: req.body.username },(err, user) => {
     if (err) {
-      return res.status(404).json({
-        err,
-        message: "User not found!",
+      return res.status(500).json({ success: false, error: err });
+    }
+    if (!user && usernameValidate) {
+      User.findOneAndUpdate(
+        { _id: req.body.userId },
+        { username : req.body.username }, 
+        { new: true },
+        (err, user) => {
+          if (err) {
+            return res.status(500).json({ success: false, error: err });
+          }
+          if (!user) {
+            return res.status(400).json({ success: false, error: "no data" });
+          }
+          return res.status(200).json({ success: true, data: { userId: user._id, username: user.username } });
       });
     }
-    user.username = body.username;
-
-    user
-      .save()
-      .then(() => {
-        var newUsername = new User({ _id: user.id, username: user.username });
-        newUsername.save();
-        return res.status(200).json({
-          success: true,
-          data: { _id: user._id, username: user.username },
-        });
-      })
-      .catch((error) => {
-        return res.status(404).json({
-          success: false,
-          error,
-          message: "Username not updated!",
-        });
-      });
-  });
+    else{
+      return res.status(400).json({ success: false, error: "already have this username!" });
+    }
+});
 };
