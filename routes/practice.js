@@ -6,7 +6,7 @@ const { authJwt, adminOnly } = require('../middlewares');
 
 const router = express.Router();
 
-// /practice/get-answer => GET
-router.get("/get-answer", [authJwt], answerController.getAnswer);
+// /practice/get-answer => POST
+router.post("/check-answer",[authJwt], answerController.checkAnswer);
 
 module.exports = router;

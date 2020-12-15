@@ -1,4 +1,3 @@
-const Item = require("../models/Item");
 const User = require("../models/User");
 
 //Add user for testing
@@ -23,7 +22,6 @@ exports.getAllUsers = async (req, res) => {
       }
       return res.status(200).json({ success: true, data: users });
     })
-    .catch((err) => console.log(err));
 };
 
 exports.getProfileByUID = async (req, res) => {
@@ -39,8 +37,8 @@ exports.getProfileByUID = async (req, res) => {
       {
         $lookup: {
           from: "items",
-          localField: "items.itemID",
-          foreignField: "_id",
+          localField: "items.itemName",
+          foreignField: "name",
           as: "fromItems",
         },
       },
@@ -59,7 +57,7 @@ exports.getProfileByUID = async (req, res) => {
                         $filter: {
                           input: "$fromItems",
                           as: "fromItem",
-                          cond: { $eq: ["$$fromItem._id", "$$item.itemID"] },
+                          cond: { $eq: ["$$fromItem.name", "$$item.itemName"] },
                         },
                       },
                       0,
@@ -76,6 +74,13 @@ exports.getProfileByUID = async (req, res) => {
           items: 0,
           fromItems: 0,
           achievements: 0,
+          __v: 0,
+          "itemInfos.name":0,
+          "itemInfos.price":0,
+          "itemInfos.description":0,
+          "itemInfos.__v":0,
+          "itemInfos._id": 0,
+          "levelInfo._id": 0,
         },
       },
     ],
@@ -84,14 +89,13 @@ exports.getProfileByUID = async (req, res) => {
         return res.status(500).json({ success: false, error: err });
       }
       if (!user.length) {
-        return res.status(400).json({ success: false, data: "no users" });
+        return res.status(400).json({ success: false, error: "no users" });
       }
       return res.status(200).json({ success: true, data: user });
-    }
-  ).catch((err) => console.log(err));
+    })
 };
 
-exports.EditUsername = async (req, res) => {
+exports.editUsername = async (req, res) => {
   const body = req.body;
   if (!body) {
     return res.status(400).json({
@@ -100,34 +104,48 @@ exports.EditUsername = async (req, res) => {
     });
   }
 
-  User.findOne({ _id: req.body._id }, (err, user) => {
+  const regex = RegExp('^(?=[a-zA-Zก-๛_\d]*[a-zA-Zก-๛])[-a-zA-Zก-๛0-9_\d]{5,12}$');
+  const usernameValidate = regex.test(body.username);
+
+  if (body.username == null || body.username.trim().length == 0 ){
+    return res.status(400).json({
+      success: false,
+      error: "Username cannot be blank!",
+    });
+  }
+
+  if (!usernameValidate) {
+    return res.status(400).json({
+      success: false,
+      error: "Username format is not correct!",
+    });
+  }
+
+  User.findOne({ username: req.body.username },(err, user) => {
     if (err) {
-      return res.status(404).json({
-        err,
-        message: "User not found!",
+      return res.status(500).json({ success: false, error: err });
+    }
+    if (!user && usernameValidate) {
+      User.findOneAndUpdate(
+        { _id: req.body.userId },
+        { username : req.body.username }, 
+        { new: true },
+        (err, user) => {
+          if (err) {
+            return res.status(500).json({ success: false, error: err });
+          }
+          if (!user) {
+            return res.status(400).json({ success: false, error: "no data" });
+          }
+          return res.status(200).json({ success: true, data: { userId: user._id, username: user.username } });
       });
     }
-    user.username = body.username;
+    else{
+      return res.status(400).json({ success: false, error: "already have this username!" });
+    }
+});
+};  
 
-    user
-      .save()
-      .then(() => {
-        var newUsername = new User({ _id: user.id, username: user.username });
-        newUsername.save();
-        return res.status(200).json({
-          success: true,
-          data: { _id: user._id, username: user.username },
-        });
-      })
-      .catch((error) => {
-        return res.status(404).json({
-          success: false,
-          error,
-          message: "Username not updated!",
-        });
-      });
-  });
-};
 
 exports.updateStreak = async (userId) => {
   const user = await User.findOne({_id:userId});
@@ -162,3 +180,4 @@ exports.updateStreak = async (userId) => {
     return
   }
 }
+

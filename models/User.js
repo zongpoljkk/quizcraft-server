@@ -25,22 +25,26 @@ const UserSchema = new Schema({
   },
   rank: {
     type: String,
-    required: true,
-    enum: ['BRONZE','SILVER','GOLD','DIAMOND'],
+    enum: ['BRONZE','SILVER','GOLD'],
     default: 'BRONZE',
   },
-  level: {
-    type: Number,
-    required: true,
-    default: 1,
-  },
+  levelInfo: [{
+    level: {
+      type: Number,
+      default: 1,
+    },
+    score: {
+      type: Number,
+      default: 0,
+    }
+  }],
   coin: {
     type: Number,
-    required: true,
     default: 0,
   },
   photo: {
     type: String,
+    default: null,
   },
   smartSchoolAccount: {
     type: String,
@@ -48,33 +52,31 @@ const UserSchema = new Schema({
   },
   streak: {
     type: Number,
-    required: true,
     default: 0,
   },
   items: [{
-    itemID: {
-      type: Schema.Types.ObjectId,
-      ref: 'Item'
+    itemName: {
+      type: String,
     },
     amount: {
       type: Number,
+      default: 0,
+    }
+  }],
+  achievements: [{
+    achievementName:{
+      type: String,
+    },
+    score: {
+      type: Number,
+      default: 0,
     }
   }],
   role: {
     type: String,
-    required: true,
     enum: ['ADMIN','USER'],
     default: 'USER',
   },
-  achievements: [{
-    achievementID:{
-      type: Schema.Types.ObjectId,
-      ref: 'Achievement'
-    },
-    score: {
-      type: Number,
-    }
-  }],
   lastLogin: {
     type: Date,
     default: Date.now
