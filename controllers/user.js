@@ -159,7 +159,7 @@ exports.usedItem = async (req, res) => {
     { _id: req.body.userId, 
       items: {
         $elemMatch: { 
-          itemID: req.body.itemId,
+          itemName: req.body.itemName,
           amount: { $gt: 0 }
         }
       }
@@ -171,8 +171,10 @@ exports.usedItem = async (req, res) => {
         return res.status(500).json({ success: false, error: err });
       }
       if (!user) {
-        return res.status(400).json({ success: false, data: "no data" });
+        return res.status(400).json({ success: false, error: "no data" });
       }
-      return res.status(200).json({ success: true, data: user.items });
+      let items = user.items
+      let index = items.findIndex(x => x.itemName === body.itemName);
+      return res.status(200).json({ success: true, data: user.items[index] });
   });
 };
