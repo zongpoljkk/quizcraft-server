@@ -2,63 +2,85 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const UserSchema = new Schema({
-  name: {
+  firstname: {
+    type: String,
+    required: true,
+  },
+  lastname: {
     type: String,
     required: true,
   },
   username: {
     type: String,
+    required: true,
     unique: true
   },
   school: {
     type: String,
-    required: true,
+    default: null,
   },
   class: {
     type: String,
-    required: true,
+    default: null,
   },
   rank: {
     type: String,
-    required: true,
-    enum: ['BRONZE','SILVER','GOLD','DIAMOND'],
+    enum: ['BRONZE','SILVER','GOLD'],
+    default: 'BRONZE',
   },
-  level: {
-    type: Number,
-    required: true,
-  },
-  coin: {
-    type: Number,
-    required: true,
-  },
-  photo: {
-    type: String,
-  },
-  smartSchoolAccount: {
-    type: String,
-  },
-  streak: {
-    type: Number,
-    required: true,
-  },
-  items: [{
-    itemID: {
-      type: Schema.Types.ObjectId,
-      ref: 'Item'
-    },
-    amount: {
+  levelInfo: [{
+    level: {
       type: Number,
-    }
-  }],
-  achievements: [{
-    achievementID:{
-      type: Schema.Types.ObjectId,
-      ref: 'Achievement'
+      default: 1,
     },
     score: {
       type: Number,
+      default: 0,
     }
-  }]
+  }],
+  coin: {
+    type: Number,
+    default: 0,
+  },
+  photo: {
+    type: String,
+    default: null,
+  },
+  smartSchoolAccount: {
+    type: String,
+    required: true,
+  },
+  streak: {
+    type: Number,
+    default: 0,
+  },
+  items: [{
+    itemName: {
+      type: String,
+    },
+    amount: {
+      type: Number,
+      default: 0,
+    }
+  }],
+  achievements: [{
+    achievementName:{
+      type: String,
+    },
+    score: {
+      type: Number,
+      default: 0,
+    }
+  }],
+  role: {
+    type: String,
+    enum: ['ADMIN','USER'],
+    default: 'USER',
+  },
+  lastLogin: {
+    type: Date,
+    default: Date.now
+  }
 });
 
 module.exports = mongoose.model('User', UserSchema);
