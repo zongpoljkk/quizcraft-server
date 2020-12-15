@@ -169,7 +169,7 @@ exports.changeProfilePicture = (req, res, next) => {
           });
       }
       user.save();
-      res.status(201).send({ success: true, data: "Upload succeeded" });
+      res.status(201).send({ success: true, data: "Upload succeeded", photo: user.photo });
     });
 };
 

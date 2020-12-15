@@ -46,7 +46,7 @@ const UserSchema = new Schema({
   },
   photo: {
     type: String,
-    default: null,
+    // default: null,
   },
   smartSchoolAccount: {
     type: String,
@@ -88,6 +88,8 @@ const UserSchema = new Schema({
     default: Date.now,
   },
   photo: {
+    // data: Buffer,
+    // contentType: String,
     type: Object,
   },
 });

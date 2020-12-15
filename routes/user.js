@@ -36,7 +36,7 @@ router.get("/get-user/", userController.getProfileByUID);
 router.get("/get-profile-picture", userController.getProfilePicture);
 router.post("/add-user", userController.addUser);
 router.put("/edit-username", userController.editUsername);
-router.put(
+router.post(
   "/change-profile-picture",
   upload.single("image"),
   userController.changeProfilePicture
