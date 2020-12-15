@@ -11,7 +11,6 @@ exports.getAllSubtopics = async (req, res) => {
       }
       return res.status(200).json({ success: true, data: subtopics });
     })
-    .catch((err) => console.log(err));
 };
 
 exports.getAllSubjects = async (req, res) => {
@@ -25,8 +24,7 @@ exports.getAllSubjects = async (req, res) => {
         return res.status(400).json({ success: false, data: "no subjects" });
       }
       return res.status(200).json({ success: true, data: subjects });
-    }
-  ).catch((err) => console.log(err));
+    })
 };
 
 exports.getTopicBySubjectName = async (req, res) => {
@@ -50,8 +48,7 @@ exports.getTopicBySubjectName = async (req, res) => {
         return res.status(400).json({ success: false, data: "no topics" });
       }
       return res.status(200).json({ success: true, data: topic });
-    }
-  ).catch((err) => console.log(err));
+    })
 };
 
 exports.getSubtopicByTopicName = async (req, res) => {
@@ -64,8 +61,7 @@ exports.getSubtopicByTopicName = async (req, res) => {
         return res.status(400).json({ success: false, data: "no subtopics" });
       }
       return res.status(200).json({ success: true, data: subtopics });
-    }
-  ).catch((err) => console.log(err));
+    })
 };
 
 exports.addSubtopic = (req, res, next) => {
