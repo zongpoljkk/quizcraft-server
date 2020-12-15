@@ -14,6 +14,11 @@ const userRouter = require('./routes/user');
 const itemRouter = require('./routes/item');
 const achievementRouter = require('./routes/achievement');
 
+mongoose.set('useNewUrlParser', true);
+mongoose.set('useFindAndModify', false);
+mongoose.set('useCreateIndex', true);
+mongoose.set('useUnifiedTopology', true);
+
 mongoose.connect(keys.mongoURI, () => {
     console.log("Connected to db")
 });
