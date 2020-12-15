@@ -49,6 +49,7 @@ exports.checkAnswer = async (req, res, next) => {
               req.correct = returnedSolution.correct;
               req.solution = returnedSolution.solution;
               req.user = returnedSolution.user._id;
+              req.answer = answer.body
               next();
             });
         } else {
@@ -63,6 +64,7 @@ exports.checkAnswer = async (req, res, next) => {
               req.correct = returnedSolution.correct;
               req.solution = returnedSolution.solution;
               req.user = returnedSolution.user._id;
+              req.answer = answer.body
               next();
             });
         }

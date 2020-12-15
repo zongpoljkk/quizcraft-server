@@ -2,7 +2,7 @@ const Problem = require("../models/Problem");
 const Subtopic = require("../models/Subtopic");
 const Answer = require("../models/Answer");
 const Hint = require("../models/Hint");
-const { mathGenerate } = require("./mathProblem/mathProblemGenerator");
+const { mathGenerate } = require("./mathProblemGenerator");
 const MATH = "คณิตศาสตร์";
 const ENG = "ภาษาอังกฤษ";
 
@@ -10,7 +10,7 @@ exports.getAllProblems = (req, res, next) => {
   Problem.find().exec((err, problems) => {
     if (err) return res.status(500).json({ success: false, error: err });
     else if (!problems)
-      return res.status(400).json({ success: false, data: "no data" });
+      return res.status(400).json({ success: false, error: "no data" });
     else return res.status(200).json({ success: true, data: problems });
   });
 };
@@ -21,7 +21,7 @@ exports.addProblem = (req, res, next) => {
   problem.save((err, newProblem) => {
     if (err) return res.status(500).json({ success: false, error: err });
     else if (!newProblem)
-      return res.status(400).json({ success: false, data: "no data" });
+      return res.status(400).json({ success: false, error: "no data" });
     else return res.status(200).json({ success: true, data: newProblem });
   });
 };
@@ -45,10 +45,10 @@ exports.getProblems = (req, res, next) => {
       },
     },
   ]).exec((err, problem) => {
-    if (err) res.send(err);
-    else if (!problem) res.send(400);
-    else res.send(problem);
-    next();
+    if (err) return res.status(500).json({ success: false, error: err });
+    else if (!problem)
+      return res.status(400).json({ success: false, data: "no data" });
+    else return res.status(200).json({ success: true, data: problem });
   });
 };
 
@@ -56,28 +56,24 @@ exports.checkAnswerAndUpdateDifficulty = async (req, res, next) => {
   const problemId = req.body.problemId;
   const userTime = req.body.userTime;
   const correct = req.correct;
+  const answer = req.answer;
   const solution = req.solution;
   const user = req.user;
 
   Problem.findById(problemId).exec(async (err, problem) => {
-    if (err) res.status(500).send("Internal Server Error");
+    if (err)
+      res.status(500).send({ success: false, error: "Internal Server Error" });
     else if (!problem)
-      res
-        .status(400)
-        .send(`Unable to find problem given problem id ${problemId}`);
-    else {
-      next();
-    }
+      res.status(400).send({
+        success: false,
+        error: `Unable to find problem given problem id ${problemId}`,
+      });
 
-    // const returnedSolution = await getAnswer(req, res, next);
-
-    // getAnswer(req, res, next).then((returnedSolution) => {ƒ
-    // console.log(`returnedSolution: ${returnedSolution}`);
     problem.times = [...problem.times, userTime];
     if (!problem.users.includes(user)) {
       problem.users = [...problem.users, user];
     }
-    // });
+
     // update problem times and user Array
     const sumUserTime = problem.toJSON().times.reduce((sum, time) => {
       return sum + +time.toString();
@@ -150,14 +146,15 @@ exports.checkAnswerAndUpdateDifficulty = async (req, res, next) => {
     problem.save();
     const new_difficulty = problem.difficulty;
 
-    res.send({
-      old_difficulty: current_difficulty,
-      new_difficulty: new_difficulty,
-      correct: correct,
-      solution: solution,
-      user: user,
+    res.status(201).send({
+      success: true,
+      data: {
+        correct: correct,
+        answer: answer,
+        solution: solution,
+        user: user,
+      },
     });
-    // });
     next();
   });
 };

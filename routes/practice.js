@@ -5,6 +5,6 @@ const answerController = require("../controllers/answer");
 const router = express.Router();
 
 // /practice/get-answer => POST
-router.post("/get-answer", answerController.checkAnswer);
+router.post("/check-answer", answerController.checkAnswer);
 
 module.exports = router;
