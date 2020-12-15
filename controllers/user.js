@@ -22,7 +22,6 @@ exports.getAllUsers = async (req, res) => {
       }
       return res.status(200).json({ success: true, data: users });
     })
-    .catch((err) => console.log(err));
 };
 
 exports.getProfileByUID = async (req, res) => {
@@ -93,8 +92,7 @@ exports.getProfileByUID = async (req, res) => {
         return res.status(400).json({ success: false, error: "no users" });
       }
       return res.status(200).json({ success: true, data: user });
-    }
-  ).catch((err) => console.log(err));
+    })
 };
 
 exports.EditUsername = async (req, res) => {
