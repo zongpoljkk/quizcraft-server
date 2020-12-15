@@ -72,7 +72,7 @@ exports.loginViaMCV = async (req, res) => {
         firstname: mcvUserInfo.user.firstname_th,
         lastname: mcvUserInfo.user.lastname_th,
         smartSchoolAccount: mcvUserInfo.user.id,
-        username: `quizcraft${num}`
+        username: `qc${num}`
       });
       user.save((err, newUser) => {
         if (err) return res.status(500).json({ success: false, error: err });
