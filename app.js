@@ -4,7 +4,6 @@ const mongoose = require("mongoose");
 const cookieSession = require("cookie-session");
 const keys = require("./config/keys");
 const bodyParser = require("body-parser");
-const multer = require("multer");
 const cors = require("cors");
 
 const problemRouter = require("./routes/problem");
