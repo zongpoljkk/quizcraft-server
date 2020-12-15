@@ -1,7 +1,7 @@
 const Problem = require("../models/Problem");
 const Subtopic = require("../models/Subtopic");
 const Answer = require("../models/Answer");
-const Hint = require("../models/hint");
+const Hint = require("../models/Hint");
 const { mathGenerate } = require("./mathProblem/mathProblemGenerator");
 const MATH = "คณิตศาสตร์";
 const ENG = "ภาษาอังกฤษ";
