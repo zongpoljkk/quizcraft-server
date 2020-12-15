@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const UserSchema = new Schema({
@@ -8,7 +8,7 @@ const UserSchema = new Schema({
   },
   username: {
     type: String,
-    unique: true
+    unique: true,
   },
   school: {
     type: String,
@@ -21,7 +21,7 @@ const UserSchema = new Schema({
   rank: {
     type: String,
     required: true,
-    enum: ['BRONZE','SILVER','GOLD','DIAMOND'],
+    enum: ["BRONZE", "SILVER", "GOLD", "DIAMOND"],
   },
   level: {
     type: Number,
@@ -41,24 +41,31 @@ const UserSchema = new Schema({
     type: Number,
     required: true,
   },
-  items: [{
-    itemID: {
-      type: Schema.Types.ObjectId,
-      ref: 'Item'
+  items: [
+    {
+      itemID: {
+        type: Schema.Types.ObjectId,
+        ref: "Item",
+      },
+      amount: {
+        type: Number,
+      },
+      itemName: {
+        type: String,
+      },
     },
-    amount: {
-      type: Number,
-    }
-  }],
-  achievements: [{
-    achievementID:{
-      type: Schema.Types.ObjectId,
-      ref: 'Achievement'
+  ],
+  achievements: [
+    {
+      achievementID: {
+        type: Schema.Types.ObjectId,
+        ref: "Achievement",
+      },
+      score: {
+        type: Number,
+      },
     },
-    score: {
-      type: Number,
-    }
-  }]
+  ],
 });
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model("User", UserSchema);

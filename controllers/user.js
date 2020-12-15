@@ -143,7 +143,7 @@ exports.getAmountOfItems = (req, res) => {
       let skip = 0;
       let refresh = 0;
       user.items.forEach((item) => {
-        switch (item.name) {
+        switch (item.itemName) {
           case "Hint":
             hint++;
             break;
