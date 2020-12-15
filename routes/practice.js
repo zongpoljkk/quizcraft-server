@@ -4,7 +4,7 @@ const answerController = require("../controllers/answer");
 
 const router = express.Router();
 
-// /practice/get-answer => GET
-router.get("/get-answer", answerController.getAnswer);
+// /practice/get-answer => POST
+router.post("/check-answer", answerController.checkAnswer);
 
 module.exports = router;

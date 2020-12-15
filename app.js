@@ -8,6 +8,7 @@ const cors = require('cors')
 
 const problemRouter = require('./routes/problem');
 const subtopicRouter = require('./routes/subtopic');
+const practiceRouter = require('./routes/practice');
 const hintRouter = require('./routes/hint');
 const userRouter = require('./routes/user');
 const itemRouter = require('./routes/item');
@@ -37,6 +38,7 @@ app.use(cors({
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log('Server is running'));
 
+app.use("/api/practice", practiceRouter);
 app.use('/api/problem', problemRouter);
 app.use('/api/subtopic', subtopicRouter);
 app.use('/api/hint', hintRouter);
