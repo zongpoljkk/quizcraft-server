@@ -6,12 +6,13 @@ const keys = require("./config/keys");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
-const problemRouter = require("./routes/problem");
-const subtopicRouter = require("./routes/subtopic");
-const hintRouter = require("./routes/hint");
-const userRouter = require("./routes/user");
-const itemRouter = require("./routes/item");
-const achievementRouter = require("./routes/achievement");
+const problemRouter = require('./routes/problem');
+const subtopicRouter = require('./routes/subtopic');
+const practiceRouter = require('./routes/practice');
+const hintRouter = require('./routes/hint');
+const userRouter = require('./routes/user');
+const itemRouter = require('./routes/item');
+const achievementRouter = require('./routes/achievement');
 
 mongoose.connect(keys.mongoURI, () => {
   console.log("Connected to db");
@@ -37,14 +38,15 @@ app.use(
 // In develpment use port 5000
 // In production use provided port from Heroku
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log("Server is running"));
+app.listen(PORT, () => console.log('Server is running'));
 
-app.use("/api/problem", problemRouter);
-app.use("/api/subtopic", subtopicRouter);
-app.use("/api/hint", hintRouter);
-app.use("/api/user", userRouter);
-app.use("/api/item", itemRouter);
-app.use("/api/achievement", achievementRouter);
+app.use("/api/practice", practiceRouter);
+app.use('/api/problem', problemRouter);
+app.use('/api/subtopic', subtopicRouter);
+app.use('/api/hint', hintRouter);
+app.use('/api/user', userRouter);
+app.use('/api/item', itemRouter);
+app.use('/api/achievement', achievementRouter);
 
 // app.use((req, res, next) => {
 //   res.status(404).render('404', { pageTitle: ' Page Not Found'});
