@@ -1,6 +1,4 @@
-const Item = require("../models/Item");
 const User = require("../models/User");
-const { getAllItems } = require("./item");
 
 //Add user for testing
 exports.addUser = (req, res, next) => {
