@@ -153,7 +153,7 @@ exports.changeProfilePicture = (req, res, next) => {
       // user.photo = fs.readFileSync(req.files.userPhoto);
       // user.photo.contentType = `image/jpg`;
       user.save();
-      res.status(201).send("Upload succeeded");
+      res.status(201).send({ success: true, data: "Upload succeeded" });
     });
 };
 

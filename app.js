@@ -35,37 +35,6 @@ app.use(
   })
 );
 
-// To upload image to server side
-// app.use(
-//   multer({
-//     dest: `./uploads/`,
-//     rename: function (fieldname, filename) {
-//       return filename;
-//     },
-//   }).single("image")
-// );
-// Create storage engine
-// const storage = new GridFsStorage({
-//   url: keys.mongoURI,
-//   file: (req, file) => {
-//     return new Promise((resolve, reject) => {
-//       crypto.randomBytes(16, (err, buf) => {
-//         if (err) {
-//           return reject(err);
-//         }
-//         const filename = file.originalname;
-//         const fileInfo = {
-//           filename: filename,
-//           bucketName: "uploads",
-//         };
-//         resolve(fileInfo);
-//       });
-//     });
-//   },
-// });
-
-// const upload = multer({ storage });
-
 // In develpment use port 5000
 // In production use provided port from Heroku
 const PORT = process.env.PORT || 5000;
