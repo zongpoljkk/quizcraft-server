@@ -10,7 +10,7 @@ exports.getAllProblems = (req, res, next) => {
   Problem.find().exec((err, problems) => {
     if (err) return res.status(500).json({ success: false, error: err });
     else if (!problems)
-      return res.status(400).json({ success: false, data: "no data" });
+      return res.status(400).json({ success: false, error: "no data" });
     else return res.status(200).json({ success: true, data: problems });
   });
 };
@@ -21,7 +21,7 @@ exports.addProblem = (req, res, next) => {
   problem.save((err, newProblem) => {
     if (err) return res.status(500).json({ success: false, error: err });
     else if (!newProblem)
-      return res.status(400).json({ success: false, data: "no data" });
+      return res.status(400).json({ success: false, error: "no data" });
     else return res.status(200).json({ success: true, data: newProblem });
   });
 };
@@ -45,9 +45,9 @@ exports.getProblems = (req, res, next) => {
       },
     },
   ]).exec((err, problem) => {
-    if (err) res.send(err);
-    else if (!problem) res.send(400);
-    else res.send(problem);
+    if (err) res.status(500).send("Internal Server Error");
+    else if (!problem) res.status(400).send("Unable to get problems");
+    else res.status(200).send(problem);
     next();
   });
 };

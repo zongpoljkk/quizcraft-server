@@ -70,13 +70,17 @@ exports.getLeaderBoard = async (req, res, next) => {
                 return user._id == userId;
               });
 
-              res.send({
-                byAll: byAll,
-                bySchool: bySchool,
-                byClassroom: byClassroom,
-                indexGlobal: indexGlobal,
-                indexSchool: indexSchool,
-                indexClassroom: indexClassroom,
+              res.status(200).send({
+                success: true,
+                data: {
+                  profilePic: user.photo,
+                  byAll: byAll,
+                  bySchool: bySchool,
+                  byClassroom: byClassroom,
+                  indexGlobal: indexGlobal + 1,
+                  indexSchool: indexSchool + 1,
+                  indexClassroom: indexClassroom + 1,
+                },
               });
               next();
             });
