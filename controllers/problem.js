@@ -116,8 +116,6 @@ exports.checkAnswerAndUpdateDifficulty = async (req, res, next) => {
     const EASY_CEIL = 13;
     const MEDIUM_CEIL = 150;
 
-    const current_difficulty = problem.difficulty;
-
     switch (problem.difficulty) {
       case "EASY":
         if (avgProblemTime >= EASY_CEIL) {
@@ -144,7 +142,6 @@ exports.checkAnswerAndUpdateDifficulty = async (req, res, next) => {
         }
     }
     problem.save();
-    const new_difficulty = problem.difficulty;
 
     res.status(201).send({
       success: true,

@@ -1,5 +1,4 @@
 const math = require("mathjs");
-const { use } = require("passport");
 
 const Answer = require("../models/Answer");
 const User = require("../models/User");
@@ -49,7 +48,7 @@ exports.checkAnswer = async (req, res, next) => {
               req.correct = returnedSolution.correct;
               req.solution = returnedSolution.solution;
               req.user = returnedSolution.user._id;
-              req.answer = answer.body
+              req.answer = answer.body;
               next();
             });
         } else {
@@ -64,7 +63,7 @@ exports.checkAnswer = async (req, res, next) => {
               req.correct = returnedSolution.correct;
               req.solution = returnedSolution.solution;
               req.user = returnedSolution.user._id;
-              req.answer = answer.body
+              req.answer = answer.body;
               next();
             });
         }
