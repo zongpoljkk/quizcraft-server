@@ -1,5 +1,5 @@
 const math = require("mathjs");
-const { use } = require("passport");
+const levelDictionary = require("../utils/level");
 
 const Answer = require("../models/Answer");
 const User = require("../models/User");
@@ -46,23 +46,6 @@ exports.getAnswer = async (req, res, next) => {
               }
 
               // * Handle Level up * //
-              const levels = 40;
-              const exp_for_first_level = 100;
-              const exp_for_last_level = 100000;
-
-              const B =
-                Math.log(exp_for_last_level / exp_for_first_level) /
-                (levels - 1);
-              const A = exp_for_first_level / (Math.exp(B) - 1.0);
-
-              const levelDictionary = new Object();
-
-              for (const i of Array(levels).keys()) {
-                const old_xp = Math.round(A * Math.exp(B * i));
-                const new_xp = Math.round(A * Math.exp(B * (i + 1)));
-                levelDictionary[i + 1] = new_xp - old_xp;
-              }
-
               // Compare user exp if it exceeds the limit of his/her level
               let level_up;
               if (user.exp >= levelDictionary[parseInt(user.level)]) {
