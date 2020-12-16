@@ -32,11 +32,9 @@ const upload = multer({ storage });
 
 router.get("/", userController.getAllUsers);
 router.get("/get-user/", userController.getProfileByUID);
-// Test getting profile pic
-router.get("/get-profile-picture", userController.getProfilePicture);
 router.post("/add-user", userController.addUser);
 router.put("/edit-username", userController.editUsername);
-router.post(
+router.put(
   "/change-profile-picture",
   upload.single("image"),
   userController.changeProfilePicture

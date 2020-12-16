@@ -45,8 +45,8 @@ const UserSchema = new Schema({
     default: 0,
   },
   photo: {
-    type: String,
-    // default: null,
+    type: Object,
+    default: null,
   },
   smartSchoolAccount: {
     type: String,
@@ -86,11 +86,6 @@ const UserSchema = new Schema({
   lastLogin: {
     type: Date,
     default: Date.now,
-  },
-  photo: {
-    // data: Buffer,
-    // contentType: String,
-    type: Object,
   },
 });
 

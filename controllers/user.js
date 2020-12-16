@@ -139,12 +139,10 @@ exports.editUsername = async (req, res) => {
           if (!user) {
             return res.status(400).json({ success: false, error: "no data" });
           }
-          return res
-            .status(200)
-            .json({
-              success: true,
-              data: { userId: user._id, username: user.username },
-            });
+          return res.status(200).json({
+            success: true,
+            data: { userId: user._id, username: user.username },
+          });
         }
       );
     }
@@ -161,35 +159,13 @@ exports.changeProfilePicture = (req, res, next) => {
           .status(500)
           .send({ success: false, error: "Internal Server Error" });
       } else if (!user) {
-        res
-          .status(400)
-          .send({
-            success: false,
-            error: "Unable to find user with the given ID",
-          });
+        res.status(400).send({
+          success: false,
+          error: "Unable to find user with the given ID",
+        });
       }
+      user.photo = req.file;
       user.save();
-      res.status(201).send({ success: true, data: "Upload succeeded", photo: user.photo });
-    });
-};
-
-exports.getProfilePicture = (req, res, next) => {
-  const userId = req.query.userId;
-  User.findById(userId)
-    .select("_id, photo")
-    .exec((err, user) => {
-      if (err) {
-        res
-          .status(500)
-          .send({ success: false, error: "Internal Server Error" });
-      } else if (!user) {
-        res
-          .status(400)
-          .send({
-            success: false,
-            error: "Unable to find user with the given ID",
-          });
-      }
-      res.status(200).send(user);
+      res.status(200).send({ success: true, data: "Upload succeeded" });
     });
 };
