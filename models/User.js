@@ -2,21 +2,26 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const UserSchema = new Schema({
-  name: {
+  firstname: {
+    type: String,
+    required: true,
+  },
+  lastname: {
     type: String,
     required: true,
   },
   username: {
     type: String,
+    required: true,
     unique: true,
   },
   school: {
     type: String,
-    required: true,
+    default: null,
   },
   class: {
     type: String,
-    required: true,
+    default: null,
   },
   rank: {
     type: String,
@@ -31,45 +36,64 @@ const UserSchema = new Schema({
     type: Number,
     required: true,
   },
+  levelInfo: [
+    {
+      level: {
+        type: Number,
+        default: 1,
+      },
+      score: {
+        type: Number,
+        default: 0,
+      },
+    },
+  ],
   coin: {
     type: Number,
-    required: true,
+    default: 0,
   },
   photo: {
-    type: String,
+    type: Object,
+    default: null,
   },
   smartSchoolAccount: {
     type: String,
+    required: true,
   },
   streak: {
     type: Number,
-    required: true,
+    default: 0,
   },
   items: [
     {
-      itemID: {
-        type: Schema.Types.ObjectId,
-        ref: "Item",
+      itemName: {
+        type: String,
       },
       amount: {
         type: Number,
+        default: 0,
       },
     },
   ],
   achievements: [
     {
-      achievementID: {
-        type: Schema.Types.ObjectId,
-        ref: "Achievement",
+      achievementName: {
+        type: String,
       },
       score: {
         type: Number,
+        default: 0,
       },
     },
   ],
-  lottie: {
-    type: Object,
-    required: false,
+  role: {
+    type: String,
+    enum: ["ADMIN", "USER"],
+    default: "USER",
+  },
+  lastLogin: {
+    type: Date,
+    default: Date.now,
   },
 });
 

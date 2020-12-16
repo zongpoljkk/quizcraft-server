@@ -1,4 +1,4 @@
-exports.levelDictionary = () => {
+exports.levelSystem = () => {
   const levels = 40;
   const exp_for_first_level = 100;
   const exp_for_last_level = 100000;
@@ -14,4 +14,13 @@ exports.levelDictionary = () => {
     levelDictionary[i + 1] = new_xp - old_xp;
   }
   return levelDictionary;
+};
+
+exports.rankSystem = () => {
+  return {
+    8: "SILVER",
+    16: "GOLD",
+    24: "DIAMOND",
+    32: "PLATINUM",
+  };
 };
