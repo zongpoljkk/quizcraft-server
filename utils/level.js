@@ -20,7 +20,7 @@ exports.rankSystem = () => {
   return {
     8: "SILVER",
     16: "GOLD",
-    24: "DIAMOND",
-    32: "PLATINUM",
+    24: "PLATINUM",
+    32: "DIAMOND",
   };
 };
