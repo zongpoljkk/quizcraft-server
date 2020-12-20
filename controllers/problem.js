@@ -45,35 +45,35 @@ exports.getProblems = (req, res, next) => {
       },
     },
   ]).exec((err, problem) => {
-    if (err) res.status(500).send("Internal Server Error");
-    else if (!problem) res.status(400).send("Unable to get problems");
-    else res.status(200).send(problem);
-    next();
+    if (err) return res.status(500).json({ success: false, error: err });
+    else if (!problem)
+      return res.status(400).json({ success: false, error: "no data" });
+    else return res.status(200).json({ success: true, data: problem });
   });
 };
 
-exports.putDifficultyIndex = async (req, res, next) => {
-  const problemId = req.query.problemId;
-  const userTime = req.query.userTime;
+exports.checkAnswerAndUpdateDifficulty = async (req, res, next) => {
+  const problemId = req.body.problemId;
+  const userTime = req.body.userTime;
   const correct = req.correct;
+  const answer = req.answer;
   const solution = req.solution;
   const user = req.user;
 
   Problem.findById(problemId).exec(async (err, problem) => {
-    if (err) res.status(500).send("Internal Server Error");
+    if (err)
+      res.status(500).send({ success: false, error: "Internal Server Error" });
     else if (!problem)
-      res
-        .status(400)
-        .send(`Unable to find problem given problem id ${problemId}`);
-    else {
-      next();
-    }
+      res.status(400).send({
+        success: false,
+        error: `Unable to find problem given problem id ${problemId}`,
+      });
 
     problem.times = [...problem.times, userTime];
     if (!problem.users.includes(user)) {
       problem.users = [...problem.users, user];
     }
-    // });
+
     // update problem times and user Array
     const sumUserTime = problem.toJSON().times.reduce((sum, time) => {
       return sum + +time.toString();
@@ -116,8 +116,6 @@ exports.putDifficultyIndex = async (req, res, next) => {
     const EASY_CEIL = 13;
     const MEDIUM_CEIL = 150;
 
-    const current_difficulty = problem.difficulty;
-
     switch (problem.difficulty) {
       case "EASY":
         if (avgProblemTime >= EASY_CEIL) {
@@ -144,16 +142,16 @@ exports.putDifficultyIndex = async (req, res, next) => {
         }
     }
     problem.save();
-    const new_difficulty = problem.difficulty;
 
-    res.send({
-      old_difficulty: current_difficulty,
-      new_difficulty: new_difficulty,
-      correct: correct,
-      solution: solution,
-      user: user,
+    res.status(201).send({
+      success: true,
+      data: {
+        correct: correct,
+        answer: answer,
+        solution: solution,
+        user: user,
+      },
     });
-    // });
     next();
   });
 };

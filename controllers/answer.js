@@ -3,11 +3,11 @@ const math = require("mathjs");
 const Answer = require("../models/Answer");
 const User = require("../models/User");
 
-exports.getAnswer = async (req, res, next) => {
-  const problemId = req.query.problemId;
-  const userId = req.query.userId;
-  const userAnswer = req.query.userAnswer;
-  const subtopic = req.query.subtopic;
+exports.checkAnswer = async (req, res, next) => {
+  const problemId = req.body.problemId;
+  const userId = req.body.userId;
+  const userAnswer = req.body.userAnswer;
+  const subtopic = req.body.subtopic;
   Answer.findOne({ problemId: problemId })
     .populate("problemId", "difficulty")
     .exec((err, answer) => {
@@ -49,6 +49,7 @@ exports.getAnswer = async (req, res, next) => {
               req.correct = returnedSolution.correct;
               req.solution = returnedSolution.solution;
               req.user = returnedSolution.user._id;
+              req.answer = answer.body;
               next();
             });
         } else {
@@ -63,6 +64,7 @@ exports.getAnswer = async (req, res, next) => {
               req.correct = returnedSolution.correct;
               req.solution = returnedSolution.solution;
               req.user = returnedSolution.user._id;
+              req.answer = answer.body;
               next();
             });
         }
