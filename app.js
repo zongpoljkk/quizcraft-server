@@ -4,15 +4,21 @@ const mongoose = require("mongoose");
 const cookieSession = require("cookie-session");
 const keys = require("./config/keys");
 const bodyParser = require("body-parser");
-const cors = require("cors");
+const cors = require('cors');
 
 const problemRouter = require('./routes/problem');
 const subtopicRouter = require('./routes/subtopic');
 const practiceRouter = require('./routes/practice');
 const hintRouter = require('./routes/hint');
+const authRouter = require('./routes/auth');
 const userRouter = require('./routes/user');
 const itemRouter = require('./routes/item');
 const achievementRouter = require('./routes/achievement');
+
+mongoose.set('useNewUrlParser', true);
+mongoose.set('useFindAndModify', false);
+mongoose.set('useCreateIndex', true);
+mongoose.set('useUnifiedTopology', true);
 
 mongoose.connect(keys.mongoURI, () => {
   console.log("Connected to db");
@@ -44,6 +50,7 @@ app.use("/api/practice", practiceRouter);
 app.use('/api/problem', problemRouter);
 app.use('/api/subtopic', subtopicRouter);
 app.use('/api/hint', hintRouter);
+app.use('/api/auth',authRouter)
 app.use('/api/user', userRouter);
 app.use('/api/item', itemRouter);
 app.use('/api/achievement', achievementRouter);
