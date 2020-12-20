@@ -144,4 +144,40 @@ exports.editUsername = async (req, res) => {
       return res.status(400).json({ success: false, error: "already have this username!" });
     }
 });
-};
+};  
+
+
+exports.updateStreak = async (userId) => {
+  const user = await User.findOne({_id:userId});
+  const now = new Date();
+  const lastLoginDate = new Date(user.lastLogin);
+  const nextDate = new Date(user.lastLogin);
+  nextDate.setDate(nextDate.getDate() + 1);
+  if (now.toDateString() == lastLoginDate.toDateString()) {
+    //same day, do nothing
+    console.log("sameday")
+    return 
+  }
+  else if(now.toDateString() == nextDate.toDateString()){
+    //inc streak by 1
+    await User.findOneAndUpdate({
+      _id: userId
+    },{
+      $inc: {
+        streak:1
+      }
+    });
+    console.log("inc streak")
+    return
+  } 
+  else { //set streak to 0
+    await User.findOneAndUpdate({
+      _id: userId
+    },{
+      streak:0
+    });
+    console.log("set 0")
+    return
+  }
+}
+
