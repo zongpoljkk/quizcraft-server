@@ -172,10 +172,9 @@ exports.changeProfilePicture = (req, res, next) => {
 });
 };  
 
-
 exports.updateStreak = async (userId) => {
-  const user = await User.findOne({_id:userId});
   const now = new Date();
+  const user = await User.findOneAndUpdate({_id:userId}, {lastLogin: now});
   const lastLoginDate = new Date(user.lastLogin);
   const nextDate = new Date(user.lastLogin);
   nextDate.setDate(nextDate.getDate() + 1);
