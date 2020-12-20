@@ -39,6 +39,7 @@ exports.loginViaMCV = async (req, res) => {
       refreshToken = res.data.refresh_token;
     }).catch((err) => {
       console.log("err post token")
+      return res.status(400).json({ success: false, error: "err post token" });
     });
 
   //get info from mcv
@@ -50,6 +51,7 @@ exports.loginViaMCV = async (req, res) => {
       mcvUserInfo = res.data;
     }).catch((err)=> {
     console.log('err get mcv user info')
+    return res.status(400).json({ success: false, error: "err get mcv user info" });
   });
   
   //login or createUser
