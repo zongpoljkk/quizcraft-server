@@ -155,26 +155,48 @@ exports.usedItem = async (req, res) => {
     });
   }
 
-  User.findOneAndUpdate(
-    { _id: req.body.userId, 
+  User.findOne(
+    {
+      _id: req.body.userId,
       items: {
-        $elemMatch: { 
+        $elemMatch: {
           itemName: req.body.itemName,
-          amount: { $gt: 0 }
-        }
-      }
+          amount: { $eq: 0 },
+        },
+      },
     },
-    { $inc: { "items.$.amount" : -1 } }, 
-    { new: true },
     (err, user) => {
       if (err) {
         return res.status(500).json({ success: false, error: err });
       }
       if (!user) {
-        return res.status(400).json({ success: false, error: "no data" });
+        User.findOneAndUpdate(
+          { _id: req.body.userId,
+            items: {
+              $elemMatch: {
+                itemName: req.body.itemName,
+                amount: { $gt: 0 }
+              }
+            }
+          },
+          { $inc: { "items.$.amount" : -1 } },
+          { new: true },
+          (err, user) => {
+            if (err) {
+              return res.status(500).json({ success: false, error: err });
+            }
+            if (!user) {
+              return res.status(400).json({ success: false, error: "no data" });
+            }
+            let items = user.items
+            let index = items.findIndex(x => x.itemName === body.itemName);
+            return res.status(200).json({ success: true, data: user.items[index] });
+        });
+      } else {
+        return res
+          .status(400)
+          .json({ success: false, error: "cannot use this item bc amount = 0!" });
       }
-      let items = user.items
-      let index = items.findIndex(x => x.itemName === body.itemName);
-      return res.status(200).json({ success: true, data: user.items[index] });
-  });
+    }
+  );
 };
