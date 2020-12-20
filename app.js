@@ -1,8 +1,8 @@
 // import express from 'express';
-const express = require('express');
-const mongoose = require('mongoose');
-const cookieSession = require('cookie-session');
-const keys = require('./config/keys');
+const express = require("express");
+const mongoose = require("mongoose");
+const cookieSession = require("cookie-session");
+const keys = require("./config/keys");
 const bodyParser = require("body-parser");
 const cors = require('cors');
 
@@ -21,7 +21,7 @@ mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
 
 mongoose.connect(keys.mongoURI, () => {
-    console.log("Connected to db")
+  console.log("Connected to db");
 });
 
 // Listen to node and route http request to the route handler
@@ -35,9 +35,11 @@ app.use(
   })
 );
 
-app.use(cors({
-  origin: 'http://localhost:3000'
-}));
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+  })
+);
 
 // In develpment use port 5000
 // In production use provided port from Heroku
