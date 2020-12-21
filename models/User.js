@@ -25,8 +25,16 @@ const UserSchema = new Schema({
   },
   rank: {
     type: String,
+    required: true,
     enum: ["BRONZE", "SILVER", "GOLD"],
-    default: "BRONZE",
+  },
+  level: {
+    type: Number,
+    required: true,
+  },
+  exp: {
+    type: Number,
+    required: true,
   },
   levelInfo: [
     {
