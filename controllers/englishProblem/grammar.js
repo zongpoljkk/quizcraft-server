@@ -19,9 +19,10 @@ var sentences = [`She quickly types the letter.`
                 ,'He was surprised that his immense laziness was inspirational to others.'
                 ,"She borrowed the book from him many years ago and hasn't yet returned it."]
 
-const wordpos = new WordPOS({stopwords: ["all","one","somehow"]});
+const wordpos = new WordPOS({stopwords: false});
 const SELECT_ONE = "SELECT_ONE"
 const RADIO_CHOICE = "RADIO_CHOICE"
+
 const randInt = (start, end) => {
   return Math.floor(Math.random() * (end - start + 1)) + start;
 };
@@ -54,13 +55,12 @@ const shuffle = async (array) => {
   return array;
 }
 
-const generateAdverbsOfManner = async (subtopicName, difficulty) => {
-  var out = '';
+const generateGrammar = async (subtopicName, difficulty) => {
   var adverbs,adj,verbs,words,sentence,tokenize;
   var random,word,lowerWord,selectedWord,temp;
   var problemBody = "", problemTitle = "";
-  var answerBody,answerChoices;
-  var hintBody;
+  var answerBody = "",answerChoices;
+  var hintBody = "",solution = "";
   const answerMode = randInt(0,1)? SELECT_ONE: RADIO_CHOICE;
   // const answerMode = SELECT_ONE;
   // const answerMode = RADIO_CHOICE
@@ -69,7 +69,7 @@ const generateAdverbsOfManner = async (subtopicName, difficulty) => {
       try {
         // sentence = sentences[6]
         sentence = await getSentence()
-        console.log(sentence)
+        // console.log(sentence)
         words = new pos.Lexer().lex(sentence);
         var tagger = new pos.Tagger();
         var taggedWords = tagger.tag(words);
@@ -84,7 +84,7 @@ const generateAdverbsOfManner = async (subtopicName, difficulty) => {
             filterWords.push(word);
           }
         }
-        console.log("filterWords",filterWords)
+        // console.log("filterWords",filterWords)
         random = randInt(0,filterWords.length-1)
         selectedWord = filterWords[random]
         lowerWord = selectedWord.toLowerCase()
@@ -113,7 +113,7 @@ const generateAdverbsOfManner = async (subtopicName, difficulty) => {
           while (temp == lowerWord);
           problemBody = randInt(0,1)? sentence.replace(selectedWord,`[${selectedWord}&${temp}]`) 
                             : sentence.replace(selectedWord,`[${temp}&${selectedWord}]`);
-          console.log(problemBody)
+          // console.log(problemBody)
         } 
         else if (answerMode==RADIO_CHOICE) {
           let n = choices.length 
@@ -134,14 +134,48 @@ const generateAdverbsOfManner = async (subtopicName, difficulty) => {
           while (answerChoices.length < 4);
           answerChoices = await shuffle(answerChoices);
           problemBody = sentence.replace(selectedWord,`[]`);
-          console.log("answerChoices",answerChoices)
-          console.log(problemBody)
+          // console.log("answerChoices",answerChoices)
+          // console.log(problemBody)
         }
       }catch(err){
+        console.log(err);
+        return err;
+      }
+      //create answer
+      answerBody = selectedWord;
+
+      //create model
+      problem = new Problem({
+        body: problemBody,
+        subtopicName: subtopicName,
+        difficulty: difficulty,
+        answerType: answerMode,
+        title: problemTitle,
+        choices: answerChoices? answerChoices: [], 
+      });
+      problemId = problem._id;
+      answer = new Answer({
+        problemId: problemId,
+        body: answerBody,
+        solution: solution,
+      });
+      hint = new Hint({ problemId: problemId, body: hintBody });
+
+      console.log("problem",problem)
+      console.log("answer",answer)
+      console.log("hint",hint)
+      //save to database
+      try{
+        // await problem.save();
+        // await answer.save();
+        // await hint.save();
+        return [{ problem, answer, hint }];
+      }catch (err) {
         console.log(err)
+        return err;
       }
       break;
   }
 };
 
-module.exports = { generateAdverbsOfManner }
+module.exports = { generateGrammar }

@@ -1,5 +1,5 @@
 const English = require("../models/English");
-const {generateAdverbsOfManner} = require("./englishProblem/adverbsOfManner")
+const {generateGrammar} = require("./englishProblem/grammar")
 
 exports.addEnglishData = (req, res) => {
   const english = new English(req.body);
@@ -12,6 +12,6 @@ exports.addEnglishData = (req, res) => {
 
 //test
 exports.test = (req, res)=>{
-  generateAdverbsOfManner('test','EASY')
+  generateGrammar('Grammar','EASY')
   return res.send("Hey")
 }
