@@ -2,12 +2,14 @@ const express = require('express');
 
 const subtopicController = require('../controllers/subtopic');
 
+const { authJwt, adminOnly } = require('../middlewares');
+
 const router = express.Router();
 
-router.get('/', subtopicController.getAllSubtopics)
-router.get('/get-all-subjects', subtopicController.getAllSubjects)
-router.get('/get-topics/', subtopicController.getTopicBySubjectName)
-router.get('/get-subtopics/', subtopicController.getSubtopicByTopicName)
-router.post('/add-subtopic', subtopicController.addSubtopic)
+router.get('/', [authJwt], subtopicController.getAllSubtopics)
+router.get('/get-all-subjects', [authJwt], subtopicController.getAllSubjects)
+router.get('/get-topics/', [authJwt], subtopicController.getTopicBySubjectName)
+router.get('/get-subtopics/', [authJwt], subtopicController.getSubtopicByTopicName)
+router.post('/add-subtopic', [authJwt, adminOnly], subtopicController.addSubtopic)
 
 module.exports = router;
