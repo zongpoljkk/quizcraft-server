@@ -169,40 +169,42 @@ exports.changeProfilePicture = (req, res, next) => {
       res.status(200).send({ success: true, data: "Upload succeeded" });
     });
 };
-});
-};  
 
 exports.updateStreak = async (userId) => {
   const now = new Date();
-  const user = await User.findOneAndUpdate({_id:userId}, {lastLogin: now});
+  const user = await User.findOneAndUpdate({ _id: userId }, { lastLogin: now });
   const lastLoginDate = new Date(user.lastLogin);
   const nextDate = new Date(user.lastLogin);
   nextDate.setDate(nextDate.getDate() + 1);
   if (now.toDateString() == lastLoginDate.toDateString()) {
     //same day, do nothing
-    console.log("sameday")
-    return 
-  }
-  else if(now.toDateString() == nextDate.toDateString()){
+    console.log("sameday");
+    return;
+  } else if (now.toDateString() == nextDate.toDateString()) {
     //inc streak by 1
-    await User.findOneAndUpdate({
-      _id: userId
-    },{
-      $inc: {
-        streak:1
+    await User.findOneAndUpdate(
+      {
+        _id: userId,
+      },
+      {
+        $inc: {
+          streak: 1,
+        },
       }
-    });
-    console.log("inc streak")
-    return
-  } 
-  else { //set streak to 0
-    await User.findOneAndUpdate({
-      _id: userId
-    },{
-      streak:0
-    });
-    console.log("set 0")
-    return
+    );
+    console.log("inc streak");
+    return;
+  } else {
+    //set streak to 0
+    await User.findOneAndUpdate(
+      {
+        _id: userId,
+      },
+      {
+        streak: 0,
+      }
+    );
+    console.log("set 0");
+    return;
   }
-}
-
+};
