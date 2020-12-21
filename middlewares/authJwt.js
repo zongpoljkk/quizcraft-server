@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const config = require("../config/keys");
 
 const verifyToken = (req, res, next) => {
+  console.log(req);
   let token = req.header('Authorization');
   if (!token) {
     return res.status(403).json({ success: false, error: "No token provided!" });
