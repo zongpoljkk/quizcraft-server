@@ -15,3 +15,5 @@ const englishGenerate = ({ subtopicName, difficulty }) => {
       return "Default";
   }
 };
+
+module.exports = { englishGenerate };

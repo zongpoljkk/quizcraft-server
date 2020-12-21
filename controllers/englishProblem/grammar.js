@@ -62,18 +62,14 @@ const generateGrammar = async (subtopicName, difficulty) => {
   var answerBody = "",answerChoices;
   var hintBody = "",solution = "";
   const answerMode = randInt(0,1)? SELECT_ONE: RADIO_CHOICE;
-  // const answerMode = SELECT_ONE;
-  // const answerMode = RADIO_CHOICE
   switch (difficulty) {
     case EASY:
       try {
         // sentence = sentences[6]
         sentence = await getSentence()
-        // console.log(sentence)
         words = new pos.Lexer().lex(sentence);
         var tagger = new pos.Tagger();
         var taggedWords = tagger.tag(words);
-        // console.log(taggedWords)
         var filterTags = ['JJ','JJR','JJS','MD','RB','RBR','RBS','VB','VBD','VBG','VBN','VBP','VBZ']
         var filterWords = []
         for (i in taggedWords) {
@@ -84,7 +80,6 @@ const generateGrammar = async (subtopicName, difficulty) => {
             filterWords.push(word);
           }
         }
-        // console.log("filterWords",filterWords)
         random = randInt(0,filterWords.length-1)
         selectedWord = filterWords[random]
         lowerWord = selectedWord.toLowerCase()
@@ -97,7 +92,7 @@ const generateGrammar = async (subtopicName, difficulty) => {
             choices.push(temp[0])
           }
         }
-        //opt 1 select right word
+        //opt 1 select correct word
         problemTitle = "Choose the correct option to complete the sentence."
         if (answerMode==SELECT_ONE) {
           let n = choices.length 
@@ -113,7 +108,6 @@ const generateGrammar = async (subtopicName, difficulty) => {
           while (temp == lowerWord);
           problemBody = randInt(0,1)? sentence.replace(selectedWord,`[${selectedWord}&${temp}]`) 
                             : sentence.replace(selectedWord,`[${temp}&${selectedWord}]`);
-          // console.log(problemBody)
         } 
         else if (answerMode==RADIO_CHOICE) {
           let n = choices.length 
@@ -134,8 +128,6 @@ const generateGrammar = async (subtopicName, difficulty) => {
           while (answerChoices.length < 4);
           answerChoices = await shuffle(answerChoices);
           problemBody = sentence.replace(selectedWord,`[]`);
-          // console.log("answerChoices",answerChoices)
-          // console.log(problemBody)
         }
       }catch(err){
         console.log(err);
@@ -161,14 +153,14 @@ const generateGrammar = async (subtopicName, difficulty) => {
       });
       hint = new Hint({ problemId: problemId, body: hintBody });
 
-      console.log("problem",problem)
-      console.log("answer",answer)
-      console.log("hint",hint)
+      // console.log("problem",problem)
+      // console.log("answer",answer)
+      // console.log("hint",hint)
       //save to database
       try{
-        // await problem.save();
-        // await answer.save();
-        // await hint.save();
+        await problem.save();
+        await answer.save();
+        await hint.save();
         return [{ problem, answer, hint }];
       }catch (err) {
         console.log(err)

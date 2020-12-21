@@ -1,6 +1,7 @@
 const English = require("../models/English");
 const {generateGrammar} = require("./englishProblem/grammar")
 
+//for mocking data
 exports.addEnglishData = (req, res) => {
   const english = new English(req.body);
   english.save((err, newEnglish) => {
@@ -11,7 +12,7 @@ exports.addEnglishData = (req, res) => {
 }
 
 //test
-exports.test = (req, res)=>{
-  generateGrammar('Grammar','EASY')
-  return res.send("Hey")
+exports.test = async (req, res) => {
+  const [{ problem, answer, hint }] = await generateGrammar('Grammar','EASY');
+  return res.status(200).json({problem,answer,hint});
 }
