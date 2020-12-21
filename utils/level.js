@@ -18,7 +18,7 @@ exports.levelSystem = () => {
 
 exports.rankSystem = () => {
   return {
-    15: "SILVER",
+    12: "SILVER",
     30: "GOLD",
   };
 };
