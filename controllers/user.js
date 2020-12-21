@@ -1,4 +1,6 @@
 const User = require("../models/User");
+const jwt = require("jsonwebtoken");
+const config = require("../config/keys");
 
 //Add user for testing
 exports.addUser = (req, res, next) => {
@@ -96,11 +98,31 @@ exports.getProfileByUID = async (req, res) => {
 };
 
 exports.editUsername = async (req, res) => {
+  let token = req.header('Authorization');
+  var userIdFromToken
+  if (!token) {
+    return res.status(403).json({ success: false, error: "No token provided!" });
+  }
+  if (token.startsWith('Bearer ')) {
+    token = token.slice(7, token.length).trimLeft();
+  } else {}
+  jwt.verify(token, config.secret, (err, decoded) => {
+    if (err) return res.status(401).json({ success: false, error: "Unauthorized!" })
+    userIdFromToken = decoded.userId;
+  })
+
   const body = req.body;
   if (!body) {
     return res.status(400).json({
       success: false,
       error: "You must provide a body to update",
+    });
+  }
+
+  if (userIdFromToken !== body.userId) {
+    return res.status(400).json({
+      success: false,
+      error: "userId not match userId that decoded from token!",
     });
   }
 

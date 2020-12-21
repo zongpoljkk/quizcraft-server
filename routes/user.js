@@ -7,6 +7,8 @@ const GridFsStorage = require("multer-gridfs-storage");
 const keys = require("../config/keys");
 const userController = require("../controllers/user");
 
+const { authJwt, adminOnly } = require('../middlewares');
+
 const router = express.Router();
 
 const storage = new GridFsStorage({
@@ -30,10 +32,10 @@ const storage = new GridFsStorage({
 
 const upload = multer({ storage });
 
-router.get("/", userController.getAllUsers);
-router.get("/get-user/", userController.getProfileByUID);
-router.post("/add-user", userController.addUser);
-router.put("/edit-username", userController.editUsername);
+router.get('/', [authJwt], userController.getAllUsers)
+router.get('/get-user/', [authJwt], userController.getProfileByUID)
+router.put('/edit-username', [authJwt], userController.editUsername)
+router.post('/add-user', [authJwt, adminOnly], userController.addUser)
 router.put(
   "/change-profile-picture",
   upload.single("image"),
