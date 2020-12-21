@@ -163,7 +163,7 @@ exports.editUsername = async (req, res) => {
           }
           return res.status(200).json({
             success: true,
-            data: { userId: user._id, username: user.username },
+            data: { username: user.username },
           });
         }
       );
