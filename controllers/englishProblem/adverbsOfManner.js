@@ -5,7 +5,6 @@ const English = require("../../models/English");
 const WordPOS = require("wordpos");
 const pos = require('pos');
 const synonyms = require("synonyms");
-const { choice } = require("synonyms/dictionary");
 const EASY = "EASY";
 const MEDIUM = "MEDIUM";
 const HARD = "HARD";
@@ -15,10 +14,14 @@ const WORD = "WORD"
 var sentences = [`She quickly types the letter.`
                 ,`Evie can play tennis and badminton but she prefers team sports.`
                 ,`He swam well despite being tired.`
-                ,'He kept telling himself that one day it would all somehow make sense.']
+                ,'He kept telling himself that one day it would all somehow make sense.'
+                ,'He swore he just saw his sushi move.'
+                ,'He was surprised that his immense laziness was inspirational to others.'
+                ,"She borrowed the book from him many years ago and hasn't yet returned it."]
 
 const wordpos = new WordPOS({stopwords: ["all","one","somehow"]});
-
+const SELECT_ONE = "SELECT_ONE"
+const RADIO_CHOICE = "RADIO_CHOICE"
 const randInt = (start, end) => {
   return Math.floor(Math.random() * (end - start + 1)) + start;
 };
@@ -36,65 +39,109 @@ const getChoices = async (word) => {
   else return null
 };
 
+const shuffle = async (array) => {
+  var currentIndex = array.length, temporaryValue, randomIndex;
+  while (0 !== currentIndex) {
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+  return array;
+}
+
 const generateAdverbsOfManner = async (subtopicName, difficulty) => {
   var out = '';
   var adverbs,adj,verbs,words,sentence,tokenize;
-  var b,random,word,lowerWord;
+  var random,word,lowerWord,selectedWord,temp;
+  var problemBody = "", problemTitle = "";
+  var answerBody,answerChoices;
+  var hintBody;
+  const answerMode = randInt(0,1)? SELECT_ONE: RADIO_CHOICE;
+  // const answerMode = SELECT_ONE;
+  // const answerMode = RADIO_CHOICE
   switch (difficulty) {
     case EASY:
       try {
-        sentence = sentences[1]
-        // sentence = await getSentence()
+        // sentence = sentences[6]
+        sentence = await getSentence()
         console.log(sentence)
         words = new pos.Lexer().lex(sentence);
-        console.log(words)
         var tagger = new pos.Tagger();
         var taggedWords = tagger.tag(words);
-        console.log(taggedWords)
+        // console.log(taggedWords)
         var filterTags = ['JJ','JJR','JJS','MD','RB','RBR','RBS','VB','VBD','VBG','VBN','VBP','VBZ']
-        //JJ JJR JJS MD RB RBR RBS VB VBD VBG VBN VBP VBZ
         var filterWords = []
         for (i in taggedWords) {
-          var taggedWord = taggedWords[i];
-          var word = taggedWord[0];
-          var tag = taggedWord[1];
+          let taggedWord = taggedWords[i];
+          let tag = taggedWord[1];
           if (filterTags.includes(tag)){
+            word = taggedWord[0];
             filterWords.push(word);
           }
         }
         console.log("filterWords",filterWords)
-        // tokenize = await wordpos.parse(sentences[3])
-        pos2 = await wordpos.getPOS(sentence)
-        console.log(pos2)
-        // verbs = pos.verbs
-        // adverbs = pos.adverbs
-        // adj = pos.adjectives 
-        // posList = [verbs,adverbs,adj]
-        // do {
-        //   random = randInt(0,posList.length-1)
-        // }
-        // while (posList[random].length == 0)
-        // word = posList[random][randInt(0,posList[random].length-1)]
-        // lowerWord = word.toLowerCase()
-        // console.log(word)
-        // choices = await getChoices(lowerWord);
-        // if (choices) {
-        //   console.log(choices)
-
-        // } else {
-
-        // }
-        // adj  = await wordpos.randAdjective({startsWith:adverbs[0][0]+adverbs[0][1]})
-        // syn = synonyms(adverb[randInt(0,adverbs.length-1)])
-        // console.log('verbs',verbs)
-        // console.log('adj',adj)
-        // console.log('adverbs',adverbs)
+        random = randInt(0,filterWords.length-1)
+        selectedWord = filterWords[random]
+        lowerWord = selectedWord.toLowerCase()
+        choices = await getChoices(lowerWord);
+        if(!choices) {
+          choices = []
+          choices.push(lowerWord);
+          for (i=0;i<4;i++) {
+            temp  = await wordpos.randAdjective({startsWith:lowerWord[0]+lowerWord[1]})
+            choices.push(temp[0])
+          }
+        }
+        //opt 1 select right word
+        problemTitle = "Choose the correct option to complete the sentence."
+        if (answerMode==SELECT_ONE) {
+          let n = choices.length 
+          if (n < 2) {
+            for (i=0;i<2-n;i++) {
+              temp  = await wordpos.randAdjective({startsWith:lowerWord[0]+lowerWord[1]})
+              choices.push(temp)
+            }
+          }
+          do {
+            temp = choices[randInt(0,choices.length-1)]
+          }
+          while (temp == lowerWord);
+          problemBody = randInt(0,1)? sentence.replace(selectedWord,`[${selectedWord}&${temp}]`) 
+                            : sentence.replace(selectedWord,`[${temp}&${selectedWord}]`);
+          console.log(problemBody)
+        } 
+        else if (answerMode==RADIO_CHOICE) {
+          let n = choices.length 
+          if (n < 4) {
+            for (i=0;i<4-n;i++) {
+              temp  = await wordpos.randAdjective({startsWith:lowerWord[0]+lowerWord[1]})
+              choices.push(temp)
+            }
+          }
+          answerChoices = [selectedWord]
+          do {
+            random = randInt(0,choices.length-1);
+            word = choices[random];
+            if (!answerChoices.includes(word)) {
+              answerChoices.push(word);
+            }
+          }
+          while (answerChoices.length < 4);
+          answerChoices = await shuffle(answerChoices);
+          problemBody = sentence.replace(selectedWord,`[]`);
+          console.log("answerChoices",answerChoices)
+          console.log(problemBody)
+        }
       }catch(err){
         console.log(err)
       }
       break;
   }
 };
-// generateAdverbsOfManner('test','EASY')
-// return 0
+
 module.exports = { generateAdverbsOfManner }
