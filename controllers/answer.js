@@ -13,6 +13,18 @@ exports.checkAnswer = async (req, res, next) => {
   const userId = req.body.userId;
   const userAnswer = req.body.userAnswer;
   const subtopic = req.body.subtopic;
+  const mode = req.body.mode;
+
+  // ------ Handle mode surplus ------ //
+  let mode_surplus = 1;
+  switch (mode) {
+    case "challenge":
+      mode_surplus = 1.2;
+    case "quiz":
+      mode_surplus = 1.4;
+    case "group":
+      mode_surplus = 0;
+  }
 
   Answer.findOne({ problemId: problemId })
     .populate("problemId", "difficulty")
@@ -28,7 +40,7 @@ exports.checkAnswer = async (req, res, next) => {
       } else {
         if (
           userAnswer === answer.body ||
-          (subtopic === "การดำเนินการของเลขยกกำลัง" &&
+          (subtopic === "การดำเนินการของเลขยกกำลัง" && // For this topic, there are many possible answers
             math.evaluate(userAnswer) === math.evaluate(answer.body))
         ) {
           const user = User.findById(userId)
@@ -37,16 +49,16 @@ exports.checkAnswer = async (req, res, next) => {
               // * Handle Earned coins * //
               switch (answer.problemId.difficulty) {
                 case "EASY":
-                  user.exp += 10;
-                  user.coin += 10;
+                  user.exp += 10 * mode_surplus;
+                  user.coin += 10 * mode_surplus;
                   break;
                 case "MEDIUM":
-                  user.exp += 20;
-                  user.coin += 20;
+                  user.exp += 20 * mode_surplus;
+                  user.coin += 20 * mode_surplus;
                   break;
                 case "HARD":
-                  user.exp += 30;
-                  user.coin += 30;
+                  user.exp += 30 * mode_surplus;
+                  user.coin += 30 * mode_surplus;
                   break;
               }
 
