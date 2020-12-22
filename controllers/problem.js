@@ -212,7 +212,7 @@ exports.getProblemForUser = async (req, res, next) => {
         } catch (err) {
           return res.status(400).json({ success: false, error: err });
         }
-        
+
       case ENG:
         try {
           await englishGenerate({ subtopicName, difficulty });
@@ -246,10 +246,17 @@ exports.getProblemForUser = async (req, res, next) => {
           .json({ success: false, error: "Problem out of stock" });
     }
   } else {
-    answer = await Answer.findOne({ problemId: problem._id });
-    return res
-      .status(200)
-      .json({ success: true, data: { problem, correctAnswer: answer.body } });
+    if (subject == MATH) {
+      answer = await Answer.findOne({ problemId: problem._id });
+      return res
+        .status(200)
+        .json({ success: true, data: { problem, correctAnswer: answer.body } });
+    } 
+    else {
+      return res
+        .status(200)
+        .json({ success: true, data: { problem} });  
+    }
   }
 };
 

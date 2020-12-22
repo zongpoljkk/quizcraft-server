@@ -152,10 +152,7 @@ const generateGrammar = async (subtopicName, difficulty) => {
         solution: solution,
       });
       hint = new Hint({ problemId: problemId, body: hintBody });
-
-      // console.log("problem",problem)
-      // console.log("answer",answer)
-      // console.log("hint",hint)
+      
       //save to database
       try{
         await problem.save();
