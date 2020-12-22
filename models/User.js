@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const UserSchema = new Schema({
@@ -25,25 +25,27 @@ const UserSchema = new Schema({
   },
   rank: {
     type: String,
-    enum: ['BRONZE','SILVER','GOLD'],
-    default: 'BRONZE',
+    enum: ["BRONZE", "SILVER", "GOLD"],
+    default: "BRONZE",
   },
-  levelInfo: [{
-    level: {
-      type: Number,
-      default: 1,
-    },
-    score: {
-      type: Number,
-      default: 0,
-    }
-  }],
+  level: {
+    type: Number,
+    default: 1,
+  },
+  exp: {
+    type: Number,
+    default: 0,
+  },
+  maxExp: {
+    type: Number,
+    default: 100,
+  },
   coin: {
     type: Number,
     default: 0,
   },
   photo: {
-    type: String,
+    type: Object,
     default: null,
   },
   smartSchoolAccount: {
@@ -54,33 +56,37 @@ const UserSchema = new Schema({
     type: Number,
     default: 0,
   },
-  items: [{
-    itemName: {
-      type: String,
+  items: [
+    {
+      itemName: {
+        type: String,
+      },
+      amount: {
+        type: Number,
+        default: 0,
+      },
     },
-    amount: {
-      type: Number,
-      default: 0,
-    }
-  }],
-  achievements: [{
-    achievementName:{
-      type: String,
+  ],
+  achievements: [
+    {
+      achievementName: {
+        type: String,
+      },
+      score: {
+        type: Number,
+        default: 0,
+      },
     },
-    score: {
-      type: Number,
-      default: 0,
-    }
-  }],
+  ],
   role: {
     type: String,
-    enum: ['ADMIN','USER'],
-    default: 'USER',
+    enum: ["ADMIN", "USER"],
+    default: "USER",
   },
   lastLogin: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model("User", UserSchema);
