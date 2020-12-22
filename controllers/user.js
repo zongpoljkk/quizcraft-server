@@ -81,7 +81,6 @@ exports.getProfileByUID = async (req, res) => {
           "itemInfos.description": 0,
           "itemInfos.__v": 0,
           "itemInfos._id": 0,
-          "levelInfo._id": 0,
         },
       },
     ],
