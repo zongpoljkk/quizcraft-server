@@ -267,7 +267,7 @@ exports.getProblemForUser = async (req, res, next) => {
     else {
       return res
         .status(200)
-        .json({ success: true, data: { problem} });  
+        .json({ success: true, data: { problem } });  
     }
   }
 };
