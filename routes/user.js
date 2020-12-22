@@ -37,6 +37,7 @@ router.get('/', [authJwt], userController.getAllUsers)
 router.get('/get-user/', [authJwt], userController.getProfileByUID)
 router.put('/edit-username', [authJwt], userController.editUsername)
 router.post('/add-user', [authJwt, adminOnly], userController.addUser)
+router.put('/used-item', [authJwt], userController.usedItem)
 router.put(
   "/change-profile-picture",
   upload.single("image"),
