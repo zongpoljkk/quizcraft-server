@@ -82,7 +82,7 @@ exports.loginViaMCV = async (req, res) => {
       });
     }
     //update streak
-    updateStreak(user._id);
+    await updateStreak(user._id);
     //Create and assign token
     const token = jwt.sign({userId: user._id, role: user.role}, config.secret, {
       expiresIn: 14400 // 4 hours
