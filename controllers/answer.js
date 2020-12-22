@@ -108,8 +108,8 @@ exports.checkAnswer = async (req, res, next) => {
               req.correct = returnedSolution.correct;
               req.solution = returnedSolution.solution;
               req.user = returnedSolution.user._id;
-              req.level_up = level_up;
-              req.rank_up = rank_up;
+              req.level_up = false;
+              req.rank_up = false;
               req.answer = answer.body;
               next();
             });

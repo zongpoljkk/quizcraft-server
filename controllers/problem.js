@@ -141,6 +141,7 @@ exports.checkAnswerAndUpdateDifficulty = async (req, res, next) => {
         } else if (avgProblemTime < EASY_CEIL) {
           problem.difficulty = "EASY";
         }
+        break;
       case "HARD":
         earned_coins = 30;
         earned_exp = 30;
