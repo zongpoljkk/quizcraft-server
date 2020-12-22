@@ -71,6 +71,7 @@ exports.checkAnswer = async (req, res, next) => {
                 } else {
                   level_up = true;
                   user.exp -= levelDictionary[parseInt(user.level)];
+                  user.maxExp = levelDictionary[parseInt(user.level + 1)];
                   user.level += 1;
                   // ? Handle Rank up ? //
                   if (user.level in rankDictionary) {
