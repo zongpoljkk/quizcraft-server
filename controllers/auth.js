@@ -50,8 +50,8 @@ exports.loginViaMCV = async (req, res) => {
     ).then((res) => {
       mcvUserInfo = res.data;
     }).catch((err)=> {
-    console.log('err get mcv user info')
-    return res.status(400).json({ success: false, error: "err get mcv user info" });
+      console.log('err get mcv user info')
+      return res.status(400).json({ success: false, error: "err get mcv user info" });
   });
   
   //login or createUser
@@ -82,7 +82,7 @@ exports.loginViaMCV = async (req, res) => {
       });
     }
     //update streak
-    updateStreak(user._id);
+    await updateStreak(user._id);
     //Create and assign token
     const token = jwt.sign({userId: user._id, role: user.role}, config.secret, {
       expiresIn: 14400 // 4 hours

@@ -60,6 +60,8 @@ exports.checkAnswerAndUpdateDifficulty = async (req, res, next) => {
   const answer = req.answer;
   const solution = req.solution;
   const user = req.user;
+  const level_up = req.level_up;
+  const rank_up = req.rank_up;
 
   Problem.findById(problemId).exec(async (err, problem) => {
     if (err)
@@ -117,8 +119,13 @@ exports.checkAnswerAndUpdateDifficulty = async (req, res, next) => {
     const EASY_CEIL = 13;
     const MEDIUM_CEIL = 150;
 
+    // Dealing with returned earned coin
+    let earned_coins = 0;
+
     switch (problem.difficulty) {
       case "EASY":
+        earned_coins = 10;
+        earned_exp = 10;
         if (avgProblemTime >= EASY_CEIL) {
           if (avgProblemTime >= MEDIUM_CEIL) {
             problem.difficulty = "HARD";
@@ -128,12 +135,16 @@ exports.checkAnswerAndUpdateDifficulty = async (req, res, next) => {
         }
         break;
       case "MEDIUM":
+        earned_coins = 20;
+        earned_exp = 20;
         if (avgProblemTime >= MEDIUM_CEIL) {
           problem.difficulty = "HARD";
         } else if (avgProblemTime < EASY_CEIL) {
           problem.difficulty = "EASY";
         }
       case "HARD":
+        earned_coins = 30;
+        earned_exp = 30;
         if (avgProblemTime < MEDIUM_CEIL) {
           if (avgProblemTime < EASY_CEIL) {
             problem.difficulty = "EASY";
@@ -144,14 +155,15 @@ exports.checkAnswerAndUpdateDifficulty = async (req, res, next) => {
     }
     problem.save();
 
-    res.status(201).send({
-      success: true,
-      data: {
-        correct: correct,
-        answer: answer,
-        solution: solution,
-        user: user,
-      },
+    res.send({
+      correct: correct,
+      solution: solution,
+      user: user,
+      answer: answer,
+      earned_coins: earned_coins,
+      earned_exp: earned_exp,
+      level_up: level_up,
+      rank_up: rank_up,
     });
     next();
   });
