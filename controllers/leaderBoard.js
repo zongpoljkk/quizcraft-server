@@ -8,9 +8,11 @@ exports.getLeaderBoard = async (req, res, next) => {
     .select("_id, username level class")
     .exec((err, users) => {
       if (err) {
-        res.status(500).send({ error: err });
+        res.status(500).send({ success: false, error: err });
       } else if (!users) {
-        res.status(400).send("Unable to get all users");
+        res
+          .status(400)
+          .send({ success: false, error: "Unable to get all users" });
         return;
       }
 
@@ -26,11 +28,12 @@ exports.getLeaderBoard = async (req, res, next) => {
         .select("_id school class")
         .exec((err, user) => {
           if (err) {
-            res.status(500).send({ error: err });
+            res.status(500).send({ success: false, error: err });
           } else if (!user) {
-            res
-              .status(400)
-              .send("The user with the given userId was not found");
+            res.status(400).send({
+              success: false,
+              error: "The user with the given userId was not found",
+            });
             return;
           }
           const classroom = user.class;
@@ -41,11 +44,14 @@ exports.getLeaderBoard = async (req, res, next) => {
             .select("_id username level class")
             .exec((err, users) => {
               if (err) {
-                res.status(500).send({ error: err });
+                res.status(500).send({ success: false, error: err });
               } else if (!user) {
                 res
                   .status(400)
-                  .send("The user with the given school name was not found");
+                  .send({
+                    success: false,
+                    error: "The user with the given school name was not found",
+                  });
                 return;
               }
 
