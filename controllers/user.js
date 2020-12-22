@@ -81,7 +81,6 @@ exports.getProfileByUID = async (req, res) => {
           "itemInfos.description": 0,
           "itemInfos.__v": 0,
           "itemInfos._id": 0,
-          "levelInfo._id": 0,
         },
       },
     ],
@@ -168,7 +167,85 @@ exports.editUsername = async (req, res) => {
         }
       );
     }
-  });
+    else{
+      return res.status(400).json({ success: false, error: "already have this username!" });
+    }
+});
+};
+
+exports.usedItem = async (req, res) => {
+  let token = req.header('Authorization');
+  var userIdFromToken
+  if (!token) {
+    return res.status(403).json({ success: false, error: "No token provided!" });
+  }
+  if (token.startsWith('Bearer ')) {
+    token = token.slice(7, token.length).trimLeft();
+  } else {}
+  jwt.verify(token, config.secret, (err, decoded) => {
+    if (err) return res.status(401).json({ success: false, error: "Unauthorized!" })
+    userIdFromToken = decoded.userId;
+  })
+
+  const body = req.body;
+  if (!body) {
+    return res.status(400).json({
+      success: false,
+      error: "You must provide a body to update",
+    });
+  }
+
+  if (userIdFromToken !== body.userId) {
+    return res.status(400).json({
+      success: false,
+      error: "userId not match userId that decoded from token!",
+    });
+  }
+
+  User.findOne(
+    {
+      _id: req.body.userId,
+      items: {
+        $elemMatch: {
+          itemName: req.body.itemName,
+          amount: { $eq: 0 },
+        },
+      },
+    },
+    (err, user) => {
+      if (err) {
+        return res.status(500).json({ success: false, error: err });
+      }
+      if (!user) {
+        User.findOneAndUpdate(
+          { _id: req.body.userId,
+            items: {
+              $elemMatch: {
+                itemName: req.body.itemName,
+                amount: { $gt: 0 }
+              }
+            }
+          },
+          { $inc: { "items.$.amount" : -1 } },
+          { new: true },
+          (err, user) => {
+            if (err) {
+              return res.status(500).json({ success: false, error: err });
+            }
+            if (!user) {
+              return res.status(400).json({ success: false, error: "no data" });
+            }
+            let items = user.items
+            let index = items.findIndex(x => x.itemName === body.itemName);
+            return res.status(200).json({ success: true, data: user.items[index] });
+        });
+      } else {
+        return res
+          .status(400)
+          .json({ success: false, error: "cannot use this item bc amount = 0!" });
+      }
+    }
+  );
 };
 
 exports.changeProfilePicture = (req, res, next) => {
