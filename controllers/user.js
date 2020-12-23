@@ -253,12 +253,10 @@ exports.usedItem = async (req, res) => {
           }
         );
       } else {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            error: "cannot use this item bc amount = 0!",
-          });
+        return res.status(400).json({
+          success: false,
+          error: "cannot use this item bc amount = 0!",
+        });
       }
     }
   );
@@ -293,12 +291,10 @@ exports.getAmountOfItems = (req, res) => {
       if (err) {
         return res.status(500).json({ success: false, error: err });
       } else if (!user) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            error: "Unable to find user with the given id",
-          });
+        return res.status(400).json({
+          success: false,
+          error: "Unable to find user with the given id",
+        });
       }
       let hint = 0;
       let skip = 0;
@@ -306,13 +302,13 @@ exports.getAmountOfItems = (req, res) => {
       user.items.forEach((item) => {
         switch (item.itemName) {
           case "Hint":
-            hint++;
+            hint += item.amount;
             break;
           case "Skip":
-            skip++;
+            skip += item.amount;
             break;
           case "Refresh":
-            refresh++;
+            refresh += item.amount;
             break;
         }
       });
