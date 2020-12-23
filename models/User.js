@@ -1,56 +1,92 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const UserSchema = new Schema({
-    name: {
+  firstname: {
+    type: String,
+    required: true,
+  },
+  lastname: {
+    type: String,
+    required: true,
+  },
+  username: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  school: {
+    type: String,
+    default: null,
+  },
+  class: {
+    type: String,
+    default: null,
+  },
+  rank: {
+    type: String,
+    enum: ["BRONZE", "SILVER", "GOLD"],
+    default: "BRONZE",
+  },
+  level: {
+    type: Number,
+    default: 1,
+  },
+  exp: {
+    type: Number,
+    default: 0,
+  },
+  maxExp: {
+    type: Number,
+    default: 100,
+  },
+  coin: {
+    type: Number,
+    default: 0,
+  },
+  photo: {
+    type: Object,
+    default: null,
+  },
+  smartSchoolAccount: {
+    type: String,
+    required: true,
+  },
+  streak: {
+    type: Number,
+    default: 0,
+  },
+  items: [
+    {
+      itemName: {
         type: String,
-        required: true,
-    },
-    username: {
-        type: String,
-    },
-    school: {
-        type: String,
-        required: true,
-    },
-    class: {
-        type: String,
-        required: true,
-    },
-    rank: {
-        type: String,
-        required: true,
-        enum: ['BRONZE','SILVER','GOLD','DIAMOND'],
-    },
-    level: {
+      },
+      amount: {
         type: Number,
-        required: true,
+        default: 0,
+      },
     },
-    coin: {
+  ],
+  achievements: [
+    {
+      achievementName: {
+        type: String,
+      },
+      score: {
         type: Number,
-        required: true,
+        default: 0,
+      },
     },
-    photo: {
-        type: String,
-    },
-    smartSchoolAccount: {
-        type: String,
-    },
-    streak: {
-        type: Number,
-        required: true,
-    },
-    items: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Item',  
-    }],
-    archievements: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Archievement'
-    }],
-    tips: [{
-        type: String,
-    }]
+  ],
+  role: {
+    type: String,
+    enum: ["ADMIN", "USER"],
+    default: "USER",
+  },
+  lastLogin: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model("User", UserSchema);
