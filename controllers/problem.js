@@ -3,6 +3,7 @@ const Subtopic = require("../models/Subtopic");
 const Answer = require("../models/Answer");
 const Hint = require("../models/Hint");
 const { mathGenerate } = require("./mathProblem/mathProblemGenerator");
+const { englishGenerate } = require("./englishProblem/englishProblemGenerator");
 const MATH = "คณิตศาสตร์";
 const ENG = "ภาษาอังกฤษ";
 
@@ -224,21 +225,51 @@ exports.getProblemForUser = async (req, res, next) => {
         } catch (err) {
           return res.status(400).json({ success: false, error: err });
         }
+
       case ENG:
-        //TODO: Generate problem
-        return res
-          .status(404)
-          .json({ success: false, error: "Problem out of stock" });
+        try {
+          await englishGenerate({ subtopicName, difficulty });
+          problem = await Problem.findOneAndUpdate(
+            {
+              subtopicName: subtopicName,
+              difficulty: difficulty,
+              users: { $ne: userId },
+            },
+            { $push: { users: userId } },
+            {
+              projection: {
+                users: 0,
+                times: 0,
+                subtopicName: 0,
+                difficulty: 0,
+              },
+            }
+          );
+          return res.status(200).json({
+            success: true,
+            data: { problem },
+          });
+        } catch (err) {
+          return res.status(400).json({ success: false, error: err });
+        }
+
       default:
         return res
           .status(404)
           .json({ success: false, error: "Problem out of stock" });
     }
   } else {
-    answer = await Answer.findOne({ problemId: problem._id });
-    return res
-      .status(200)
-      .json({ success: true, data: { problem, correctAnswer: answer.body } });
+    if (subject == MATH) {
+      answer = await Answer.findOne({ problemId: problem._id });
+      return res
+        .status(200)
+        .json({ success: true, data: { problem, correctAnswer: answer.body } });
+    } 
+    else {
+      return res
+        .status(200)
+        .json({ success: true, data: { problem } });  
+    }
   }
 };
 

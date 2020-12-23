@@ -9,7 +9,6 @@ const HintSchema = new Schema({
   }, 
   body: {
     type: String,
-    required: true,
   }
 })
 
