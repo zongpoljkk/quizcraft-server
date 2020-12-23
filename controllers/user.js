@@ -127,7 +127,7 @@ exports.editUsername = async (req, res) => {
   }
 
   const regex = RegExp(
-    "^(?=[a-zA-Zก-๛_d]*[a-zA-Zก-๛])[-a-zA-Zก-๛0-9_d]{5,12}$"
+    "^(?=[a-zA-Zก-๛_d\S]*[a-zA-Zก-๛\S])[-a-zA-Zก-๛0-9_d\S]{5,12}$"
   );
   const usernameValidate = regex.test(body.username);
 
