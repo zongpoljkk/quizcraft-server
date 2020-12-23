@@ -7,6 +7,7 @@ const HARD = "HARD";
 const alphabet = "abcdefghijklmnopqrstuvwxyz";
 
 
+
 const baseSelector = () => {
   let rand = Math.floor(Math.random() * 4) + 1; //choose base
   let a, b, c;
@@ -343,9 +344,9 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
       solution += `\n${answerBody}`;
 
       //create hint
-      hintBody = `a^m*a^n = a^(m+n)|สมบัติการคูณของเลขยกกำลัง`;
+      hintBody = `a^m*a^n = a^(m+n) | สมบัติการคูณของเลขยกกำลัง`;
       if (isDivided)
-        hintBody += `\n(a^m)/(a^n) = a^(m-n)|สมบัติการหารของเลขยกกำลัง`;
+        hintBody += `\n(a^m)/(a^n) = a^(m-n) | สมบัติการหารของเลขยกกำลัง`;
 
       //create model
       problem = new Problem({
@@ -453,9 +454,9 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           solution += `\n${answerBody}`;
 
           //create hint
-          hintBody = `ลองเปลี่ยนเลขธรรมดาให้เป็นเลขยกกำลังที่ฐานเท่ากับเลขยกกำลังตัวอื่นดูสิ\na^m*a^n = a^(m+n)|สมบัติการคูณของเลขยกกำลัง`;
+          hintBody = `ลองเปลี่ยนเลขธรรมดาให้เป็นเลขยกกำลังที่ฐานเท่ากับเลขยกกำลังตัวอื่นดูสิ\na^m*a^n = a^(m+n) | สมบัติการคูณของเลขยกกำลัง`;
           if (isDivided)
-            hintBody += `\n(a^m)/(a^n) = a^(m-n)|สมบัติการหารของเลขยกกำลัง`;
+            hintBody += `\n(a^m)/(a^n) = a^(m-n) | สมบัติการหารของเลขยกกำลัง`;
           break;
 
         case 2: //(1/2)^2*(0.5)^[3]
@@ -531,9 +532,9 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           solution += `\n${answerBody}`;
 
           //create hint
-          hintBody = `ถ้าสังเกตดี ๆ เศษส่วนกับทศนิยมเท่ากันนะ\na^m*a^n = a^(m+n)|สมบัติการคูณของเลขยกกำลัง`;
+          hintBody = `ถ้าสังเกตดี ๆ เศษส่วนกับทศนิยมเท่ากันนะ\na^m*a^n = a^(m+n) | สมบัติการคูณของเลขยกกำลัง`;
           if (isDivided)
-            hintBody += `\n(a^m)/(a^n) = a^(m-n)|สมบัติการหารของเลขยกกำลัง`;
+            hintBody += `\n(a^m)/(a^n) = a^(m-n) | สมบัติการหารของเลขยกกำลัง`;
           break;
 
         case 3: // (-3)^2*(3)^2
@@ -610,9 +611,9 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           solution += `\n${answerBody}`;
 
           //create hint
-          hintBody = `ถ้าเลขติดลบยกกำลังด้วยเลขคู่จะกลายเป็นค่าบวกนะ เช่น (-3)^[2] = 9 = 3^[2]\nแต่ถ้าเลขติดลบยกกำลังด้วยเลขคี่จะกลายเป็นค่าลบนะ เช่น (-3)^[3] = -27 = -(3^[3])\na^m*a^n = a^(m+n)|สมบัติการคูณของเลขยกกำลัง`;
+          hintBody = `ถ้าเลขติดลบยกกำลังด้วยเลขคู่จะกลายเป็นค่าบวกนะ เช่น (-3)^[2] = 9 = 3^[2]\nแต่ถ้าเลขติดลบยกกำลังด้วยเลขคี่จะกลายเป็นค่าลบนะ เช่น (-3)^[3] = -27 = -(3^[3])\na^m*a^n = a^(m+n) | สมบัติการคูณของเลขยกกำลัง`;
           if (isDivided)
-            hintBody += `\n(a^m)/(a^n) = a^(m-n)|สมบัติการหารของเลขยกกำลัง`;
+            hintBody += `\n(a^m)/(a^n) = a^(m-n) | สมบัติการหารของเลขยกกำลัง`;
           break;
       }
 
