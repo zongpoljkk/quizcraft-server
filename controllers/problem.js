@@ -172,11 +172,25 @@ exports.checkAnswerAndUpdateDifficulty = async (req, res, next) => {
 
 // for testing
 exports.generateProblem = async (req, res, next) => {
-  try {
-    const [{ problem, answer, hint }] = await mathGenerate(req.body);
-    return res.send({ problem, answer, hint });
-  } catch (err) {
-    return res.status(500).json({ success: false, error: err });
+  let subject = req.body.subject;
+  let problem, answer, hint;
+  switch (subject) {
+    case MATH: 
+      try {
+        [{ problem, answer, hint }] = await mathGenerate(req.body);
+        return res.send({ problem, answer, hint });
+      } catch (err) {
+        return res.status(500).json({ success: false, error: err });
+      }
+    
+    case ENG:
+      try {
+        [{ problem, answer, hint }] = await englishGenerate(req.body);
+        return res.send({ problem, answer, hint });
+      } catch (err) {
+        return res.status(500).json({ success: false, error: err });
+      }
+     default: return res.send("Not Implement");
   }
 };
 
