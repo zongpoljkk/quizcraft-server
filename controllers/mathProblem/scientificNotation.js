@@ -64,6 +64,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
   var problemTitle,problemBody,answerBody,hintBody,solution;
   var a,n,stn,num,opt,nn,ff;
   let i;
+  let problem, problemId, answer, hint, newProblem,newAnswer,newHint;
   switch (difficulty) {
     case EASY:
       nn = randInt(1,9);
@@ -78,7 +79,6 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
       stn = `${a}*10^[${n}]`;
       num = moveThePoint(a,n);
       opt = randInt(1,2);
-      console.log(opt);
       switch(opt) {
         case 1: 
           problemTitle = "จงเขียนจำนวนต่อไปนี้ให้อยู่ในรูปสัญกรณ์วิทยาศาสตร์"
@@ -111,12 +111,6 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           }
           break;
       }
-      console.log(problemTitle);
-      console.log(problemBody);
-      console.log(answerBody); 
-      console.log(hintBody);
-      console.log(solution);
-
       //create model
       problem = new Problem({
         body: problemBody,
@@ -132,28 +126,23 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
         solution: solution,
       });
       hint = new Hint({ problemId: problemId, body: hintBody });
-      //save to database
-      // try{
-      //   newProblem = await problem.save();
-      //   newAnswer = await answer.save();
-      //   newHint = await hint.save();
-      //   return [{ problem:newProblem, answer:newAnswer, hint:newHint }];
-      // }catch (err) {
-      //   console.log(err)
-      //   return err;
-      // }
+      // save to database
+      try {
+        newProblem = await problem.save();
+        newAnswer = await answer.save();
+        newHint = await hint.save();
+        return [{ problem:newProblem, answer:newAnswer, hint:newHint }];
+      } catch (err) {
+        console.log(err)
+        return err;
+      }
 
-
-      return "Not Implement";
     case MEDIUM:
       return "Not Implement";
     case HARD:
       return "Not Implement";
   }
 };
-
-generateScientificNotation('test','EASY')
-return 0
 
 module.exports = {generateScientificNotation};
 
