@@ -76,17 +76,19 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           problemTitle = "จงเขียนจำนวนต่อไปนี้ให้อยู่ในรูปสัญกรณ์วิทยาศาสตร์"
           problemBody = num;
           answerBody = stn; 
-          hintBody = 'เขียนเลขให้อยู่ในรูป a*10^[n] โดยที่ 1 <= a < 10';
+          hintBody = `เขียนเลขให้อยู่ในรูป a*10^n โดยที่ 1 <= a < 10 \nเลื่อนจุดไปทาง${n<0? `ขวา ${-n} หน่วย`:`ซ้าย ${n} หน่วย`}`;
           break;
         case 2:
           problemTitle = "จงเขียนตัวเลขแทนจำนวนต่อไปนี้โดยไม่ใช้เลขยกกำลัง";
           problemBody = stn;
           answerBody = num;
+          hintBody = `เลื่อนจุดไปทาง${n<0? `ซ้าย ${-n} หน่วย`:`ขวา ${n} หน่วย`}`
           break;
       }
       console.log(problemTitle);
       console.log(problemBody);
       console.log(answerBody); 
+      console.log(hintBody);
       return "Not Implement";
     case MEDIUM:
       return "Not Implement";
