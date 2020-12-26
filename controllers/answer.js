@@ -43,7 +43,7 @@ exports.checkAnswer = async (req, res, next) => {
           (subtopic === "การดำเนินการของเลขยกกำลัง" && // For this topic, there are many possible answers
             math.evaluate(userAnswer) === math.evaluate(answer.body))
         ) {
-          const user = User.findById(userId)
+          User.findById(userId)
             .exec()
             .then((user) => {
               // * Handle Earned coins * //

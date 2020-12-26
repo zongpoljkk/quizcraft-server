@@ -14,6 +14,7 @@ const authRouter = require("./routes/auth");
 const userRouter = require("./routes/user");
 const itemRouter = require("./routes/item");
 const achievementRouter = require("./routes/achievement");
+const leaderboardRouter = require("./routes/leaderBoard");
 const englishRouter = require("./routes/english");
 
 mongoose.set("useNewUrlParser", true);
@@ -55,6 +56,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/item", itemRouter);
 app.use("/api/achievement", achievementRouter);
+app.use("/api/leader-board", leaderboardRouter);
 app.use("/api/english", englishRouter);
 
 // app.use((req, res, next) => {

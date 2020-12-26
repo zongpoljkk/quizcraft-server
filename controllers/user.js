@@ -97,18 +97,22 @@ exports.getProfileByUID = async (req, res) => {
 };
 
 exports.editUsername = async (req, res) => {
-  let token = req.header('Authorization');
-  var userIdFromToken
+  let token = req.header("Authorization");
+  var userIdFromToken;
   if (!token) {
-    return res.status(403).json({ success: false, error: "No token provided!" });
+    return res
+      .status(403)
+      .json({ success: false, error: "No token provided!" });
   }
-  if (token.startsWith('Bearer ')) {
+  if (token.startsWith("Bearer ")) {
     token = token.slice(7, token.length).trimLeft();
-  } else {}
+  } else {
+  }
   jwt.verify(token, config.secret, (err, decoded) => {
-    if (err) return res.status(401).json({ success: false, error: "Unauthorized!" })
+    if (err)
+      return res.status(401).json({ success: false, error: "Unauthorized!" });
     userIdFromToken = decoded.userId;
-  })
+  });
 
   const body = req.body;
   if (!body) {
@@ -126,7 +130,7 @@ exports.editUsername = async (req, res) => {
   }
 
   const regex = RegExp(
-    "^(?=[a-zA-Zก-๛_d]*[a-zA-Zก-๛])[-a-zA-Zก-๛0-9_d]{5,12}$"
+    "^(?=[a-zA-Zก-๛_d\S]*[a-zA-Zก-๛\S])[-a-zA-Zก-๛0-9_d\S]{5,12}$"
   );
   const usernameValidate = regex.test(body.username);
 
@@ -166,26 +170,31 @@ exports.editUsername = async (req, res) => {
           });
         }
       );
+    } else {
+      return res
+        .status(400)
+        .json({ success: false, error: "already have this username!" });
     }
-    else{
-      return res.status(400).json({ success: false, error: "already have this username!" });
-    }
-});
+  });
 };
 
 exports.usedItem = async (req, res) => {
-  let token = req.header('Authorization');
-  var userIdFromToken
+  let token = req.header("Authorization");
+  var userIdFromToken;
   if (!token) {
-    return res.status(403).json({ success: false, error: "No token provided!" });
+    return res
+      .status(403)
+      .json({ success: false, error: "No token provided!" });
   }
-  if (token.startsWith('Bearer ')) {
+  if (token.startsWith("Bearer ")) {
     token = token.slice(7, token.length).trimLeft();
-  } else {}
+  } else {
+  }
   jwt.verify(token, config.secret, (err, decoded) => {
-    if (err) return res.status(401).json({ success: false, error: "Unauthorized!" })
+    if (err)
+      return res.status(401).json({ success: false, error: "Unauthorized!" });
     userIdFromToken = decoded.userId;
-  })
+  });
 
   const body = req.body;
   if (!body) {
@@ -218,15 +227,16 @@ exports.usedItem = async (req, res) => {
       }
       if (!user) {
         User.findOneAndUpdate(
-          { _id: req.body.userId,
+          {
+            _id: req.body.userId,
             items: {
               $elemMatch: {
                 itemName: req.body.itemName,
-                amount: { $gt: 0 }
-              }
-            }
+                amount: { $gt: 0 },
+              },
+            },
           },
-          { $inc: { "items.$.amount" : -1 } },
+          { $inc: { "items.$.amount": -1 } },
           { new: true },
           (err, user) => {
             if (err) {
@@ -235,14 +245,18 @@ exports.usedItem = async (req, res) => {
             if (!user) {
               return res.status(400).json({ success: false, error: "no data" });
             }
-            let items = user.items
-            let index = items.findIndex(x => x.itemName === body.itemName);
-            return res.status(200).json({ success: true, data: user.items[index] });
-        });
+            let items = user.items;
+            let index = items.findIndex((x) => x.itemName === body.itemName);
+            return res
+              .status(200)
+              .json({ success: true, data: user.items[index] });
+          }
+        );
       } else {
-        return res
-          .status(400)
-          .json({ success: false, error: "cannot use this item bc amount = 0!" });
+        return res.status(400).json({
+          success: false,
+          error: "cannot use this item bc amount = 0!",
+        });
       }
     }
   );
@@ -266,6 +280,39 @@ exports.changeProfilePicture = (req, res, next) => {
       user.photo = req.file;
       user.save();
       res.status(200).send({ success: true, data: "Upload succeeded" });
+    });
+};
+
+exports.getAmountOfItems = (req, res) => {
+  const userId = req.query.userId;
+  User.findById(userId)
+    .select("_id items")
+    .exec((err, user) => {
+      if (err) {
+        return res.status(500).json({ success: false, error: err });
+      } else if (!user) {
+        return res.status(400).json({
+          success: false,
+          error: "Unable to find user with the given id",
+        });
+      }
+      let hint = 0;
+      let skip = 0;
+      let refresh = 0;
+      user.items.forEach((item) => {
+        switch (item.itemName) {
+          case "Hint":
+            hint += item.amount;
+            break;
+          case "Skip":
+            skip += item.amount;
+            break;
+          case "Refresh":
+            refresh += item.amount;
+            break;
+        }
+      });
+      res.send({ hint: hint, skip: skip, refresh: refresh });
     });
 };
 
