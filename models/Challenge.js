@@ -43,12 +43,15 @@ const ChallengeSchema = new Schema({
     required: true,
     default: 0,
   },
-  currentProblem: {
-    type: Number,
+  subtopicName: {
+    type: String,
     required: true,
-    enum: [1,2,3,4,5],
-    default: 1,
-  }
+  },
+  difficulty: {
+    type: String,
+    enum: ["EASY", "MEDIUM", "HARD"],
+    required: true,
+  },
 })
 
 module.exports = mongoose.model('Challenge', ChallengeSchema);
