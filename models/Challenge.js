@@ -43,6 +43,11 @@ const ChallengeSchema = new Schema({
     required: true,
     default: 0,
   },
+  currentProblem: {
+    type: Number,
+    enum: [1,2,3,4,5],
+    default: 1,
+  },
   subtopicName: {
     type: String,
     required: true,
