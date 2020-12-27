@@ -45,6 +45,7 @@ const ChallengeSchema = new Schema({
   },
   currentProblem: {
     type: Number,
+    required: true,
     enum: [1,2,3,4,5],
     default: 1,
   },
