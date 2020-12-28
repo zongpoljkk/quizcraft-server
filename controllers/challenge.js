@@ -88,7 +88,8 @@ exports.specificChallenge = async (req, res) => {
   var problem,problems = [];
   try {
     //step1: check if username is exist and not same as user1
-    const user2 = await User.findOne({username: username}, { _id:1, firstname:1, lastname:1, username:1 });
+    const user1 = await User.findOne({ _id: user1Id }, { _id:1, firstname:1, lastname:1, username:1, photo:1 });
+    const user2 = await User.findOne({ username: username }, { _id:1, firstname:1, lastname:1, username:1, photo:1 });
     if (!user2) return res.status(400).json({success: false, error: "Cannot find the user"});
     if (user2._id == user1Id) return res.status(400).json({success: false, error: "Cannot challenge yourself"});
     const user2Id = user2._id;
@@ -138,7 +139,7 @@ exports.specificChallenge = async (req, res) => {
 
     // save to database
     await challenge.save();
-    return res.status(200).json({ success: true, challenge});
+    return res.status(200).json({ success: true, challenge, user1, user2});
 
   } catch (err) {
     return res.status(400).json({ success: false, error: err });
