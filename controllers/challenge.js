@@ -137,15 +137,9 @@ exports.specificChallenge = async (req, res) => {
       difficulty: difficulty,
     })
 
-    const outChallenge = {
-      _id: challenge._id,
-      problems: challenge.problems,
-      currentProblem: challenge.currentProblem,
-    }
-
     // save to database
     await challenge.save();
-    return res.status(200).json({ success: true, data: {challenge: outChallenge, user1, user2}});
+    return res.status(200).json({ success: true, data: {challengeId: challenge._id, user1, user2}});
 
   } catch (err) {
     return res.status(400).json({ success: false, error: err });
