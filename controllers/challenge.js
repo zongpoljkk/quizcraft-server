@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Challenge = require("../models/Challenge");
 const Problem = require("../models/Problem");
+const { NUMBER_OF_PROBLEM } = require("../utils/challenge");
 
 const randInt = (start, end) => {
   return Math.floor(Math.random() * (end - start + 1)) + start;
@@ -20,8 +21,8 @@ exports.randomChallenge = async (req, res) => {
     const randomUser = await User.findOne({_id: {$ne: user1Id} }, { _id:1, firstname:1, lastname:1, username:1, photo:1 }).skip(random);
     const user2Id = randomUser._id;
     
-    //step2: get 5 question for both user (both user should never seen all questions before)
-    for (i=0; i<5; i++) {
+    //step2: get <NUMBER_OF_PROBLEM> question for both user (both user should never seen all questions before)
+    for (i=0; i<NUMBER_OF_PROBLEM; i++) {
       problem = await Problem.findOneAndUpdate(
         {
           subtopicName: subtopicName,
