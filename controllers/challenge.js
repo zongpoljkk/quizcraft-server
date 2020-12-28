@@ -46,7 +46,7 @@ exports.randomChallenge = async (req, res) => {
           {
             subtopicName: subtopicName,
             difficulty: difficulty,
-            users: { $ne: userId },
+            users: { $nin: [user1Id,user2Id] },
           },
           { $addToSet: { users: [user1Id,user2Id] } },
           { projection: { _id: 1 } }
