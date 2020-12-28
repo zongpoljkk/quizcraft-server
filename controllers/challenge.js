@@ -1,9 +1,9 @@
 const User = require("../models/User");
 const Challenge = require("../models/Challenge");
 const Problem = require("../models/Problem");
+const { NUMBER_OF_PROBLEM } = require("../utils/challenge")
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
-const {NUMBER_OF_PROBLEM} = require("../utils/challenge")
 
 const randInt = (start, end) => {
   return Math.floor(Math.random() * (end - start + 1)) + start;
