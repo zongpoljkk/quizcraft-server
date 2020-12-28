@@ -78,3 +78,10 @@ exports.randomChallenge = async (req, res) => {
     return res.status(400).json({ success: false, error: err });
   }
 }
+
+exports.getAllMyChallenges = async (req, res) => {
+  const userId = req.query.userId;
+  const challenges = await Challenge.find({ $or: [ {user1Id: userId}, {user2Id:userId} ] });
+  //TODO: 
+  return res.send(challenges);
+}
