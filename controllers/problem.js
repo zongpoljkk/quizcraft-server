@@ -79,12 +79,6 @@ exports.checkAnswerAndUpdateDifficulty = async (req, res, next) => {
       problem.users = [...problem.users, user];
     }
 
-    // update problem times and user Array
-    // const sumUserTime = problem.toJSON().times.reduce((sum, time) => {
-    //   return sum + +time.toString();
-    // }, 0);
-    // const avgUserTime = sumUserTime / problem.toJSON().times.length;
-
     // TODO: filter outliers
     if (problem.times.length > 10) {
       // Copy the values, rather than operating on references to existing values
@@ -98,15 +92,10 @@ exports.checkAnswerAndUpdateDifficulty = async (req, res, next) => {
         return a - b;
       });
 
-      console.log(`sortedCopyTimes: ${sortedCopyTimes}`);
-
       const q1 = sortedCopyTimes[Math.floor(sortedCopyTimes.length / 4)];
       // Likewise for q3.
       const q3 = sortedCopyTimes[Math.ceil(sortedCopyTimes.length * (3 / 4))];
       const iqr = q3 - q1;
-
-      console.log(`q1: ${q1}`);
-      console.log(`q3: ${q3}`);
 
       // Then find min and max values
       const maxValue = q3 + iqr * 1.5;
@@ -114,9 +103,6 @@ exports.checkAnswerAndUpdateDifficulty = async (req, res, next) => {
 
       // Then filter anything beyond or beneath these values.
       const filteredValues = sortedCopyTimes.filter((time) => {
-        console.log(maxValue);
-        console.log(minValue);
-        console.log(time);
         return time <= maxValue && time >= minValue;
       });
 

@@ -43,10 +43,9 @@ exports.checkAnswer = async (req, res, next) => {
           .send("The answer with the given problem id was not found");
         return;
       } else {
-        // console.log(userAnswer);
-        // console.log(answer.body);
         if (
           userAnswer === answer.body
+          // TODO: Evaluate Math expression for subtopic "การดำเนินการของเลขยกกำลัง"
           // (subtopic === "การดำเนินการของเลขยกกำลัง" && // For this topic, there are many possible answers
           //   math.evaluate(userAnswer) === math.evaluate(answer.body))
           // math.compare(userAnswer, answer.body) === true)
