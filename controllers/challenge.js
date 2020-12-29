@@ -71,3 +71,10 @@ exports.randomChallenge = async (req, res) => {
     return res.status(400).json({ success: false, error: err });
   }
 }
+
+exports.readChallenge = async (req, res) => {
+  //put
+  const challengeId = req.body.challengeId;
+  const userId = req.body.userId;
+  return res.send("TODO")
+}
