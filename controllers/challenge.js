@@ -235,6 +235,6 @@ exports.getAllMyChallenges = async (req, res) => {
     return res.status(200).json({ succes: true, data: {myTurn, theirTurn, result} });
   } catch (err) {
     if (err) return res.status(500).json({ succes:false, error: err.toString()});
-    else return res.status(500).json({ succes:false, error: "Something went wrong"});
+    else return res.status(400).json({ succes:false, error: "Something went wrong"});
   }
 }
