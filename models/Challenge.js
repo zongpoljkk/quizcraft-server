@@ -63,7 +63,15 @@ const ChallengeSchema = new Schema({
   }],
   user2Result: [{
     type: Number,
-  }]
+  }],
+  user1IsRead: {
+    type: Boolean,
+    default: false,
+  },
+  user2IsRead: {
+    type: Boolean,
+    default: false,
+  }
 })
 
 module.exports = mongoose.model('Challenge', ChallengeSchema);
