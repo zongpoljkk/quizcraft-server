@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const Item = require("../models/Item");
 const jwt = require("jsonwebtoken");
 const config = require("../config/keys");
 
@@ -353,4 +354,69 @@ exports.updateStreak = async (userId) => {
     console.log("set 1");
     return;
   }
+};
+
+exports.buyItem = async (req, res) => {
+  const body = req.body;
+  if (!body) {
+    return res.status(400).json({
+      success: false,
+      error: "You must provide a body to update",
+    });
+  }
+
+  const item = await Item.findOne({ name: req.body.itemName }, (err, item) => {
+    if (err) {
+      return res.status(500).json({ success: false, error: err });
+    }
+    if (!item) {
+      return res.status(400).json({ success: false, error: "no items" });
+    }
+    return item;
+  });
+
+  const item_price = item.price;
+  const item_name = item.name;
+
+  User.findOne(
+    {
+      _id: req.body.userId,
+      "items.itemName": item_name,
+      coin: { $lt: item_price },
+    },
+    (err, user) => {
+      if (err) {
+        return res.status(500).json({ success: false, error: err });
+      }
+      if (!user) {
+        User.findOneAndUpdate(
+          {
+            _id: req.body.userId,
+            "items.itemName": item_name,
+            coin: { $gte: item_price },
+          },
+          { $inc: { "items.$.amount": 1, coin: -item_price } },
+          { new: true },
+          (err, user) => {
+            if (err) {
+              return res.status(500).json({ success: false, error: err });
+            }
+            if (!user) {
+              return res.status(400).json({ success: false, error: "no data" });
+            }
+            let items = user.items;
+            let index = items.findIndex((x) => x.itemName === body.itemName);
+            return res
+              .status(200)
+              .json({ success: true, data: user.items[index] });
+          }
+        );
+      } else {
+        return res.status(400).json({
+          success: false,
+          error: "You don't have enough money to buy this item!",
+        });
+      }
+    }
+  );
 };
