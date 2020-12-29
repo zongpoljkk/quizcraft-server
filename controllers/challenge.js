@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const Challenge = require("../models/Challenge");
 const Problem = require("../models/Problem");
-const { NUMBER_OF_PROBLEM } = require("../utils/challenge")
+const { NUMBER_OF_PROBLEM } = require("../utils/challenge");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 
