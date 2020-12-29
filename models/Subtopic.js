@@ -22,7 +22,17 @@ const SubtopicSchema = new Schema({
   topicImg: {
     type: String,
     default: null,
-  }
+  },
+  availableDifficulty: [{
+    difficulty: {
+      type: String,
+      enum: ["EASY","MEDIUM","HARD"]
+    },
+    isAvailable: {
+      type: Boolean,
+      default: false,
+    },
+  }]
 })
 
 
