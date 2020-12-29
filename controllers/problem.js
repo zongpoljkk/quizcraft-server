@@ -237,7 +237,9 @@ exports.getProblemForUser = async (req, res, next) => {
             data: { problem, correctAnswer: answer.body },
           });
         } catch (err) {
-          return res.status(400).json({ success: false, error: err });
+          if (!problem) return res.status(404).json({ success: false, error: "Problem out of stock and cannot generate problem" });
+          else if (err) return res.status(500).json({ success: false, error: err.toString() });
+          else return res.status(400).json({ success: false, error: "Something went wrong" });
         }
 
       case ENG:
@@ -264,7 +266,9 @@ exports.getProblemForUser = async (req, res, next) => {
             data: { problem },
           });
         } catch (err) {
-          return res.status(400).json({ success: false, error: err });
+          if (!problem) return res.status(404).json({ success: false, error: "Problem out of stock and cannot generate problem" });
+          else if (err) return res.status(500).json({ success: false, error: err.toString() });
+          else return res.status(400).json({ success: false, error: "Something went wrong" });
         }
 
       default:
