@@ -24,6 +24,7 @@ const SubtopicSchema = new Schema({
     default: null,
   },
   availableDifficulty: [{
+    _id: false,
     difficulty: {
       type: String,
       enum: ["EASY","MEDIUM","HARD"]
