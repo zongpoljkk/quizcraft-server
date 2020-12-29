@@ -103,7 +103,8 @@ exports.getAllMyChallenges = async (req, res) => {
     },
     { $unwind: "$user2"},
     { $project: 
-      { _id:1, whoTurn:1, user1Score:1, user2Score:1, user1Id:1, user2Id:1, user1Result:1, user2Result:1,
+      { _id:1, whoTurn:1, user1Score:1, user2Score:1, user1Id:1, user2Id:1, 
+        user1Result:1, user2Result:1, user1IsRead:1, user2IsRead:1,
         user1: {
           photo:1, firstname:1, lastname: 1, username: 1
         }, 
