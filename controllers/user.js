@@ -341,16 +341,16 @@ exports.updateStreak = async (userId) => {
     console.log("inc streak");
     return;
   } else {
-    //set streak to 0
+    //set streak to 1
     await User.findOneAndUpdate(
       {
         _id: userId,
       },
       {
-        streak: 0,
+        streak: 1,
       }
     );
-    console.log("set 0");
+    console.log("set 1");
     return;
   }
 };
