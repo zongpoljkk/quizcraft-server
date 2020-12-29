@@ -139,10 +139,8 @@ exports.specificChallenge = async (req, res) => {
 }
 
 exports.readChallenge = async (req, res) => {
-  //put
   const challengeId = req.body.challengeId;
   const userId = req.body.userId;
-  //TODO: find challenge and update isRead (should know whether they are user1 or 2)
   await Challenge.findOne({ _id: challengeId, $or: [ {user1Id: userId}, {user2Id: userId} ] } )
     .exec((err, challenge) => {
       if (err) return res.status(500).json({ success: false, error: err });
