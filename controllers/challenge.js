@@ -149,7 +149,7 @@ exports.readChallenge = async (req, res) => {
       else challenge.user2IsRead = true;
       challenge.save((err, newChallenge) => {
         if (err) return res.status(500).json({ success: false, error: err });
-        else if (!newChallenge) return res.status(400).json({ success: false, error: "Challenge not exist" });
+        else if (!newChallenge) return res.status(400).json({ success: false, error: "Cannot update challenge" });
         return res.status(200).json({ success: true, isRead: newChallenge.user1Id == userId? newChallenge.user1IsRead:newChallenge.user2IsRead })
       })
     })
