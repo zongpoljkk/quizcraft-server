@@ -128,7 +128,8 @@ exports.getAllMyChallenges = async (req, res) => {
         username: challenge.user2.username,
         photo: challenge.user2.photo,
         myScore: challenge.user1Score,
-        theirScore: challenge.user2Score
+        theirScore: challenge.user2Score,
+        isRead: challenge.user1IsRead,
       }
       if (challenge.user1Result.length == NUMBER_OF_PROBLEM && challenge.user1Result.length == NUMBER_OF_PROBLEM) {
         result.push(temp);
@@ -149,7 +150,8 @@ exports.getAllMyChallenges = async (req, res) => {
         username: challenge.user1.username,
         photo: challenge.user1.photo,
         myScore: challenge.user2Score,
-        theirScore: challenge.user1Score
+        theirScore: challenge.user1Score,
+        isRead: challenge.user2IsRead,
       }
       if (challenge.user1Result.length == NUMBER_OF_PROBLEM && challenge.user1Result.length == NUMBER_OF_PROBLEM) {
         result.push(temp);
