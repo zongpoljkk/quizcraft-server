@@ -58,6 +58,20 @@ const ChallengeSchema = new Schema({
     enum: ["EASY", "MEDIUM", "HARD"],
     required: true,
   },
+  user1Result: [{
+    type: Number,
+  }],
+  user2Result: [{
+    type: Number,
+  }],
+  user1IsRead: {
+    type: Boolean,
+    default: false,
+  },
+  user2IsRead: {
+    type: Boolean,
+    default: false,
+  }
 })
 
 module.exports = mongoose.model('Challenge', ChallengeSchema);
