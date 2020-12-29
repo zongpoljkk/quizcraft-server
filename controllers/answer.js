@@ -14,8 +14,8 @@ exports.checkAnswer = async (req, res, next) => {
   const userAnswer = req.body.userAnswer;
   const subtopic = req.body.subtopic;
   const mode = req.body.mode;
-  let earned_exp;
-  let earned_coins;
+  let earned_exp = 0;
+  let earned_coins = 0;
 
   // ------ Handle mode surplus ------ //
   let mode_surplus = 1;
@@ -43,8 +43,8 @@ exports.checkAnswer = async (req, res, next) => {
           .send("The answer with the given problem id was not found");
         return;
       } else {
-        console.log(userAnswer);
-        console.log(answer.body);
+        // console.log(userAnswer);
+        // console.log(answer.body);
         if (
           userAnswer === answer.body
           // (subtopic === "การดำเนินการของเลขยกกำลัง" && // For this topic, there are many possible answers
