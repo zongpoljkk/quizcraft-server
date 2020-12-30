@@ -58,6 +58,7 @@ const UserSchema = new Schema({
   },
   items: [
     {
+      _id: false,
       itemName: {
         type: String,
       },
@@ -69,6 +70,7 @@ const UserSchema = new Schema({
   ],
   achievements: [
     {
+      _id: false,
       achievementName: {
         type: String,
       },
