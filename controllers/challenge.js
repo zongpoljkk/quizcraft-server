@@ -137,3 +137,52 @@ exports.specificChallenge = async (req, res) => {
     return res.status(400).json({ success: false, error: err });
   }
 }
+
+exports.getChallengeInfo = async (req, res) => {
+  var mongoose = require("mongoose");
+  const challengeId = req.query.challengeId;
+  await Challenge.aggregate(
+    [
+      {
+        $match: {
+          _id: mongoose.Types.ObjectId(challengeId),
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user1Id",
+          foreignField: "_id",
+          as: "fromUser1",
+        },
+      },
+      { $unwind : "$fromUser1" },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user2Id",
+          foreignField: "_id",
+          as: "fromUser2",
+        },
+      },
+      { $unwind : "$fromUser2" },
+      {
+        $project: {
+          "fromUser1.photo": 1,
+          "fromUser2.photo": 1,
+          "user1Score": 1,
+          "user2Score": 1
+        },
+      },
+    ],
+    (err, challenge) => {
+      if (err) {
+        return res.status(500).json({ success: false, error: err });
+      }
+      if (!challenge.length) {
+        return res.status(400).json({ success: false, error: "no challenges" });
+      }
+      return res.status(200).json({ success: true, data: challenge });
+    }
+  );
+};
