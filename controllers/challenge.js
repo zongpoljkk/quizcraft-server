@@ -137,3 +137,7 @@ exports.specificChallenge = async (req, res) => {
     return res.status(400).json({ success: false, error: err });
   }
 }
+
+exports.getFinalChallengeResult = async (req, res) => {
+  return res.send("TODO");
+}
