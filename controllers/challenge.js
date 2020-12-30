@@ -199,7 +199,7 @@ exports.getAllMyChallenges = async (req, res) => {
           theirScore: challenge.user2Score,
           isRead: challenge.user1IsRead,
         }
-        if (challenge.user1Result.length == NUMBER_OF_PROBLEM && challenge.user1Result.length == NUMBER_OF_PROBLEM) {
+        if (challenge.user1Result.length == NUMBER_OF_PROBLEM && challenge.user2Result.length == NUMBER_OF_PROBLEM) {
           result.push(temp);
         }
         else if (challenge.whoTurn == 1) {
