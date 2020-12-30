@@ -2,6 +2,8 @@ const User = require("../models/User");
 const Challenge = require("../models/Challenge");
 const Problem = require("../models/Problem");
 const { NUMBER_OF_PROBLEM } = require("../utils/challenge");
+const mongoose = require("mongoose");
+const ObjectId = mongoose.Types.ObjectId;
 
 const randInt = (start, end) => {
   return Math.floor(Math.random() * (end - start + 1)) + start;
@@ -156,5 +158,82 @@ exports.readChallenge = async (req, res) => {
 }
 
 exports.getFinalChallengeResult = async (req, res) => {
-  return res.send("TODO");
+  const challengeId = req.query.challengeId;
+  const userId = req.query.userId;
+  try {
+    // const challenge = await Challenge.findOne( {_id: challengeId, $or: [ {user1Id: userId}, {user2Id: userId} ] } );
+    var challenge = await Challenge.aggregate([
+      { 
+        $match: {
+          _id: ObjectId(challengeId),
+          $or: [ {user1Id: ObjectId(userId)}, {user2Id: ObjectId(userId)} ] 
+        }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user1Id",
+          foreignField: "_id",
+          as: "user1"
+        }
+      },
+      { $unwind: "$user1" },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user2Id",
+          foreignField: "_id",
+          as: "user2"
+        }
+      },
+      { $unwind: "$user2"},
+    ]);
+
+    challenge = challenge[0];
+    var out;
+    if (challenge.user1Id == userId) {
+      out = {
+        me: {
+          result: challenge.user1Result,
+          score: challenge.user1Score,
+          photo: challenge.user1.photo,
+          username: challenge.user1.username,
+          firstname: challenge.user1.firstname,
+          lastname: challenge.user1.lastname,
+        },
+        opponent: {
+          result: challenge.user2Result,
+          score: challenge.user2Score,
+          photo: challenge.user2.photo,
+          username: challenge.user2.username,
+          firstname: challenge.user2.firstname,
+          lastname: challenge.user2.lastname,
+        }
+      }
+    } else {
+      out = {
+        me: {
+          result: challenge.user2Result,
+          score: challenge.user2Score,
+          photo: challenge.user2.photo,
+          username: challenge.user2.username,
+          firstname: challenge.user2.firstname,
+          lastname: challenge.user2.lastname,
+        },
+        opponent: {
+          result: challenge.user1Result,
+          score: challenge.user1Score,
+          photo: challenge.user1.photo,
+          username: challenge.user1.username,
+          firstname: challenge.user1.firstname,
+          lastname: challenge.user1.lastname,
+        }
+      }
+    }
+    return res.status(200).json({ success: true, data: out });
+  } catch (err) {
+    if (!challenge) return res.status(400).json({ success:false, error: "Cannot find the challenge" });
+    else if (err) return res.status(500).json({ success:false, error: err.toString() });
+    else return res.status(400).json({ succes:false, error: "Something went wrong"});
+  }
 }
