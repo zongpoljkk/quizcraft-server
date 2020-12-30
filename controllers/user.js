@@ -357,6 +357,13 @@ exports.updateStreak = async (userId) => {
 };
 
 exports.buyItem = async (req, res) => {
+  if(req.userId !== req.body.userId){
+    return res.status(400).json({
+      success: false,
+      error: "userId not match userId that decoded from token!",
+    });
+  }
+  
   const body = req.body;
   if (!body) {
     return res.status(400).json({
@@ -375,14 +382,36 @@ exports.buyItem = async (req, res) => {
     return item;
   });
 
-  const item_price = item.price;
-  const item_name = item.name;
+  const priceOfItem = item.price;
+  const nameOfItem = item.name;
+
+  function buyItemAfterCheckMoney() {
+    User.findOneAndUpdate(
+      {
+        _id: req.body.userId,
+        "items.itemName": nameOfItem,
+        coin: { $gte: priceOfItem },
+      },
+      { $inc: { "items.$.amount": 1, coin: -priceOfItem } },
+      { new: true },
+      (err, user) => {
+        if (err) {
+          return res.status(500).json({ success: false, error: err });
+        }
+        if (!user) {
+          return res.status(400).json({ success: false, error: "no data" });
+        }
+        let items = user.items;
+        let index = items.findIndex((x) => x.itemName === body.itemName);
+        return res.status(200).json({ success: true, data: user.items[index] });
+      }
+    );
+  }
 
   User.findOne(
     {
       _id: req.body.userId,
-      "items.itemName": item_name,
-      coin: { $lt: item_price },
+      coin: { $lt: priceOfItem },
     },
     (err, user) => {
       if (err) {
@@ -392,23 +421,23 @@ exports.buyItem = async (req, res) => {
         User.findOneAndUpdate(
           {
             _id: req.body.userId,
-            "items.itemName": item_name,
-            coin: { $gte: item_price },
+            "items.itemName": { $ne: nameOfItem },
           },
-          { $inc: { "items.$.amount": 1, coin: -item_price } },
+          {
+            $addToSet: {
+              items: { $each: [{ itemName: nameOfItem }] },
+            },
+          },
           { new: true },
           (err, user) => {
             if (err) {
               return res.status(500).json({ success: false, error: err });
             }
             if (!user) {
-              return res.status(400).json({ success: false, error: "no data" });
+              return buyItemAfterCheckMoney();
+            } else {
+              return buyItemAfterCheckMoney();
             }
-            let items = user.items;
-            let index = items.findIndex((x) => x.itemName === body.itemName);
-            return res
-              .status(200)
-              .json({ success: true, data: user.items[index] });
           }
         );
       } else {
