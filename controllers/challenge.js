@@ -167,11 +167,19 @@ exports.getChallengeInfo = async (req, res) => {
       },
       { $unwind : "$fromUser2" },
       {
+        $addFields: {
+          "user1Photo": "$fromUser1.photo",
+          "user2Photo": "$fromUser2.photo",
+          "user1Username": "$fromUser1.username",
+          "user2Username": "$fromUser2.username"
+       }
+      },
+      {
         $project: {
-          "fromUser1.photo": 1,
-          "fromUser1.username": 1,
-          "fromUser2.photo": 1,
-          "fromUser2.username": 1,
+          "user1Photo": 1,
+          "user1Username": 1,
+          "user2Photo": 1,
+          "user2Username": 1,
           "user1Score": 1,
           "user2Score": 1
         },
