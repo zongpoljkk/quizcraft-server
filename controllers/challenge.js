@@ -169,7 +169,9 @@ exports.getChallengeInfo = async (req, res) => {
       {
         $project: {
           "fromUser1.photo": 1,
+          "fromUser1.username": 1,
           "fromUser2.photo": 1,
+          "fromUser2.username": 1,
           "user1Score": 1,
           "user2Score": 1
         },
