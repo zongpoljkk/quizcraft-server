@@ -166,9 +166,23 @@ exports.specificChallenge = async (req, res) => {
 
 exports.getProblemByChallengeId = (req, res) => {
   const challengeId = req.body.challenge_id;
-  Challenge.findById(challengeId)
-    .exec()
-    .then((challenge) => {
-      res.send({ success: true, data: challengeId });
-    });
+
+  try {
+    Challenge.findById(challengeId)
+      .exec()
+      .then((challenge) => {
+        const problems = Promise.all(
+          challenge.problems.map((problem_id) => {
+            Problem.findById(problem_id)
+              .exec()
+              .then((problem) => {
+                return problem;
+              });
+          })
+        );
+        res.send({ success: true, data: problems });
+      });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err });
+  }
 };
