@@ -171,6 +171,12 @@ exports.getProblemByChallengeId = (req, res) => {
     Challenge.findById(challengeId)
       .exec()
       .then((challenge) => {
+        if (!challenge) {
+          return res.status(400).json({
+            success: false,
+            error: `Unable to find challenge given challenge id ${challenge._id}`,
+          });
+        }
         const problems = Promise.all(
           challenge.problems.map((problem_id) => {
             Problem.findById(problem_id)
@@ -180,9 +186,17 @@ exports.getProblemByChallengeId = (req, res) => {
               });
           })
         );
-        res.send({ success: true, data: problems });
+        problems.then((problems) => {
+          if (problems.includes(undefined)) {
+            return res.send({
+              success: false,
+              error: `Unable to find problems given challenge id ${challenge._id}`,
+            });
+          }
+          return res.send({ success: true, data: problems });
+        });
       });
   } catch (err) {
-    res.status(400).json({ success: false, error: err });
+    return res.status(400).json({ success: false, error: err });
   }
 };
