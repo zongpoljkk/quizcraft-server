@@ -200,7 +200,7 @@ exports.getFinalChallengeResult = async (req, res) => {
           username: challenge.user1.username,
           firstname: challenge.user1.firstname,
           lastname: challenge.user1.lastname,
-          time: challenge.user1Time,
+          time: parseFloat(challenge.user1Time),
         },
         opponent: {
           result: challenge.user2Result,
@@ -209,7 +209,7 @@ exports.getFinalChallengeResult = async (req, res) => {
           username: challenge.user2.username,
           firstname: challenge.user2.firstname,
           lastname: challenge.user2.lastname,
-          time: challenge.user2Time,
+          time: parseFloat(challenge.user2Time),
         }
       }
     } else {
@@ -221,7 +221,7 @@ exports.getFinalChallengeResult = async (req, res) => {
           username: challenge.user2.username,
           firstname: challenge.user2.firstname,
           lastname: challenge.user2.lastname,
-          time: challenge.user2Time,
+          time: parseFloat(challenge.user2Time),
         },
         opponent: {
           result: challenge.user1Result,
@@ -230,7 +230,7 @@ exports.getFinalChallengeResult = async (req, res) => {
           username: challenge.user1.username,
           firstname: challenge.user1.firstname,
           lastname: challenge.user1.lastname,
-          time: challenge.user1Time,
+          time: parseFloat(challenge.user1Time),
         }
       }
     }
