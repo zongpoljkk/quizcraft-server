@@ -137,3 +137,20 @@ exports.specificChallenge = async (req, res) => {
     return res.status(400).json({ success: false, error: err });
   }
 }
+
+exports.readChallenge = async (req, res) => {
+  const challengeId = req.body.challengeId;
+  const userId = req.body.userId;
+  await Challenge.findOne({ _id: challengeId, $or: [ {user1Id: userId}, {user2Id: userId} ] } )
+    .exec((err, challenge) => {
+      if (err) return res.status(500).json({ success: false, error: err });
+      else if (!challenge) return res.status(400).json({ success: false, error: "Challenge not exist" });
+      if (challenge.user1Id == userId) challenge.user1IsRead = true;
+      else challenge.user2IsRead = true;
+      challenge.save((err, newChallenge) => {
+        if (err) return res.status(500).json({ success: false, error: err });
+        else if (!newChallenge) return res.status(400).json({ success: false, error: "Cannot update challenge" });
+        return res.status(200).json({ success: true, isRead: newChallenge.user1Id == userId? newChallenge.user1IsRead:newChallenge.user2IsRead })
+      })
+    })
+}
