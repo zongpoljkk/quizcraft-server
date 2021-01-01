@@ -165,7 +165,7 @@ exports.specificChallenge = async (req, res) => {
 };
 
 exports.getProblemByChallengeId = (req, res) => {
-  const challengeId = req.body.challenge_id;
+  const challengeId = req.query.challenge_id;
 
   try {
     Challenge.findById(challengeId)
@@ -221,15 +221,13 @@ exports.readChallenge = async (req, res) => {
         return res
           .status(400)
           .json({ success: false, error: "Cannot update challenge" });
-      return res
-        .status(200)
-        .json({
-          success: true,
-          isRead:
-            newChallenge.user1Id == userId
-              ? newChallenge.user1IsRead
-              : newChallenge.user2IsRead,
-        });
+      return res.status(200).json({
+        success: true,
+        isRead:
+          newChallenge.user1Id == userId
+            ? newChallenge.user1IsRead
+            : newChallenge.user2IsRead,
+      });
     });
   });
 };
