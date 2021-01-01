@@ -16,6 +16,7 @@ router.post(
   [authJwt],
   challengeController.specificChallenge
 );
+router.put("/read-challenge", [authJwt], challengeController.readChallenge);
 router.delete(
   "/delete-challenge",
   [authJwt],
