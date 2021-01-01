@@ -6,10 +6,6 @@ const MEDIUM = "MEDIUM";
 const HARD = "HARD";
 const alphabet = "abcdefghijklmnopqrstuvwxyz";
 const math = require("mathjs");
-// math.config({
-//   number: 'BigNumber',
-//   precision: 64             
-// })
 
 const randInt = (start, end, haveNegative) => {
   if (haveNegative) {
