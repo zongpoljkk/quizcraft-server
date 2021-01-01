@@ -73,12 +73,10 @@ exports.randomChallenge = async (req, res) => {
 
     //save to database
     await challenge.save();
-    return res
-      .status(200)
-      .json({
-        success: true,
-        data: { challengeId: challenge._id, user1, user2: randomUser },
-      });
+    return res.status(200).json({
+      success: true,
+      data: { challengeId: challenge._id, user1, user2: randomUser },
+    });
   } catch (err) {
     return res.status(400).json({ success: false, error: err });
   }
@@ -157,18 +155,37 @@ exports.specificChallenge = async (req, res) => {
 
     // save to database
     await challenge.save();
-    return res
-      .status(200)
-      .json({
-        success: true,
-        data: { challengeId: challenge._id, user1, user2 },
-      });
+    return res.status(200).json({
+      success: true,
+      data: { challengeId: challenge._id, user1, user2 },
+    });
   } catch (err) {
     return res.status(400).json({ success: false, error: err });
   }
 };
 
-exports.deleteChallenge = (req, res, next) => {
-  // const challengeId = req.body
-  res.status(200).json({ success: true, data: "OH DELETE" });
+exports.deleteChallenge = (req, res) => {
+  const challengeId = req.body.challenge_id;
+
+  try {
+    Challenge.findByIdAndDelete(challengeId)
+      .exec()
+      .then((challenge) => {
+        if (!challenge) {
+          res.status(400).json({
+            success: false,
+            error: "Unable to find challenge given challenge id",
+          });
+        } else {
+          res.status(200).json({
+            success: true,
+            data: `Successfully delete challenge ${challengeId}`,
+          });
+        }
+      });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal server Error" });
+  }
 };
