@@ -63,7 +63,7 @@ const moveThePoint = (a,n) => {
 
 const generateScientificNotation = async (subtopicName, difficulty) => {
   var problemTitle,problemBody,answerBody,hintBody,solution;
-  var a,n,stn,num,opt,nn,ff,stn2;
+  var a,n,stn,num,opt,nn,ff;
   let i;
   let problem, problemId, answer, hint, newProblem,newAnswer,newHint;
   var termNum;
