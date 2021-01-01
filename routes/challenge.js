@@ -21,5 +21,6 @@ router.post(
   [authJwt],
   challengeController.specificChallenge
 );
+router.put("/read-challenge", [authJwt], challengeController.readChallenge);
 
 module.exports = router;
