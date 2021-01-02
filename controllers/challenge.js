@@ -144,50 +144,43 @@ exports.getChallengeInfo = async (req, res) => {
   const userId = req.query.userId;
   const challengeId = req.query.challengeId;
   try{
-    var challenge = await Challenge.aggregate(
-      [
-        {
-          $match: {
-            _id: mongoose.Types.ObjectId(challengeId),
-          },
+    var challenge = await Challenge.aggregate([
+      {
+        $match: {
+          _id: mongoose.Types.ObjectId(challengeId),
         },
-        {
-          $lookup: {
-            from: "users",
-            localField: "user1Id",
-            foreignField: "_id",
-            as: "fromUser1",
-          },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user1Id",
+          foreignField: "_id",
+          as: "fromUser1",
         },
-        { $unwind : "$fromUser1" },
-        {
-          $lookup: {
-            from: "users",
-            localField: "user2Id",
-            foreignField: "_id",
-            as: "fromUser2",
-          },
+      },
+      { $unwind: "$fromUser1" },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user2Id",
+          foreignField: "_id",
+          as: "fromUser2",
         },
-        { $unwind : "$fromUser2" },
-        {
-          $addFields: {
-            "user1Photo": "$fromUser1.photo",
-            "user2Photo": "$fromUser2.photo",
-            "user1Username": "$fromUser1.username",
-            "user2Username": "$fromUser2.username"
-         }
+      },
+      { $unwind: "$fromUser2" },
+      {
+        $addFields: {
+          user1Photo: "$fromUser1.photo",
+          user2Photo: "$fromUser2.photo",
+          user1Username: "$fromUser1.username",
+          user2Username: "$fromUser2.username",
+          user1IsPlayed: false,
+          user2IsPlayed: false,
         },
-        {
-          $project: {
-            "user1Photo": 1,
-            "user1Username": 1,
-            "user1Score": 1,
-            "user2Photo": 1,
-            "user2Username": 1,
-            "user2Score": 1,
-          },
-        },
-      ]);
+      },
+      { $set: { user1IsPlayed: { $gt: [{ $size: "$user1Result" }, 0] } } },
+      { $set: { user2IsPlayed: { $gt: [{ $size: "$user2Result" }, 0] } } },
+    ]);
 
       challenge = challenge[0];
       var out;
@@ -197,11 +190,13 @@ exports.getChallengeInfo = async (req, res) => {
             photo: challenge.user1Photo,
             username: challenge.user1Username,
             score: challenge.user1Score,
+            isPlayed: challenge.user1IsPlayed
           },
           opponent: {
             photo: challenge.user2Photo,
             username: challenge.user2Username,
             score: challenge.user2Score,
+            isPlayed: challenge.user2IsPlayed
           }
         }
       } else {
@@ -210,11 +205,13 @@ exports.getChallengeInfo = async (req, res) => {
             photo: challenge.user2Photo,
             username: challenge.user2Username,
             score: challenge.user2Score,
+            isPlayed: challenge.user2IsPlayed
           },
           opponent: {
             photo: challenge.user1Photo,
             username: challenge.user1Username,
             score: challenge.user1Score,
+            isPlayed: challenge.user1IsPlayed
           }
         }
       }
