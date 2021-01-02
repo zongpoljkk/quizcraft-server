@@ -52,7 +52,7 @@ exports.getTopicBySubjectName = async (req, res) => {
 };
 
 exports.getSubtopicByTopicName = async (req, res) => {
-  await Subtopic.find({ topic: req.query.topic }, { subtopicName: 1 },
+  await Subtopic.find({ topic: req.query.topic }, { subtopicName: 1, availableDifficulty:1 },
     (err, subtopics) => {
       if (err) {
         return res.status(500).json({ success: false, error: err });

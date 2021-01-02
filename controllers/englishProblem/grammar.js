@@ -99,7 +99,7 @@ const generateGrammar = async (subtopicName, difficulty) => {
           if (n < 2) {
             for (i=0;i<2-n;i++) {
               temp  = await wordpos.randAdjective({startsWith:lowerWord[0]+lowerWord[1]})
-              choices.push(temp)
+              choices.push(temp[0])
             }
           }
           do {
@@ -114,7 +114,7 @@ const generateGrammar = async (subtopicName, difficulty) => {
           if (n < 4) {
             for (i=0;i<4-n;i++) {
               temp  = await wordpos.randAdjective({startsWith:lowerWord[0]+lowerWord[1]})
-              choices.push(temp)
+              choices.push(temp[0])
             }
           }
           answerChoices = [selectedWord]
