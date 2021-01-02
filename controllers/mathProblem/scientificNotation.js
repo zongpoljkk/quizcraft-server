@@ -229,9 +229,6 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
       });
       hint = new Hint({ problemId: problemId, body: hintBody });
 
-      console.log(problem)
-      console.log(answer)
-      console.log(hint)
       // save to database
       try {
         newProblem = await problem.save();
@@ -243,6 +240,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
         return err;
       }
     case HARD:
+
       return "Not Implement";
   }
 };
