@@ -23,11 +23,12 @@ const getChallengeProblemId = (challengeId) => {
   return challengeProblemId;
 };
 
-const updateChallengeScore = (challengeId, correct) => {
+const updateChallengeScore = (challengeId, correct, userTime) => {
   Challenge.findById(challengeId)
     .exec()
     .then((challenge) => {
       if (challenge.whoturn === 1) {
+        challenge.user1Time += userTime;
         if (correct) {
           challenge.user1Result[challenge.currentProblem] = 1;
           challenge.user1Score++;
@@ -35,6 +36,7 @@ const updateChallengeScore = (challengeId, correct) => {
           challenge.user1Result[challenge.currentProblem] = 0;
         }
       } else {
+        challenge.user2Time += userTime;
         if (correct) {
           challenge.user2Result[challenge.currentProblem] = 1;
           challenge.user2Score++;
@@ -67,6 +69,7 @@ exports.checkAnswer = async (req, res, next) => {
   const subtopic = req.body.subtopic;
   const mode = req.body.mode;
   const challengeId = req.body.challengeId;
+  const userTime = req.body.userTime;
   let earned_exp = 0;
   let earned_coins = 0;
 
@@ -157,7 +160,7 @@ exports.checkAnswer = async (req, res, next) => {
 
               // * Update Challenge Field * //
               if (mode === "challenge") {
-                updateChallengeScore(challengeId, true);
+                updateChallengeScore(challengeId, true, userTime);
               }
 
               const returnedSolution = {
@@ -178,7 +181,7 @@ exports.checkAnswer = async (req, res, next) => {
         } else {
           // * Update Challenge Field * //
           if (mode === "challenge") {
-            updateChallengeScore(challengeId, true);
+            updateChallengeScore(challengeId, true, userTime);
           }
 
           const user = User.findById(userId)
