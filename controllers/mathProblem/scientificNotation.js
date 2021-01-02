@@ -274,10 +274,9 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
       let listOfBaseList = [];
       let listOfNList = [];
       let listOfRandList = [];
-      let isMul = 1;
-      // let isMul = randInt(0,1); 
+      let isMul = randInt(0,1); 
       let isDiv = isMul? randInt(0,1) : 1;
-      problemTitle = "จงหาผลลัพธ์ของเลขต่อไปนี้ แล้วตอบในรูปสัญกรณ์วิทยาศาสตร์"
+      problemTitle = "จงหาผลลัพธ์ของเลขต่อไปนี้ แล้วตอบในรูปสัญกรณ์วิทยาศาสตร์โดยมีทศนิยมสองตำแหน่ง"
       problemBody = "";
       m = randInt(4,13,true);
       termNum = randInt(2, 3, false); //random 2-4
@@ -304,10 +303,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
         minList.push(Math.min(...nList));
         problemBody = `(${problemBody})/(${temp})`
       }
-      // console.log(listOfBaseList)
-      // console.log(listOfNList)
-      // console.log(listOfRandList)
-      // console.log(minList)
+      
       console.log(problemBody)
 
       //create solution
@@ -332,9 +328,9 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
         listOfBaseOut.push(baseOut)
         if (i==0) {
           solution = out;
-        } else if (i==1) {
+        } else if (i==1 && isMul) {
           solution = `(${solution})*(${out})`;
-        } else if (i==2) {
+        } else if ((i==2) || (i==1 && isDiv) ) {
           solution = `(${solution})/(${out})`;
         }
       }
@@ -342,24 +338,21 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
       for (i in listOfBaseOut) {
         if (i==0) {
           temp = `${listOfBaseOut[i]}*10^[${minList[i]}]`;
-        } else if (i==1) {
+        } else if (i==1 && isMul) {
           temp = `(${temp})*(${listOfBaseOut[i]}*10^[${minList[i]}])`;
-        } else if (i==2) {
+        } else if ((i==2) || (i==1 && isDiv)) {
           temp = `(${temp})/(${listOfBaseOut[i]}*10^[${minList[i]}])`;
         }
       }
-      solution += `\n${temp}`; 
-      // console.log('-------------------')
-      // console.log(listOfBaseList)
-      // console.log(listOfNList)
-      // console.log(listOfRandList)
-      // console.log(listOfBaseOut)
+      solution += `\n${temp}`;
       if (listOfBaseOut.length == 2) {
         baseOut = math.multiply(math.bignumber(listOfBaseOut[0]),math.bignumber(listOfBaseOut[1]));
+        baseOut = math.round(baseOut,15);
         n = minList[0]+minList[1];
         temp = `${baseOut}*10^[${n}]`;
       } else if (listOfBaseOut.length == 3) {
         baseOut = math.divide(math.multiply(math.bignumber(listOfBaseOut[0]),math.bignumber(listOfBaseOut[1])), math.bignumber(listOfBaseOut[2]));
+        baseOut = math.round(baseOut,10);
         n = minList[0]+minList[1]-minList[2];
         temp = `${baseOut}*10^[${n}]`;
       }
