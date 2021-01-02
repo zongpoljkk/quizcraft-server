@@ -1,19 +1,72 @@
 const math = require("mathjs");
 const { levelSystem } = require("../utils/level");
 const { rankSystem } = require("../utils/level");
+const { NUMBER_OF_PROBLEM } = require("../utils/challenge");
 
 const Answer = require("../models/Answer");
 const User = require("../models/User");
+const Challenge = require("../models/Challenge");
 
 const levelDictionary = levelSystem();
 const rankDictionary = rankSystem();
 
+// TODO: Handle checkChallengeAnswer
+const getChallengeProblemId = (challengeId) => {
+  let challengeProblemId = "";
+
+  Challenge.findById(challengeId)
+    .exec()
+    .then((challenge) => {
+      challengeProblemId = challenge.problems[currentProblem];
+    });
+
+  return challengeProblemId;
+};
+
+const updateChallengeScore = (challengeId, correct) => {
+  Challenge.findById(challengeId)
+    .exec()
+    .then((challenge) => {
+      if (challenge.whoturn === 1) {
+        if (correct) {
+          challenge.user1Result[challenge.currentProblem] = 1;
+          challenge.user1Score++;
+        } else {
+          challenge.user1Result[challenge.currentProblem] = 0;
+        }
+      } else {
+        if (correct) {
+          challenge.user2Result[challenge.currentProblem] = 1;
+          challenge.user2Score++;
+        } else {
+          challenge.user2Result[challenge.currentProblem] = 0;
+        }
+      }
+
+      // Update current_problem index
+      challenge.currentProblem++;
+
+      // Update whoTurn when player finished NUMBER_OR_PROBLEM
+      if (challenge.currentProblem === NUMBER_OF_PROBLEM - 1) {
+        switch (challenge.whoturn) {
+          case 1:
+            challenge.whoturn = 2;
+            break;
+          case 2:
+            challenge.whoturn = 1;
+        }
+      }
+      challenge.save();
+    });
+};
+
 exports.checkAnswer = async (req, res, next) => {
-  const problemId = req.body.problemId;
+  let problemId = req.body.problemId;
   const userId = req.body.userId;
   const userAnswer = req.body.userAnswer;
   const subtopic = req.body.subtopic;
   const mode = req.body.mode;
+  const challengeId = req.body.challengeId;
   let earned_exp = 0;
   let earned_coins = 0;
 
@@ -29,6 +82,10 @@ exports.checkAnswer = async (req, res, next) => {
     case "group":
       mode_surplus = 0;
       break;
+  }
+
+  if (mode === "challenge") {
+    problemId = getChallengeProblemId(challengeId);
   }
 
   Answer.findOne({ problemId: problemId })
@@ -97,6 +154,12 @@ exports.checkAnswer = async (req, res, next) => {
                 rank_up = false;
               }
               user.save();
+
+              // * Update Challenge Field * //
+              if (mode === "challenge") {
+                updateChallengeScore(challengeId, true);
+              }
+
               const returnedSolution = {
                 correct: true,
                 solution: answer.solution,
@@ -113,6 +176,11 @@ exports.checkAnswer = async (req, res, next) => {
               next();
             });
         } else {
+          // * Update Challenge Field * //
+          if (mode === "challenge") {
+            updateChallengeScore(challengeId, true);
+          }
+
           const user = User.findById(userId)
             .exec()
             .then((user) => {
