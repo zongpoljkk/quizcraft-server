@@ -62,6 +62,8 @@ exports.checkAnswerAndUpdateDifficulty = async (req, res, next) => {
   const user = req.user;
   const level_up = req.level_up;
   const rank_up = req.rank_up;
+  const earned_exp = req.earned_exp;
+  const earned_coins = req.earned_coins;
 
   Problem.findById(problemId).exec(async (err, problem) => {
     if (err)
@@ -77,55 +79,50 @@ exports.checkAnswerAndUpdateDifficulty = async (req, res, next) => {
       problem.users = [...problem.users, user];
     }
 
-    // update problem times and user Array
-    const sumUserTime = problem.toJSON().times.reduce((sum, time) => {
-      return sum + +time.toString();
-    }, 0);
-    const avgUserTime = sumUserTime / problem.toJSON().times.length;
-
     // TODO: filter outliers
-    // Copy the values, rather than operating on references to existing values
-    let copyTimes = [];
-    for (let time of problem.toJSON().times) {
-      copyTimes.push(+time.toString());
+    if (problem.times.length > 10) {
+      // Copy the values, rather than operating on references to existing values
+      let copyTimes = [];
+      for (let time of problem.toJSON().times) {
+        copyTimes.push(+time.toString());
+      }
+
+      // Then sort
+      const sortedCopyTimes = copyTimes.sort((a, b) => {
+        return a - b;
+      });
+
+      const q1 = sortedCopyTimes[Math.floor(sortedCopyTimes.length / 4)];
+      // Likewise for q3.
+      const q3 = sortedCopyTimes[Math.ceil(sortedCopyTimes.length * (3 / 4))];
+      const iqr = q3 - q1;
+
+      // Then find min and max values
+      const maxValue = q3 + iqr * 1.5;
+      const minValue = q1 - iqr * 1.5;
+
+      // Then filter anything beyond or beneath these values.
+      const filteredValues = sortedCopyTimes.filter((time) => {
+        return time <= maxValue && time >= minValue;
+      });
+
+      sumProblemTime = filteredValues.reduce((sum, time) => {
+        return sum + time;
+      });
+
+      avgProblemTime = sumProblemTime / filteredValues.length;
+    } else {
+      avgProblemTime = -1;
     }
-
-    // Then sort
-    const sortedCopyTimes = copyTimes.sort((a, b) => {
-      return a - b;
-    });
-
-    const q1 = sortedCopyTimes[Math.floor(sortedCopyTimes.length / 4)];
-    // Likewise for q3.
-    const q3 = sortedCopyTimes[Math.ceil(sortedCopyTimes.length * (3 / 4))];
-    const iqr = q3 - q1;
-
-    // Then find min and max values
-    const maxValue = q3 + iqr * 1.5;
-    const minValue = q1 - iqr * 1.5;
-
-    // Then filter anything beyond or beneath these values.
-    const filteredValues = sortedCopyTimes.filter((time) => {
-      return time <= maxValue && time >= minValue;
-    });
-
-    sumProblemTime = filteredValues.reduce((sum, time) => {
-      return sum + time;
-    });
-
-    avgProblemTime = sumProblemTime / filteredValues.length;
 
     // Time limit for a problem to be in the specific difficulty level
     const EASY_CEIL = 13;
     const MEDIUM_CEIL = 150;
 
-    // Dealing with returned earned coin
-    let earned_coins = 0;
+    const old_difficulty = problem.difficulty;
 
     switch (problem.difficulty) {
       case "EASY":
-        earned_coins = 10;
-        earned_exp = 10;
         if (avgProblemTime >= EASY_CEIL) {
           if (avgProblemTime >= MEDIUM_CEIL) {
             problem.difficulty = "HARD";
@@ -135,8 +132,6 @@ exports.checkAnswerAndUpdateDifficulty = async (req, res, next) => {
         }
         break;
       case "MEDIUM":
-        earned_coins = 20;
-        earned_exp = 20;
         if (avgProblemTime >= MEDIUM_CEIL) {
           problem.difficulty = "HARD";
         } else if (avgProblemTime < EASY_CEIL) {
@@ -144,8 +139,6 @@ exports.checkAnswerAndUpdateDifficulty = async (req, res, next) => {
         }
         break;
       case "HARD":
-        earned_coins = 30;
-        earned_exp = 30;
         if (avgProblemTime < MEDIUM_CEIL) {
           if (avgProblemTime < EASY_CEIL) {
             problem.difficulty = "EASY";
@@ -153,6 +146,9 @@ exports.checkAnswerAndUpdateDifficulty = async (req, res, next) => {
             problem.difficulty = "MEDIUM";
           }
         }
+    }
+    if (avgProblemTime === -1) {
+      problem.difficulty = old_difficulty;
     }
     problem.save();
 
@@ -282,11 +278,8 @@ exports.getProblemForUser = async (req, res, next) => {
       return res
         .status(200)
         .json({ success: true, data: { problem, correctAnswer: answer.body } });
-    } 
-    else {
-      return res
-        .status(200)
-        .json({ success: true, data: { problem } });  
+    } else {
+      return res.status(200).json({ success: true, data: { problem } });
     }
   }
 };
