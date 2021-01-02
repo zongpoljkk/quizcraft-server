@@ -11,6 +11,30 @@ exports.addItem = (req, res, next) => {
   });
 };
 
+exports.addFile = (req, res) => {
+  const itemName = req.body.itemName;
+  const image = req.files.image;
+  const lottie = req.files.lottie;
+  Item.findOne({name: itemName})
+    .select("_id photo")
+    .exec((err, item) => {
+      if (err) {
+        res
+          .status(500)
+          .send({ success: false, error: "Internal Server Error" });
+      } else if (!item) {
+        res.status(400).send({
+          success: false,
+          error: "Unable to find user with the given ID",
+        });
+      }
+      item.image = image;
+      item.lottie = lottie;
+      item.save();
+      res.status(200).send({ success: true, data: "Upload succeeded" });
+    });
+};
+
 exports.getAllItems = async (req, res) => {
   await Item.find()
     .exec((err, items) => {

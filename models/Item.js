@@ -15,11 +15,12 @@ const ItemSchema = new Schema({
     type: String,
   },
   image: {
-    type: String,
-    default: null
+    type: Object,
+    default: null,
   },
   lottie: {
-    type: Object
+    type: Object,
+    default: null,
   }
 })
 
