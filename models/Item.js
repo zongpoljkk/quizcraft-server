@@ -17,6 +17,9 @@ const ItemSchema = new Schema({
   image: {
     type: String,
     default: null
+  },
+  lottie: {
+    type: Object
   }
 })
 
