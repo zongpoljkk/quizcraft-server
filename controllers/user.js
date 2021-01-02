@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const Item = require("../models/Item");
 const jwt = require("jsonwebtoken");
 const config = require("../config/keys");
 
@@ -353,4 +354,98 @@ exports.updateStreak = async (userId) => {
     console.log("set 1");
     return;
   }
+};
+
+exports.buyItem = async (req, res) => {
+  if(req.userId !== req.body.userId){
+    return res.status(400).json({
+      success: false,
+      error: "userId not match userId that decoded from token!",
+    });
+  }
+  
+  const body = req.body;
+  if (!body) {
+    return res.status(400).json({
+      success: false,
+      error: "You must provide a body to update",
+    });
+  }
+
+  const item = await Item.findOne({ name: req.body.itemName }, (err, item) => {
+    if (err) {
+      return res.status(500).json({ success: false, error: err });
+    }
+    if (!item) {
+      return res.status(400).json({ success: false, error: "no items" });
+    }
+    return item;
+  });
+
+  const priceOfItem = item.price;
+  const nameOfItem = item.name;
+
+  function buyItemAfterCheckMoney() {
+    User.findOneAndUpdate(
+      {
+        _id: req.body.userId,
+        "items.itemName": nameOfItem,
+        coin: { $gte: priceOfItem },
+      },
+      { $inc: { "items.$.amount": 1, coin: -priceOfItem } },
+      { new: true },
+      (err, user) => {
+        if (err) {
+          return res.status(500).json({ success: false, error: err });
+        }
+        if (!user) {
+          return res.status(400).json({ success: false, error: "no data" });
+        }
+        let items = user.items;
+        let index = items.findIndex((x) => x.itemName === body.itemName);
+        return res.status(200).json({ success: true, data: user.items[index] });
+      }
+    );
+  }
+
+  User.findOne(
+    {
+      _id: req.body.userId,
+      coin: { $lt: priceOfItem },
+    },
+    (err, user) => {
+      if (err) {
+        return res.status(500).json({ success: false, error: err });
+      }
+      if (!user) {
+        User.findOneAndUpdate(
+          {
+            _id: req.body.userId,
+            "items.itemName": { $ne: nameOfItem },
+          },
+          {
+            $addToSet: {
+              items: { $each: [{ itemName: nameOfItem }] },
+            },
+          },
+          { new: true },
+          (err, user) => {
+            if (err) {
+              return res.status(500).json({ success: false, error: err });
+            }
+            if (!user) {
+              return buyItemAfterCheckMoney();
+            } else {
+              return buyItemAfterCheckMoney();
+            }
+          }
+        );
+      } else {
+        return res.status(400).json({
+          success: false,
+          error: "You don't have enough money to buy this item!",
+        });
+      }
+    }
+  );
 };
