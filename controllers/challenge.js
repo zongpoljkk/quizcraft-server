@@ -141,63 +141,90 @@ exports.specificChallenge = async (req, res) => {
 }
 
 exports.getChallengeInfo = async (req, res) => {
-  var mongoose = require("mongoose");
+  const userId = req.query.userId;
   const challengeId = req.query.challengeId;
-  await Challenge.aggregate(
-    [
-      {
-        $match: {
-          _id: mongoose.Types.ObjectId(challengeId),
+  try{
+    var challenge = await Challenge.aggregate(
+      [
+        {
+          $match: {
+            _id: mongoose.Types.ObjectId(challengeId),
+          },
         },
-      },
-      {
-        $lookup: {
-          from: "users",
-          localField: "user1Id",
-          foreignField: "_id",
-          as: "fromUser1",
+        {
+          $lookup: {
+            from: "users",
+            localField: "user1Id",
+            foreignField: "_id",
+            as: "fromUser1",
+          },
         },
-      },
-      { $unwind : "$fromUser1" },
-      {
-        $lookup: {
-          from: "users",
-          localField: "user2Id",
-          foreignField: "_id",
-          as: "fromUser2",
+        { $unwind : "$fromUser1" },
+        {
+          $lookup: {
+            from: "users",
+            localField: "user2Id",
+            foreignField: "_id",
+            as: "fromUser2",
+          },
         },
-      },
-      { $unwind : "$fromUser2" },
-      {
-        $addFields: {
-          "user1Photo": "$fromUser1.photo",
-          "user2Photo": "$fromUser2.photo",
-          "user1Username": "$fromUser1.username",
-          "user2Username": "$fromUser2.username"
-       }
-      },
-      {
-        $project: {
-          "user1Photo": 1,
-          "user1Username": 1,
-          "user2Photo": 1,
-          "user2Username": 1,
-          "user1Score": 1,
-          "user2Score": 1
+        { $unwind : "$fromUser2" },
+        {
+          $addFields: {
+            "user1Photo": "$fromUser1.photo",
+            "user2Photo": "$fromUser2.photo",
+            "user1Username": "$fromUser1.username",
+            "user2Username": "$fromUser2.username"
+         }
         },
-      },
-    ],
-    (err, challenge) => {
-      if (err) {
-        return res.status(500).json({ success: false, error: err });
+        {
+          $project: {
+            "user1Photo": 1,
+            "user1Username": 1,
+            "user1Score": 1,
+            "user2Photo": 1,
+            "user2Username": 1,
+            "user2Score": 1,
+          },
+        },
+      ]);
+
+      challenge = challenge[0];
+      var out;
+      if (challenge.user1Id == userId) {
+        out = {
+          me: {
+            photo: challenge.user1Photo,
+            username: challenge.user1Username,
+            score: challenge.user1Score,
+          },
+          opponent: {
+            photo: challenge.user2Photo,
+            username: challenge.user2Username,
+            score: challenge.user2Score,
+          }
+        }
+      } else {
+        out = {
+          me: {
+            photo: challenge.user2Photo,
+            username: challenge.user2Username,
+            score: challenge.user2Score,
+          },
+          opponent: {
+            photo: challenge.user1Photo,
+            username: challenge.user1Username,
+            score: challenge.user1Score,
+          }
+        }
       }
-      if (!challenge.length) {
-        return res.status(400).json({ success: false, error: "no challenges" });
-      }
-      return res.status(200).json({ success: true, data: challenge });
+      return res.status(200).json({ success: true, data: out });
+    } catch (err) {
+      if (!challenge) return res.status(400).json({ success:false, error: "Cannot find the challenge" });
+      else if (err) return res.status(500).json({ success:false, error: err.toString() });
+      else return res.status(400).json({ succes:false, error: "Something went wrong"});
     }
-  );
-};
+  }
 
 exports.readChallenge = async (req, res) => {
   const challengeId = req.body.challengeId;
