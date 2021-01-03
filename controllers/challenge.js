@@ -4,6 +4,10 @@ const Problem = require("../models/Problem");
 const { NUMBER_OF_PROBLEM } = require("../utils/challenge");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
+const { mathGenerate } = require("./mathProblem/mathProblemGenerator");
+const { englishGenerate } = require("./englishProblem/englishProblemGenerator");
+const MATH = "คณิตศาสตร์";
+const ENG = "ภาษาอังกฤษ";
 
 const randInt = (start, end) => {
   return Math.floor(Math.random() * (end - start + 1)) + start;
@@ -70,7 +74,7 @@ exports.randomChallenge = async (req, res) => {
     await challenge.save();
     return res.status(200).json({ success: true, data: {challengeId: challenge._id, user1, user2: randomUser}});
   } catch (err) {
-    return res.status(400).json({ success: false, error: err });
+    return res.status(400).json({ success: false, error: err.toString() });
   }
 }
 
@@ -136,7 +140,7 @@ exports.specificChallenge = async (req, res) => {
     await challenge.save();
     return res.status(200).json({ success: true, data: {challengeId: challenge._id, user1, user2}});
   } catch (err) {
-    return res.status(400).json({ success: false, error: err });
+    return res.status(400).json({ success: false, error: err.toString() });
   }
 }
 
@@ -382,6 +386,8 @@ exports.getFinalChallengeResult = async (req, res) => {
           firstname: challenge.user1.firstname,
           lastname: challenge.user1.lastname,
           time: parseFloat(challenge.user1Time),
+          gainExp: challenge.user1GainExp,
+          gainCoin: challenge.user1GainCoin,
         },
         opponent: {
           result: challenge.user2Result,
@@ -403,6 +409,8 @@ exports.getFinalChallengeResult = async (req, res) => {
           firstname: challenge.user2.firstname,
           lastname: challenge.user2.lastname,
           time: parseFloat(challenge.user2Time),
+          gainExp: challenge.user2GainExp,
+          gainCoin: challenge.user2GainCoin,
         },
         opponent: {
           result: challenge.user1Result,
