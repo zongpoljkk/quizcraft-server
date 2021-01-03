@@ -303,8 +303,6 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
         minList.push(Math.min(...nList));
         problemBody = `(${problemBody})/(${temp})`
       }
-      
-      console.log(problemBody)
 
       //create solution
       solution = "";
@@ -345,15 +343,19 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
         }
       }
       solution += `\n${temp}`;
-      if (listOfBaseOut.length == 2) {
+      if (listOfBaseOut.length == 2 && isMul) {
         baseOut = math.multiply(math.bignumber(listOfBaseOut[0]),math.bignumber(listOfBaseOut[1]));
         baseOut = math.round(baseOut,15);
         n = minList[0]+minList[1];
         temp = `${baseOut}*10^[${n}]`;
-      } else if (listOfBaseOut.length == 3) {
-        baseOut = math.divide(math.multiply(math.bignumber(listOfBaseOut[0]),math.bignumber(listOfBaseOut[1])), math.bignumber(listOfBaseOut[2]));
+      } else if ((listOfBaseOut.length == 3) || (listOfBaseOut.length == 2 && isDiv)) {
+        baseOut = listOfBaseOut.length == 3
+                  ? math.divide(math.multiply(math.bignumber(listOfBaseOut[0]),math.bignumber(listOfBaseOut[1])), math.bignumber(listOfBaseOut[2]))
+                  : math.divide(math.bignumber(listOfBaseOut[0]),math.bignumber(listOfBaseOut[1]));
         baseOut = math.round(baseOut,10);
-        n = minList[0]+minList[1]-minList[2];
+        n = listOfBaseOut.length == 3
+            ? minList[0]+minList[1]-minList[2]
+            : minList[0]-minList[1];
         temp = `${baseOut}*10^[${n}]`;
       }
       solution += `\n${temp}`;
@@ -381,6 +383,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           solution += `\n${answerBody}`;
         }
       }
+      console.log(problemBody)
       console.log(solution)
 
       return "Not Implement";
