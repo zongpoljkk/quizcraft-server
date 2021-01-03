@@ -389,18 +389,34 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
       hintBody += `${isMul? `\na^m*a^n = a^(m+n) | สมบัติการคูณของเลขยกกำลัง`:``}`;
       hintBody += `${isDiv? `\n(a^m)/(a^n) = a^(m-n) | สมบัติการหารของเลขยกกำลัง`:``}`;
       
-      console.log('problemTitle',problemTitle)
-      console.log('problemBody',problemBody)
-      console.log('solution',solution)
-      console.log('anwerBody',answerBody)
-      console.log('hintBody',hintBody)
+      //create model
+      problem = new Problem({
+        body: problemBody,
+        subtopicName: subtopicName,
+        difficulty: difficulty,
+        answerType: "MATH_INPUT",
+        title: problemTitle,
+      });
+      problemId = problem._id;
+      answer = new Answer({
+        problemId: problemId,
+        body: answerBody,
+        solution: solution,
+      });
+      hint = new Hint({ problemId: problemId, body: hintBody });
 
-      return "Not Implement";
+      // save to database
+      try {
+        newProblem = await problem.save();
+        newAnswer = await answer.save();
+        newHint = await hint.save();
+        return [{ problem:newProblem, answer:newAnswer, hint:newHint }];
+      } catch (err) {
+        console.log(err)
+        return err;
+      }
   }
 };
-
-generateScientificNotation('สัญกรณ์วิทยาศาสตร์','HARD')
-return 0
 
 module.exports = {generateScientificNotation};
 
