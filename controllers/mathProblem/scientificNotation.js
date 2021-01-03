@@ -385,7 +385,10 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
       }
 
       //create hint
-      hintBody = `ทำให้เลขยกกำลังของ 10 เท่ากันก่อน แล้วจึงนำเลขข้างหน้า 10 มาบวกลบกัน จากนั้นค่อยนำเลขมาคูณหารกัน แล้วจัดให้อยู่ในรูปสัญกรณ์วิทยาศาสตร์\na^m*a^n = a^(m+n) | สมบัติการคูณของเลขยกกำลัง\n(a^m)/(a^n) = a^(m-n) | สมบัติการหารของเลขยกกำลัง`
+      hintBody = `ทำให้เลขยกกำลังของ 10 เท่ากันก่อน แล้วจึงนำเลขข้างหน้า 10 มาบวกลบกัน จากนั้นค่อยนำเลขมา${isMul? `คูณ`: ``}${isDiv? `หาร`:``}กัน แล้วจัดให้อยู่ในรูปสัญกรณ์วิทยาศาสตร์`;
+      hintBody += `${isMul? `\na^m*a^n = a^(m+n) | สมบัติการคูณของเลขยกกำลัง`:``}`;
+      hintBody += `${isDiv? `\n(a^m)/(a^n) = a^(m-n) | สมบัติการหารของเลขยกกำลัง`:``}`;
+      
       console.log('problemTitle',problemTitle)
       console.log('problemBody',problemBody)
       console.log('solution',solution)
