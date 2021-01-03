@@ -383,8 +383,14 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           solution += `\n${answerBody}`;
         }
       }
-      console.log(problemBody)
-      console.log(solution)
+
+      //create hint
+      hintBody = `ทำให้เลขยกกำลังของ 10 เท่ากันก่อน แล้วจึงนำเลขข้างหน้า 10 มาบวกลบกัน จากนั้นค่อยนำเลขมาคูณหารกัน แล้วจัดให้อยู่ในรูปสัญกรณ์วิทยาศาสตร์\na^m*a^n = a^(m+n) | สมบัติการคูณของเลขยกกำลัง\n(a^m)/(a^n) = a^(m-n) | สมบัติการหารของเลขยกกำลัง`
+      console.log('problemTitle',problemTitle)
+      console.log('problemBody',problemBody)
+      console.log('solution',solution)
+      console.log('anwerBody',answerBody)
+      console.log('hintBody',hintBody)
 
       return "Not Implement";
   }
