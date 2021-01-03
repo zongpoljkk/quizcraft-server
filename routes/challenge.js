@@ -8,5 +8,9 @@ const router = express.Router();
 
 router.post('/random-challenge', [authJwt], challengeController.randomChallenge);
 router.post('/specific-challenge', [authJwt], challengeController.specificChallenge);
+router.get('/challenge-info/', [authJwt], challengeController.getChallengeInfo);
+router.put('/read-challenge', [authJwt], challengeController.readChallenge);
+router.get('/get-all-my-challenges/', [authJwt], challengeController.getAllMyChallenges);
+router.get('/get-final-challenge-result/', [authJwt], challengeController.getFinalChallengeResult);
 
 module.exports = router;
