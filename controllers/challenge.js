@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Challenge = require("../models/Challenge");
 const Problem = require("../models/Problem");
+const Answer = require("../models/Answer");
 const { NUMBER_OF_PROBLEM } = require("../utils/challenge");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
@@ -185,23 +186,31 @@ exports.getProblemByChallengeId = (req, res) => {
           });
         }
         // TODO: Handle user lost connection by skip user's current problem and mark as incorrect
-        // if (challenge.currentProblem != NUMBER_OF_PROBLEM - 1) {
-        //   challenge.currentProblem++;
-        // }
-        // if (challenge.whoTurn === 1) {
-        //   challenge.user1Result.push(0);
-        // } else {
-        //   challenge.user2Result.push(0);
-        // }
-        // challenge.save();
+        if (challenge.currentProblem != NUMBER_OF_PROBLEM - 1) {
+          challenge.currentProblem++;
+        }
+        if (challenge.whoTurn === 1) {
+          challenge.user1Result.push(0);
+        } else {
+          challenge.user2Result.push(0);
+        }
+        challenge.save();
 
         Problem.findById(challenge.problems[problemIndex])
+          .select("choices _id body answerType title")
           .exec()
-          .then((problem) => {
+          .then(async (problem) => {
             if (!problem) {
               return res.status(400).json({
                 success: false,
                 error: `Unable to find problem given index ${problemIndex}`,
+              });
+            }
+            if (problem.answerType === "MATH_INPUT") {
+              const answer = await Answer.findOne({ problemId: problem._id });
+              return res.status(200).json({
+                success: true,
+                data: { problem: problem, correct_answer: answer.body },
               });
             }
             return res.status(200).json({ success: true, data: problem });
