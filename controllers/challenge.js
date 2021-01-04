@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Challenge = require("../models/Challenge");
 const Problem = require("../models/Problem");
+const Answer = require("../models/Answer");
 const { NUMBER_OF_PROBLEM } = require("../utils/challenge");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
@@ -35,7 +36,7 @@ exports.randomChallenge = async (req, res) => {
     const user2Id = randomUser._id;
 
     //step2: get <NUMBER_OF_PROBLEM> question for both user (both user should never seen all questions before)
-    for (i = 0; i < NUMBER_OF_PROBLEM; i++) {
+    do {
       problem = await Problem.findOneAndUpdate(
         {
           subtopicName: subtopicName,
@@ -65,9 +66,9 @@ exports.randomChallenge = async (req, res) => {
           { projection: { _id: 1 } }
         );
       }
-      problems.push(problem._id);
-    }
-
+      if (problem) problems.push(problem._id);
+    } while (problems.length < NUMBER_OF_PROBLEM);
+  
     //step3: create challenge
     const challenge = new Challenge({
       user1Id: user1Id,
@@ -117,7 +118,7 @@ exports.specificChallenge = async (req, res) => {
     const user2Id = user2._id;
 
     //step2: get <NUMBER_OF_PROBLEM> question for both user (both user should never seen all questions before)
-    for (i = 0; i < NUMBER_OF_PROBLEM; i++) {
+    do {
       problem = await Problem.findOneAndUpdate(
         {
           subtopicName: subtopicName,
@@ -147,8 +148,8 @@ exports.specificChallenge = async (req, res) => {
           { projection: { _id: 1 } }
         );
       }
-      problems.push(problem._id);
-    }
+      if (problem) problems.push(problem._id);
+    } while (problems.length < NUMBER_OF_PROBLEM);
 
     //step3: create challenge
     const challenge = new Challenge({
@@ -165,6 +166,56 @@ exports.specificChallenge = async (req, res) => {
       success: true,
       data: { challengeId: challenge._id, user1, user2 },
     });
+  } catch (err) {
+    return res.status(400).json({ success: false, error: err });
+  }
+};
+
+exports.getProblemByChallengeId = (req, res) => {
+  const challengeId = req.query.challenge_id;
+  const problemIndex = req.query.problem_index;
+
+  try {
+    Challenge.findById(challengeId)
+      .exec()
+      .then(async (challenge) => {
+        if (!challenge) {
+          return res.status(400).json({
+            success: false,
+            error: `Unable to find challenge given challenge id`,
+          });
+        }
+        // ? Handle user lost connection by skip user's current problem and mark as incorrect  ? //
+        if (challenge.currentProblem < NUMBER_OF_PROBLEM - 1) {
+          challenge.currentProblem++;
+        }
+        if (challenge.whoTurn === 1) {
+          challenge.user1Result.push(0);
+        } else {
+          challenge.user2Result.push(0);
+        }
+        challenge.save();
+
+        Problem.findById(challenge.problems[problemIndex])
+          .select("choices _id body answerType title")
+          .exec()
+          .then(async (problem) => {
+            if (!problem) {
+              return res.status(400).json({
+                success: false,
+                error: `Unable to find problem given index ${problemIndex}`,
+              });
+            }
+            if (problem.answerType === "MATH_INPUT") {
+              const answer = await Answer.findOne({ problemId: problem._id });
+              return res.status(200).json({
+                success: true,
+                data: { problem: problem, correct_answer: answer.body },
+              });
+            }
+            return res.status(200).json({ success: true, data: problem });
+          });
+      });
   } catch (err) {
     return res.status(400).json({ success: false, error: err.toString() });
   }
