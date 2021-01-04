@@ -12,6 +12,6 @@ router.post('/random-challenge', [authJwt], challengeController.randomChallenge)
 router.post('/specific-challenge', [authJwt], challengeController.specificChallenge);
 router.get('/challenge-info/', [authJwt], challengeController.getChallengeInfo);
 router.put('/read-challenge', [authJwt], challengeController.readChallenge);
-router.delete("/delete-challenge", [authJwt], challengeController.deleteChallenge);
+router.delete('/delete-challenge', [authJwt], challengeController.deleteChallenge);
 
 module.exports = router;
