@@ -199,7 +199,7 @@ exports.deleteChallenge = (req, res) => {
 exports.getChallengeInfo = async (req, res) => {
   const userId = req.query.userId;
   const challengeId = req.query.challengeId;
-  try{
+  try {
     var challenge = await Challenge.aggregate([
       {
         $match: {
@@ -238,46 +238,53 @@ exports.getChallengeInfo = async (req, res) => {
       { $set: { user2IsPlayed: { $gt: [{ $size: "$user2Result" }, 0] } } },
     ]);
 
-      challenge = challenge[0];
-      var out;
-      if (challenge.user1Id == userId) {
-        out = {
-          me: {
-            photo: challenge.user1Photo,
-            username: challenge.user1Username,
-            score: challenge.user1Score,
-            isPlayed: challenge.user1IsPlayed
-          },
-          opponent: {
-            photo: challenge.user2Photo,
-            username: challenge.user2Username,
-            score: challenge.user2Score,
-            isPlayed: challenge.user2IsPlayed
-          }
-        }
-      } else {
-        out = {
-          me: {
-            photo: challenge.user2Photo,
-            username: challenge.user2Username,
-            score: challenge.user2Score,
-            isPlayed: challenge.user2IsPlayed
-          },
-          opponent: {
-            photo: challenge.user1Photo,
-            username: challenge.user1Username,
-            score: challenge.user1Score,
-            isPlayed: challenge.user1IsPlayed
-          }
-        }
-      }
-      return res.status(200).json({ success: true, data: out });
-    } catch (err) {
-      if (!challenge) return res.status(400).json({ success:false, error: "Cannot find the challenge" });
-      else if (err) return res.status(500).json({ success:false, error: err.toString() });
-      else return res.status(400).json({ succes:false, error: "Something went wrong"});
+    challenge = challenge[0];
+    var out;
+    if (challenge.user1Id == userId) {
+      out = {
+        me: {
+          photo: challenge.user1Photo,
+          username: challenge.user1Username,
+          score: challenge.user1Score,
+          isPlayed: challenge.user1IsPlayed,
+        },
+        opponent: {
+          photo: challenge.user2Photo,
+          username: challenge.user2Username,
+          score: challenge.user2Score,
+          isPlayed: challenge.user2IsPlayed,
+        },
+      };
+    } else {
+      out = {
+        me: {
+          photo: challenge.user2Photo,
+          username: challenge.user2Username,
+          score: challenge.user2Score,
+          isPlayed: challenge.user2IsPlayed,
+        },
+        opponent: {
+          photo: challenge.user1Photo,
+          username: challenge.user1Username,
+          score: challenge.user1Score,
+          isPlayed: challenge.user1IsPlayed,
+        },
+      };
     }
+    return res.status(200).json({ success: true, data: out });
+  } catch (err) {
+    if (!challenge)
+      return res
+        .status(400)
+        .json({ success: false, error: "Cannot find the challenge" });
+    else if (err)
+      return res.status(500).json({ success: false, error: err.toString() });
+    else
+      return res
+        .status(400)
+        .json({ succes: false, error: "Something went wrong" });
   }
+};
 
 exports.readChallenge = async (req, res) => {
   const challengeId = req.body.challengeId;
@@ -307,15 +314,13 @@ exports.readChallenge = async (req, res) => {
           return res
             .status(400)
             .json({ success: false, error: "Cannot update challenge" });
-        return res
-          .status(200)
-          .json({
-            success: true,
-            isRead:
-              newChallenge.user1Id == userId
-                ? newChallenge.user1IsRead
-                : newChallenge.user2IsRead,
-          });
+        return res.status(200).json({
+          success: true,
+          isRead:
+            newChallenge.user1Id == userId
+              ? newChallenge.user1IsRead
+              : newChallenge.user2IsRead,
+        });
       });
     });
   });
@@ -537,4 +542,4 @@ exports.getFinalChallengeResult = async (req, res) => {
         .status(400)
         .json({ succes: false, error: "Something went wrong" });
   }
-}
+};
