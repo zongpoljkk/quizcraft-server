@@ -2,7 +2,6 @@ const Problem = require("../../models/Problem");
 const Answer = require("../../models/Answer");
 const Hint = require("../../models/Hint");
 const math = require("mathjs");
-const { problem } = require("synonyms/dictionary");
 const EASY = "EASY";
 const MEDIUM = "MEDIUM";
 const HARD = "HARD";
@@ -24,13 +23,12 @@ const randInt = (start, end, haveNegative) => {
 
 const generateMeaningOfExponents = async (subtopicName, difficulty) => {
   var problemTitle,problemBody,answerBody,hintBody,solution, answerType;
-  var expo, num,a ,n, rand, positiveBase, opt;
+  var expo, num,a ,n, rand, positiveBase, opt, selectedExpo, expoList, numList, choices;
   let problem, problemId, answer, hint, newProblem,newAnswer,newHint;
   let i;
   switch (difficulty) {
     case EASY:
-      // opt = 2;
-      opt = randInt(1,2);
+      opt = randInt(1,3);
       switch (opt) {
         case 1:
           problemTitle = `จงหาว่าเลขยกกำลังต่อไปนี้แทนจำนวนใด`;
@@ -58,6 +56,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           }
           problemBody = `${expo}`;
           answerBody = `${num}`;
+          answerType = MATH_INPUT;
           solution = "";
           let bool = a < 0 && rand; //ex -3^[4] ?
           for (i=0 ;i<n; i++) {
@@ -91,17 +90,63 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
             }
           }
           answerBody = a<0? `(${a})^[${n}]` : `${a}^[${n}]`;
+          answerType = MATH_INPUT;
           hintBody = "a*a*a = a^3";
           solution = answerBody;
           break;
+        case 3:
+          problemTitle = "จงหาว่าเลขยกกำลังต่อไปนี้มีค่าเท่ากันหรือไม่"
+          let indexList;
+          a = randInt(1,500);
+          n = randInt(0,15);
+          indexList = [];
+          expoList = []; 
+          numList = [];
+          expoList.push(`${a}^[${n}]`); // 3^[2]
+          numList.push(1);
+          expoList.push(`(-${a})^[${n}]`); //(-3)^[2]
+          if (n % 2 == 0) {
+            numList.push(1);
+          } else {
+            numList.push(-1)
+          }
+          expoList.push(`-${a}^[${n}]`); // -3^[2]
+          numList.push(-1);
+          selectedExpo = [];
+          do {
+            rand = randInt(0,expoList.length-1);
+            expo = expoList[rand];
+            if (!selectedExpo.includes(expo)) {
+              selectedExpo.push(expo);
+              indexList.push(rand);
+            }
+          } while (selectedExpo.length < 2);
+
+          problemBody = `${selectedExpo[0]} และ ${selectedExpo[1]}`
+          //create answer
+          answerBody = numList[indexList[0]] == numList[indexList[1]] ? "เท่ากัน" : "ไม่เท่า";
+          answerType = RADIO_CHOICE;
+          choices = ["เท่ากัน","ไม่เท่า"]
+          solution = `${selectedExpo[0]} มีค่าเป็น${numList[indexList[0]]==1? `บวก`:`ลบ`} `
+                    + `${answerBody==`เท่ากัน`? `และ`:`ในขณะที่`} `
+                    +`${selectedExpo[1]} ${answerBody==`เท่ากัน`? `ก็`:``}มีค่าเป็น`
+                    +`${numList[indexList[1]]==1? `บวก`:`ลบ`}${answerBody==`เท่ากัน`? `เช่นเดียวกัน`:``}`;
+                    
+          //create hint
+          hintBody = `ถ้าเลขติดลบยกกำลังด้วยเลขคู่จะได้ค่าบวก`
+                    +`\nถ้าเลขติดลบยกกำลังด้วยเลขคี่จะได้ค่าลบ`
+                    +`\n(-${a})^[2] = (-${a})*(-${a}) แต่ -${a}^[2] = -(${a}*${a})`;
+          break;
+        
       }
-      //create model
+      // create model
       problem = new Problem({
         body: problemBody,
         subtopicName: subtopicName,
         difficulty: difficulty,
-        answerType: "MATH_INPUT",
+        answerType: answerType,
         title: problemTitle,
+        choices: answerType == RADIO_CHOICE? choices : [],
       });
       problemId = problem._id;
       answer = new Answer({
@@ -110,28 +155,23 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
         solution: solution,
       });
       hint = new Hint({ problemId: problemId, body: hintBody });
-      console.log(problem);
 
       // save to database
-      // try {
-      //   newProblem = await problem.save();
-      //   newAnswer = await answer.save();
-      //   newHint = await hint.save();
-      //   return [{ problem:newProblem, answer:newAnswer, hint:newHint }];
-      // } catch (err) {
-      //   console.log(err)
-      //   return err;
-      // }
-      return "Not Implement";
+      try {
+        newProblem = await problem.save();
+        newAnswer = await answer.save();
+        newHint = await hint.save();
+        return [{ problem:newProblem, answer:newAnswer, hint:newHint }];
+      } catch (err) {
+        console.log(err)
+        return err;
+      }
     case MEDIUM:
       return "Not Implement";
     case HARD:
       return "Not Implement";
   }
 };
-
-generateMeaningOfExponents('ความหมายของเลขยกกำลัง','EASY')
-return 0
 
 module.exports = {generateMeaningOfExponents};
 
