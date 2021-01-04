@@ -5,6 +5,7 @@ const EASY = "EASY";
 const MEDIUM = "MEDIUM";
 const HARD = "HARD";
 const alphabet = "abcdefghijklmnopqrstuvwxyz";
+const math = require("mathjs");
 
 const randInt = (start, end, haveNegative) => {
   if (haveNegative) {
@@ -65,6 +66,8 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
   var a,n,stn,num,opt,nn,ff;
   let i;
   let problem, problemId, answer, hint, newProblem,newAnswer,newHint;
+  var termNum;
+  var baseList, nList, randList, temp;
   switch (difficulty) {
     case EASY:
       nn = randInt(1,9);
@@ -138,7 +141,107 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
       }
 
     case MEDIUM:
-      return "Not Implement";
+      termNum = randInt(2, 5, false); //random 2-5
+      baseList = [], nList = [];
+      randList = Array.from({ length: termNum }, () =>
+        Math.floor(Math.random() * 2)
+      );
+      problemTitle = "จงหาผลลัพธ์ของเลขต่อไปนี้ แล้วตอบในรูปสัญกรณ์วิทยาศาสตร์"
+      problemBody = "";
+      let m = randInt(4,13,true);
+      for (i=0; i<termNum; i++) {
+        nn = randInt(1,9);
+        ff = String(randInt(1,999));
+        if (ff[ff.length-1] == 0) {
+          for(i in ff) {
+            if(ff[ff.length-1] == 0) ff = ff.substring(0,ff.length-1);
+          }
+        }
+        a = `${nn}.${ff}`
+        n = m + randInt(1,3,true);
+        stn = `${a}*10^[${n}]`;
+        baseList.push(a);
+        nList.push(n);
+        if (i==0) {
+          problemBody += randList[i]? `${stn}` : `-${stn}` ;
+        } else {
+          problemBody += randList[i]? `+${stn}` : `-${stn}` ;
+        }
+      }
+      let min = Math.min(...nList);
+      solution = "";
+      let baseOut = 0;
+      for (i in baseList) {
+        temp = moveThePoint(baseList[i],nList[i]-min);
+        baseList[i] = temp;
+        nList[i] = min;
+        stn = `${temp}*10^[${min}]`
+        if (i==0) {
+          solution += randList[i]? `${stn}` : `-${stn}` ;
+        } else {
+          solution += randList[i]? `+${stn}` : `-${stn}` ;
+        }
+        baseOut = math.add(baseOut,randList[i]? math.bignumber(temp) : math.bignumber(-temp))
+      }
+      solution += `\n${baseOut}*10^[${min}]`;
+      let positiveBase = Math.abs(baseOut)
+      if (1<=positiveBase && positiveBase<10) {
+        answerBody = `${baseOut}*10^[${min}]`;
+      } 
+      else {
+        n = min;
+        if (positiveBase<1) { 
+          //goRight
+          do {
+            positiveBase = moveThePoint(positiveBase,1);
+            n -= 1;
+          } while (positiveBase<1);
+          answerBody = baseOut<0? `-${positiveBase}*10^[${n}]` : `${positiveBase}*10^[${n}]`;
+          solution += `\n${answerBody}`;
+
+        } else if (positiveBase>=10) { 
+          //goLeft
+          do {
+            positiveBase = moveThePoint(positiveBase,-1);
+            n += 1
+          } while (positiveBase>=10);
+          answerBody = baseOut<0? `-${positiveBase}*10^[${n}]` : `${positiveBase}*10^[${n}]`;
+          solution += `\n${answerBody}`;
+        }
+      }
+
+      //create hint
+      hintBody = `ทำให้เลขยกกำลังเท่ากันก่อน แล้วจึงนำเลขข้างหน้ามาบวกลบกัน\nเช่น 3*10^[4] + 5.6*10^[6]\n= 3*10^[4] + 560*10[4]\n= 563*10[4]\n= 5.63*10^[6]`;
+
+      //create model
+      problem = new Problem({
+        body: problemBody,
+        subtopicName: subtopicName,
+        difficulty: difficulty,
+        answerType: "MATH_INPUT",
+        title: problemTitle,
+      });
+      problemId = problem._id;
+      answer = new Answer({
+        problemId: problemId,
+        body: answerBody,
+        solution: solution,
+      });
+      hint = new Hint({ problemId: problemId, body: hintBody });
+
+      console.log(problem)
+      console.log(answer)
+      console.log(hint)
+      // save to database
+      try {
+        newProblem = await problem.save();
+        newAnswer = await answer.save();
+        newHint = await hint.save();
+        return [{ problem:newProblem, answer:newAnswer, hint:newHint }];
+      } catch (err) {
+        console.log(err)
+        return err;
+      }
     case HARD:
       return "Not Implement";
   }

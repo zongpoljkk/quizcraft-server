@@ -71,6 +71,22 @@ const ChallengeSchema = new Schema({
   user2IsRead: {
     type: Boolean,
     default: false,
+  },
+  user1GainCoin: {
+    type: Number,
+    default: 0,
+  },
+  user2GainCoin: {
+    type: Number,
+    default: 0,
+  },
+  user1GainExp: {
+    type: Number,
+    default: 0,
+  },
+  user2GainExp: {
+    type: Number,
+    default: 0,
   }
 })
 
