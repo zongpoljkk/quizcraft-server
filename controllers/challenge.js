@@ -196,7 +196,7 @@ exports.deleteChallenge = async (req, res) => {
             } else {
               res.status(200).json({
                 success: true,
-                data: `Successfully delete challenge ${challengeId}`,
+                data: `Successfully delete challenge`,
               });
             }
           });
