@@ -185,7 +185,7 @@ exports.getProblemByChallengeId = (req, res) => {
             error: `Unable to find challenge given challenge id ${challengeId}`,
           });
         }
-        // TODO: Handle user lost connection by skip user's current problem and mark as incorrect
+        // ? Handle user lost connection by skip user's current problem and mark as incorrect  ? //
         if (challenge.currentProblem != NUMBER_OF_PROBLEM - 1) {
           challenge.currentProblem++;
         }
