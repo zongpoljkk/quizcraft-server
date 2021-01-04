@@ -10,6 +10,7 @@ router.get('/get-all-my-challenges/', [authJwt], challengeController.getAllMyCha
 router.get('/get-final-challenge-result/', [authJwt], challengeController.getFinalChallengeResult);
 router.post('/random-challenge', [authJwt], challengeController.randomChallenge);
 router.post('/specific-challenge', [authJwt], challengeController.specificChallenge);
+router.get('/challenge-info/', [authJwt], challengeController.getChallengeInfo);
 router.put('/read-challenge', [authJwt], challengeController.readChallenge);
 router.delete("/delete-challenge", [authJwt], challengeController.deleteChallenge);
 

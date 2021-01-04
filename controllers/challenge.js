@@ -4,6 +4,10 @@ const Problem = require("../models/Problem");
 const { NUMBER_OF_PROBLEM } = require("../utils/challenge");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
+const { mathGenerate } = require("./mathProblem/mathProblemGenerator");
+const { englishGenerate } = require("./englishProblem/englishProblemGenerator");
+const MATH = "คณิตศาสตร์";
+const ENG = "ภาษาอังกฤษ";
 
 const randInt = (start, end) => {
   return Math.floor(Math.random() * (end - start + 1)) + start;
@@ -80,7 +84,7 @@ exports.randomChallenge = async (req, res) => {
       data: { challengeId: challenge._id, user1, user2: randomUser },
     });
   } catch (err) {
-    return res.status(400).json({ success: false, error: err });
+    return res.status(400).json({ success: false, error: err.toString() });
   }
 };
 
@@ -162,7 +166,7 @@ exports.specificChallenge = async (req, res) => {
       data: { challengeId: challenge._id, user1, user2 },
     });
   } catch (err) {
-    return res.status(400).json({ success: false, error: err });
+    return res.status(400).json({ success: false, error: err.toString() });
   }
 };
 
@@ -191,6 +195,89 @@ exports.deleteChallenge = (req, res) => {
       .json({ success: false, error: "Internal server Error" });
   }
 };
+
+exports.getChallengeInfo = async (req, res) => {
+  const userId = req.query.userId;
+  const challengeId = req.query.challengeId;
+  try{
+    var challenge = await Challenge.aggregate([
+      {
+        $match: {
+          _id: mongoose.Types.ObjectId(challengeId),
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user1Id",
+          foreignField: "_id",
+          as: "fromUser1",
+        },
+      },
+      { $unwind: "$fromUser1" },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user2Id",
+          foreignField: "_id",
+          as: "fromUser2",
+        },
+      },
+      { $unwind: "$fromUser2" },
+      {
+        $addFields: {
+          user1Photo: "$fromUser1.photo",
+          user2Photo: "$fromUser2.photo",
+          user1Username: "$fromUser1.username",
+          user2Username: "$fromUser2.username",
+          user1IsPlayed: false,
+          user2IsPlayed: false,
+        },
+      },
+      { $set: { user1IsPlayed: { $gt: [{ $size: "$user1Result" }, 0] } } },
+      { $set: { user2IsPlayed: { $gt: [{ $size: "$user2Result" }, 0] } } },
+    ]);
+
+      challenge = challenge[0];
+      var out;
+      if (challenge.user1Id == userId) {
+        out = {
+          me: {
+            photo: challenge.user1Photo,
+            username: challenge.user1Username,
+            score: challenge.user1Score,
+            isPlayed: challenge.user1IsPlayed
+          },
+          opponent: {
+            photo: challenge.user2Photo,
+            username: challenge.user2Username,
+            score: challenge.user2Score,
+            isPlayed: challenge.user2IsPlayed
+          }
+        }
+      } else {
+        out = {
+          me: {
+            photo: challenge.user2Photo,
+            username: challenge.user2Username,
+            score: challenge.user2Score,
+            isPlayed: challenge.user2IsPlayed
+          },
+          opponent: {
+            photo: challenge.user1Photo,
+            username: challenge.user1Username,
+            score: challenge.user1Score,
+            isPlayed: challenge.user1IsPlayed
+          }
+        }
+      }
+      return res.status(200).json({ success: true, data: out });
+    } catch (err) {
+      if (!challenge) return res.status(400).json({ success:false, error: "Cannot find the challenge" });
+      else if (err) return res.status(500).json({ success:false, error: err.toString() });
+      else return res.status(400).json({ succes:false, error: "Something went wrong"});
+    }
+  }
 
 exports.readChallenge = async (req, res) => {
   const challengeId = req.body.challengeId;
@@ -400,6 +487,8 @@ exports.getFinalChallengeResult = async (req, res) => {
           firstname: challenge.user1.firstname,
           lastname: challenge.user1.lastname,
           time: parseFloat(challenge.user1Time),
+          gainExp: challenge.user1GainExp,
+          gainCoin: challenge.user1GainCoin,
         },
         opponent: {
           result: challenge.user2Result,
@@ -421,6 +510,8 @@ exports.getFinalChallengeResult = async (req, res) => {
           firstname: challenge.user2.firstname,
           lastname: challenge.user2.lastname,
           time: parseFloat(challenge.user2Time),
+          gainExp: challenge.user2GainExp,
+          gainCoin: challenge.user2GainCoin,
         },
         opponent: {
           result: challenge.user1Result,
@@ -446,4 +537,4 @@ exports.getFinalChallengeResult = async (req, res) => {
         .status(400)
         .json({ succes: false, error: "Something went wrong" });
   }
-};
+}
