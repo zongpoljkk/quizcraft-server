@@ -2,6 +2,7 @@ const Problem = require("../../models/Problem");
 const Answer = require("../../models/Answer");
 const Hint = require("../../models/Hint");
 const math = require("mathjs");
+const { problem } = require("synonyms/dictionary");
 const EASY = "EASY";
 const MEDIUM = "MEDIUM";
 const HARD = "HARD";
@@ -24,37 +25,12 @@ const randInt = (start, end, haveNegative) => {
 const generateMeaningOfExponents = async (subtopicName, difficulty) => {
   var problemTitle,problemBody,answerBody,hintBody,solution, answerType;
   var expo, num,a ,n, rand, positiveBase, opt;
+  let problem, problemId, answer, hint, newProblem,newAnswer,newHint;
   let i;
   switch (difficulty) {
     case EASY:
-      // problemTitle = `จงหาว่าเลขยกกำลังต่อไปนี้แทนจำนวนใด`;
-      // a = randInt(1,40,true);
-      // positiveBase = Math.abs(a);
-      
-      // if (1 <= positiveBase && positiveBase <= 10) {
-      //   n = randInt(0,12);
-      // }
-      // else if (10 < positiveBase && positiveBase <= 20) {
-      //   n = randInt(0,7);
-      // }
-      // else if (positiveBase > 20) {
-      //   n = randInt(0,4); 
-      // }
-      // rand = randInt(0,1);
-      // console.log(a);
-      // console.log(n);
-      // // rand = 1;
-      // if (a < 0 && rand) {
-      //   //-3^[4]
-      //   expo = `${a}^[${n}]`;
-      //   num = -1*math.pow(math.bignumber(positiveBase),math.bignumber(n));
-      // }
-      // else {
-      //   expo = a<0? `(${a})^[${n}]`: `${a}^[${n}]`;
-      //   num = math.pow(math.bignumber(a),math.bignumber(n));
-      // }
-      // opt = randInt(1,3);
-      opt = 2;
+      // opt = 2;
+      opt = randInt(1,2);
       switch (opt) {
         case 1:
           problemTitle = `จงหาว่าเลขยกกำลังต่อไปนี้แทนจำนวนใด`;
@@ -119,11 +95,33 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           solution = answerBody;
           break;
       }
-      console.log("problemTitle",problemTitle);
-      console.log("problemBody",problemBody);
-      console.log("answerBody",answerBody);
-      console.log("solution",solution);
-      console.log("hintBody",hintBody)
+      //create model
+      problem = new Problem({
+        body: problemBody,
+        subtopicName: subtopicName,
+        difficulty: difficulty,
+        answerType: "MATH_INPUT",
+        title: problemTitle,
+      });
+      problemId = problem._id;
+      answer = new Answer({
+        problemId: problemId,
+        body: answerBody,
+        solution: solution,
+      });
+      hint = new Hint({ problemId: problemId, body: hintBody });
+      console.log(problem);
+
+      // save to database
+      // try {
+      //   newProblem = await problem.save();
+      //   newAnswer = await answer.save();
+      //   newHint = await hint.save();
+      //   return [{ problem:newProblem, answer:newAnswer, hint:newHint }];
+      // } catch (err) {
+      //   console.log(err)
+      //   return err;
+      // }
       return "Not Implement";
     case MEDIUM:
       return "Not Implement";
@@ -132,8 +130,8 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
   }
 };
 
-// generateMeaningOfExponents('ความหมายของเลขยกกำลัง','EASY')
-// return 0
+generateMeaningOfExponents('ความหมายของเลขยกกำลัง','EASY')
+return 0
 
 module.exports = {generateMeaningOfExponents};
 
