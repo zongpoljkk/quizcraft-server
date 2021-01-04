@@ -10,7 +10,6 @@ const ReportSchema = new Schema({
   },
   userId: {
     type: ObjectID,
-    ref: "Problem",
     required: true,
   },
   body: {
