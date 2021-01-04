@@ -54,7 +54,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
       //   num = math.pow(math.bignumber(a),math.bignumber(n));
       // }
       // opt = randInt(1,3);
-      opt = 1;
+      opt = 2;
       switch (opt) {
         case 1:
           problemTitle = `จงหาว่าเลขยกกำลังต่อไปนี้แทนจำนวนใด`;
@@ -104,6 +104,19 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           break;
         case 2: 
           problemTitle = "จงเขียนผลคูณต่อไปนี้ในรูปเลขยกกำลัง"
+          a = randInt(0,1)? randInt(1,1000,true) : alphabet[randInt(0,alphabet.length)];
+          n = randInt(2,7);
+          problemBody = "";
+          for (i=0; i<n; i++) {
+            if (i==0) {
+              problemBody += a<0? `(${a})` : `${a}`;
+            } else {
+              problemBody += a<0? `*(${a})` : `*${a}`;
+            }
+          }
+          answerBody = a<0? `(${a})^[${n}]` : `${a}^[${n}]`;
+          hintBody = "a*a*a = a^3";
+          solution = answerBody;
           break;
       }
       console.log("problemTitle",problemTitle);
