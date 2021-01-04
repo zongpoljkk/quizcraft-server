@@ -28,7 +28,7 @@ exports.randomChallenge = async (req, res) => {
     const user2Id = randomUser._id;
     
     //step2: get <NUMBER_OF_PROBLEM> question for both user (both user should never seen all questions before)
-    for (i=0; i<NUMBER_OF_PROBLEM; i++) {
+    do {
       problem = await Problem.findOneAndUpdate(
         {
           subtopicName: subtopicName,
@@ -58,8 +58,8 @@ exports.randomChallenge = async (req, res) => {
           { projection: { _id: 1 } }
         );
       }
-      problems.push(problem._id);
-    }
+      if (problem) problems.push(problem._id);
+    } while (problems.length < NUMBER_OF_PROBLEM);
   
     //step3: create challenge
     const challenge = new Challenge({
@@ -94,7 +94,7 @@ exports.specificChallenge = async (req, res) => {
     const user2Id = user2._id;
 
     //step2: get <NUMBER_OF_PROBLEM> question for both user (both user should never seen all questions before)
-    for (i=0; i<NUMBER_OF_PROBLEM; i++) {
+    do {
       problem = await Problem.findOneAndUpdate(
         {
           subtopicName: subtopicName,
@@ -124,8 +124,8 @@ exports.specificChallenge = async (req, res) => {
           { projection: { _id: 1 } }
         );
       }
-      problems.push(problem._id);
-    }
+      if (problem) problems.push(problem._id);
+    } while (problems.length < NUMBER_OF_PROBLEM);
 
     //step3: create challenge
     const challenge = new Challenge({
