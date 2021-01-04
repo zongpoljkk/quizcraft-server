@@ -15,7 +15,10 @@ exports.getAllSubtopics = async (req, res) => {
 
 exports.getAllSubjects = async (req, res) => {
   await Subtopic.aggregate(
-    [{ $group: { _id: "$subject", subjectImg: { $first: "$subjectImg" } } }],
+    [
+      { $group: { _id: "$subject", subjectImg: { $first: "$subjectImg" } } },
+      { $sort: { _id: 1 } },
+    ],
     (err, subjects) => {
       if (err) {
         return res.status(500).json({ success: false, error: err });
@@ -24,7 +27,8 @@ exports.getAllSubjects = async (req, res) => {
         return res.status(400).json({ success: false, data: "no subjects" });
       }
       return res.status(200).json({ success: true, data: subjects });
-    })
+    }
+  );
 };
 
 exports.getTopicBySubjectName = async (req, res) => {

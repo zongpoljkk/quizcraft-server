@@ -14,16 +14,21 @@ exports.checkAnswer = async (req, res, next) => {
   const userAnswer = req.body.userAnswer;
   const subtopic = req.body.subtopic;
   const mode = req.body.mode;
+  let earnedExp = 0;
+  let earnedCoins = 0;
 
   // ------ Handle mode surplus ------ //
   let mode_surplus = 1;
   switch (mode) {
     case "challenge":
       mode_surplus = 1.2;
+      break;
     case "quiz":
       mode_surplus = 1.4;
+      break;
     case "group":
       mode_surplus = 0;
+      break;
   }
 
   Answer.findOne({ problemId: problemId })
@@ -39,26 +44,44 @@ exports.checkAnswer = async (req, res, next) => {
         return;
       } else {
         if (
-          userAnswer === answer.body ||
-          (subtopic === "การดำเนินการของเลขยกกำลัง" && // For this topic, there are many possible answers
-            math.evaluate(userAnswer) === math.evaluate(answer.body))
+          userAnswer === answer.body
+          // TODO: Evaluate Math expression for subtopic "การดำเนินการของเลขยกกำลัง"
+          // (subtopic === "การดำเนินการของเลขยกกำลัง" && // For this topic, there are many possible answers
+          //   math.evaluate(userAnswer) === math.evaluate(answer.body))
+          // math.compare(userAnswer, answer.body) === true)
         ) {
+        //  || subtopic === "การดำเนินการของเลขยกกำลัง") {
+
+          // try {
+          //    const eval = math.evaluate(userAnswer) === math.evaluate(answer.body)
+          // }
+          // catch (err) {
+          //   console.log(`Can't evaluate string: ${err}`)
+          // }
+
+
           User.findById(userId)
             .exec()
             .then((user) => {
               // * Handle Earned coins * //
               switch (answer.problemId.difficulty) {
                 case "EASY":
-                  user.exp += 10 * mode_surplus;
-                  user.coin += 10 * mode_surplus;
+                  earnedExp = 10 * mode_surplus;
+                  earnedCoins = 10 * mode_surplus;
+                  user.exp += earnedExp;
+                  user.coin += earnedCoins;
                   break;
                 case "MEDIUM":
-                  user.exp += 20 * mode_surplus;
-                  user.coin += 20 * mode_surplus;
+                  earnedExp = 20 * mode_surplus;
+                  earnedCoins = 20 * mode_surplus;
+                  user.exp += earnedExp;
+                  user.coin += earnedCoins;
                   break;
                 case "HARD":
-                  user.exp += 30 * mode_surplus;
-                  user.coin += 30 * mode_surplus;
+                  earnedExp = 30 * mode_surplus;
+                  earnedCoins = 30 * mode_surplus;
+                  user.exp += earnedExp;
+                  user.coin += earnedCoins;
                   break;
               }
 
@@ -95,6 +118,8 @@ exports.checkAnswer = async (req, res, next) => {
               req.level_up = level_up;
               req.rank_up = rank_up;
               req.answer = answer.body;
+              req.earned_exp = earnedExp;
+              req.earned_coins = earnedCoins;
               next();
             });
         } else {
@@ -112,6 +137,8 @@ exports.checkAnswer = async (req, res, next) => {
               req.level_up = false;
               req.rank_up = false;
               req.answer = answer.body;
+              req.earned_exp = earnedExp;
+              req.earned_coins = earned_coins;
               next();
             });
         }
