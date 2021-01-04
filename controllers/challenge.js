@@ -221,6 +221,57 @@ exports.getProblemByChallengeId = (req, res) => {
   }
 };
 
+exports.deleteChallenge = async (req, res) => {
+  const challengeId = req.body.challenge_id;
+  const userId = req.body.user_id;
+  let deleteAble = false;
+
+  try {
+    // Check Authorization
+    if (userId === req.userId) {
+      const challenge = await Challenge.findById(challengeId).exec();
+
+      if (challenge.user1IsRead && challenge.user2IsRead) {
+        deleteAble = true;
+      }
+
+      if (deleteAble) {
+        Challenge.findByIdAndDelete(challengeId)
+          .exec()
+          .then((challenge) => {
+            if (!challenge) {
+              res.status(400).json({
+                success: false,
+                error: "Unable to find challenge given challenge id",
+              });
+            } else {
+              res.status(200).json({
+                success: true,
+                data: `Successfully delete challenge`,
+              });
+            }
+          });
+      } else {
+        res.status(400).json({
+          success: false,
+          error: `Both user haven't read the challenge result yet`,
+        });
+      }
+    } else {
+      res
+        .status(401)
+        .json({
+          succes: false,
+          error: `userId does not match with authentication id`,
+        });
+    }
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ success: false, error: "Internal server Error" });
+  }
+};
+
 exports.getChallengeInfo = async (req, res) => {
   const userId = req.query.userId;
   const challengeId = req.query.challengeId;
