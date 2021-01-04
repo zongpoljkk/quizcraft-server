@@ -182,7 +182,7 @@ exports.getProblemByChallengeId = (req, res) => {
         if (!challenge) {
           return res.status(400).json({
             success: false,
-            error: `Unable to find challenge given challenge id ${challengeId}`,
+            error: `Unable to find challenge given challenge id`,
           });
         }
         // ? Handle user lost connection by skip user's current problem and mark as incorrect  ? //
