@@ -194,7 +194,7 @@ exports.getChallengeInfo = async (req, res) => {
             photo: challenge.user1Photo,
             username: challenge.user1Username,
             score: challenge.user1Score,
-            usedTime: challenge.user1Time,
+            usedTime: parseFloat(challenge.user1Time),
             currentProblem: challenge.currentProblem,
             isPlayed: challenge.user1IsPlayed
           },
@@ -202,7 +202,7 @@ exports.getChallengeInfo = async (req, res) => {
             photo: challenge.user2Photo,
             username: challenge.user2Username,
             score: challenge.user2Score,
-            usedTime: challenge.user2Time,
+            usedTime: parseFloat(challenge.user2Time),
             currentProblem: challenge.currentProblem,
             isPlayed: challenge.user2IsPlayed
           }
@@ -213,7 +213,7 @@ exports.getChallengeInfo = async (req, res) => {
             photo: challenge.user2Photo,
             username: challenge.user2Username,
             score: challenge.user2Score,
-            usedTime: challenge.user2Time,
+            usedTime: parseFloat(challenge.user2Time),
             currentProblem: challenge.currentProblem,
             isPlayed: challenge.user2IsPlayed
           },
@@ -221,7 +221,7 @@ exports.getChallengeInfo = async (req, res) => {
             photo: challenge.user1Photo,
             username: challenge.user1Username,
             score: challenge.user1Score,
-            usedTime: challenge.user1Time,
+            usedTime: parseFloat(challenge.user1Time),
             currentProblem: challenge.currentProblem,
             isPlayed: challenge.user1IsPlayed
           }
