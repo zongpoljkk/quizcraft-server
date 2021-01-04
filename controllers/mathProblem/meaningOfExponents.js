@@ -20,10 +20,19 @@ const randInt = (start, end, haveNegative) => {
 
 const generateMeaningOfExponents = async (subtopicName, difficulty) => {
   var problemTitle,problemBody,answerBody,hintBody,solution;
-  var expo, num;
+  var expo, num,a ,n;
   switch (difficulty) {
     case EASY:
-
+      a = randInt(1,40,true);
+      if (1 < Math.abs(a) <= 10) {
+        n = randInt(1,12);
+      }
+      else if (10 < Math.abs(a) <= 20) {
+        n = randInt(1,7,true);
+      }
+      else if (Math.abs(a) > 20) {
+        n = randInt(1,5,true); 
+      }
       return "Not Implement";
     case MEDIUM:
       return "Not Implement";
