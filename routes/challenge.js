@@ -1,11 +1,12 @@
-const express = require('express');
+const express = require("express");
 
-const challengeController = require('../controllers/challenge');
+const challengeController = require("../controllers/challenge");
 
-const { authJwt, adminOnly } = require('../middlewares');
+const { authJwt, adminOnly } = require("../middlewares");
 
 const router = express.Router();
 
+router.get("/get-problem", [authJwt], challengeController.getProblemByChallengeId);
 router.post('/random-challenge', [authJwt], challengeController.randomChallenge);
 router.post('/specific-challenge', [authJwt], challengeController.specificChallenge);
 router.get('/challenge-info/', [authJwt], challengeController.getChallengeInfo);
