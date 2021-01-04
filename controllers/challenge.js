@@ -170,25 +170,43 @@ exports.specificChallenge = async (req, res) => {
   }
 };
 
-exports.deleteChallenge = (req, res) => {
+exports.deleteChallenge = async (req, res) => {
   const challengeId = req.body.challenge_id;
+  const userId = req.body.user_id;
+  let deleteAble = false;
 
   try {
-    Challenge.findByIdAndDelete(challengeId)
-      .exec()
-      .then((challenge) => {
-        if (!challenge) {
-          res.status(400).json({
-            success: false,
-            error: "Unable to find challenge given challenge id",
+    // Check Authorization
+    if (userId === req.userId) {
+      const challenge = await Challenge.findById(challengeId).exec();
+
+      if (challenge.user1IsRead && challenge.user2IsRead) {
+        deleteAble = true;
+      }
+
+      if (deleteAble) {
+        Challenge.findByIdAndDelete(challengeId)
+          .exec()
+          .then((challenge) => {
+            if (!challenge) {
+              res.status(400).json({
+                success: false,
+                error: "Unable to find challenge given challenge id",
+              });
+            } else {
+              res.status(200).json({
+                success: true,
+                data: `Successfully delete challenge ${challengeId}`,
+              });
+            }
           });
-        } else {
-          res.status(200).json({
-            success: true,
-            data: `Successfully delete challenge ${challengeId}`,
-          });
-        }
-      });
+      } else {
+        res.status(400).json({
+          success: false,
+          error: `Both user haven't read the challenge result yet`,
+        });
+      }
+    }
   } catch (err) {
     return res
       .status(500)
