@@ -263,38 +263,52 @@ exports.getChallengeInfo = async (req, res) => {
       { $set: { user2IsPlayed: { $gt: [{ $size: "$user2Result" }, 0] } } },
     ]);
 
-    challenge = challenge[0];
-    var out;
-    if (challenge.user1Id == userId) {
-      out = {
-        me: {
-          photo: challenge.user1Photo,
-          username: challenge.user1Username,
-          score: challenge.user1Score,
-          isPlayed: challenge.user1IsPlayed,
-        },
-        opponent: {
-          photo: challenge.user2Photo,
-          username: challenge.user2Username,
-          score: challenge.user2Score,
-          isPlayed: challenge.user2IsPlayed,
-        },
-      };
-    } else {
-      out = {
-        me: {
-          photo: challenge.user2Photo,
-          username: challenge.user2Username,
-          score: challenge.user2Score,
-          isPlayed: challenge.user2IsPlayed,
-        },
-        opponent: {
-          photo: challenge.user1Photo,
-          username: challenge.user1Username,
-          score: challenge.user1Score,
-          isPlayed: challenge.user1IsPlayed,
-        },
-      };
+      challenge = challenge[0];
+      var out;
+      if (challenge.user1Id == userId) {
+        out = {
+          me: {
+            photo: challenge.user1Photo,
+            username: challenge.user1Username,
+            score: challenge.user1Score,
+            usedTime: parseFloat(challenge.user1Time),
+            currentProblem: challenge.currentProblem,
+            isPlayed: challenge.user1IsPlayed
+          },
+          opponent: {
+            photo: challenge.user2Photo,
+            username: challenge.user2Username,
+            score: challenge.user2Score,
+            usedTime: parseFloat(challenge.user2Time),
+            currentProblem: challenge.currentProblem,
+            isPlayed: challenge.user2IsPlayed
+          }
+        }
+      } else {
+        out = {
+          me: {
+            photo: challenge.user2Photo,
+            username: challenge.user2Username,
+            score: challenge.user2Score,
+            usedTime: parseFloat(challenge.user2Time),
+            currentProblem: challenge.currentProblem,
+            isPlayed: challenge.user2IsPlayed
+          },
+          opponent: {
+            photo: challenge.user1Photo,
+            username: challenge.user1Username,
+            score: challenge.user1Score,
+            usedTime: parseFloat(challenge.user1Time),
+            currentProblem: challenge.currentProblem,
+            isPlayed: challenge.user1IsPlayed
+          }
+        }
+      }
+      return res.status(200).json({ success: true, data: out });
+    } catch (err) {
+      if (!challenge) return res.status(400).json({ success:false, error: "Cannot find the challenge" });
+      else if (err) return res.status(500).json({ success:false, error: err.toString() });
+      else return res.status(400).json({ succes:false, error: "Something went wrong"});
     }
     return res.status(200).json({ success: true, data: out });
   } catch (err) {
