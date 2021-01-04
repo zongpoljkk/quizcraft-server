@@ -6,7 +6,7 @@ const { authJwt, adminOnly } = require("../middlewares");
 
 const router = express.Router();
 
-router.get("/get-problems", [authJwt], challengeController.getProblemByChallengeId);
+router.get("/get-problem", [authJwt], challengeController.getProblemByChallengeId);
 router.post('/random-challenge', [authJwt], challengeController.randomChallenge);
 router.post('/specific-challenge', [authJwt], challengeController.specificChallenge);
 router.get('/challenge-info/', [authJwt], challengeController.getChallengeInfo);

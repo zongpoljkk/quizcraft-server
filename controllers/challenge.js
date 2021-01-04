@@ -172,6 +172,7 @@ exports.specificChallenge = async (req, res) => {
 
 exports.getProblemByChallengeId = (req, res) => {
   const challengeId = req.query.challenge_id;
+  const problemIndex = req.query.problem_index;
 
   try {
     Challenge.findById(challengeId)
@@ -180,7 +181,7 @@ exports.getProblemByChallengeId = (req, res) => {
         if (!challenge) {
           return res.status(400).json({
             success: false,
-            error: `Unable to find challenge given challenge id ${challenge._id}`,
+            error: `Unable to find challenge given challenge id ${challengeId}`,
           });
         }
         const problems = Promise.all(
@@ -199,7 +200,7 @@ exports.getProblemByChallengeId = (req, res) => {
               error: `Unable to find problems given challenge id ${challenge._id}`,
             });
           }
-          return res.send({ success: true, data: problems });
+          return res.send({ success: true, data: problems[problemIndex] });
         });
       });
   } catch (err) {
@@ -325,15 +326,13 @@ exports.readChallenge = async (req, res) => {
           return res
             .status(400)
             .json({ success: false, error: "Cannot update challenge" });
-        return res
-          .status(200)
-          .json({
-            success: true,
-            isRead:
-              newChallenge.user1Id == userId
-                ? newChallenge.user1IsRead
-                : newChallenge.user2IsRead,
-          });
+        return res.status(200).json({
+          success: true,
+          isRead:
+            newChallenge.user1Id == userId
+              ? newChallenge.user1IsRead
+              : newChallenge.user2IsRead,
+        });
       });
     });
   });
