@@ -186,7 +186,7 @@ exports.getProblemByChallengeId = (req, res) => {
           });
         }
         // ? Handle user lost connection by skip user's current problem and mark as incorrect  ? //
-        if (challenge.currentProblem != NUMBER_OF_PROBLEM - 1) {
+        if (challenge.currentProblem < NUMBER_OF_PROBLEM - 1) {
           challenge.currentProblem++;
         }
         if (challenge.whoTurn === 1) {
