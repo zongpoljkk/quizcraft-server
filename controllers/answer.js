@@ -138,7 +138,7 @@ exports.checkAnswer = async (req, res, next) => {
               req.rank_up = false;
               req.answer = answer.body;
               req.earned_exp = earnedExp;
-              req.earned_coins = earned_coins;
+              req.earned_coins = earnedCoins;
               next();
             });
         }
