@@ -177,31 +177,35 @@ exports.getProblemByChallengeId = (req, res) => {
   try {
     Challenge.findById(challengeId)
       .exec()
-      .then((challenge) => {
+      .then(async (challenge) => {
         if (!challenge) {
           return res.status(400).json({
             success: false,
             error: `Unable to find challenge given challenge id ${challengeId}`,
           });
         }
-        const problems = Promise.all(
-          challenge.problems.map((problem_id) => {
-            Problem.findById(problem_id)
-              .exec()
-              .then((problem) => {
-                return problem;
+        // TODO: Handle user lost connection by skip user's current problem and mark as incorrect
+        // if (challenge.currentProblem != NUMBER_OF_PROBLEM - 1) {
+        //   challenge.currentProblem++;
+        // }
+        // if (challenge.whoTurn === 1) {
+        //   challenge.user1Result.push(0);
+        // } else {
+        //   challenge.user2Result.push(0);
+        // }
+        // challenge.save();
+
+        Problem.findById(challenge.problems[problemIndex])
+          .exec()
+          .then((problem) => {
+            if (!problem) {
+              return res.status(400).json({
+                success: false,
+                error: `Unable to find problem given index ${problemIndex}`,
               });
-          })
-        );
-        problems.then((problems) => {
-          if (problems.includes(undefined)) {
-            return res.send({
-              success: false,
-              error: `Unable to find problems given challenge id ${challenge._id}`,
-            });
-          }
-          return res.send({ success: true, data: problems[problemIndex] });
-        });
+            }
+            return res.status(200).json({ success: true, data: problem });
+          });
       });
   } catch (err) {
     return res.status(400).json({ success: false, error: err.toString() });
