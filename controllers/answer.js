@@ -11,37 +11,37 @@ const levelDictionary = levelSystem();
 const rankDictionary = rankSystem();
 
 // TODO: Handle checkChallengeAnswer
-const getChallengeProblemId = (challengeId) => {
+const getChallengeProblemId = (challengeId, problemIndex) => {
   let challengeProblemId = "";
 
   Challenge.findById(challengeId)
     .exec()
     .then((challenge) => {
-      challengeProblemId = challenge.problems[currentProblem];
+      challengeProblemId = challenge.problems[problemIndex];
     });
 
   return challengeProblemId;
 };
 
-const updateChallengeScore = (challengeId, correct, userTime) => {
+const updateChallengeScore = (challengeId, correct, userTime, problemIndex) => {
   Challenge.findById(challengeId)
     .exec()
     .then((challenge) => {
       if (challenge.whoturn === 1) {
         challenge.user1Time += userTime;
         if (correct) {
-          challenge.user1Result[challenge.currentProblem] = 1;
+          challenge.user1Result[problemIndex] = 1;
           challenge.user1Score++;
         } else {
-          challenge.user1Result[challenge.currentProblem] = 0;
+          challenge.user1Result[problemIndex] = 0;
         }
       } else {
         challenge.user2Time += userTime;
         if (correct) {
-          challenge.user2Result[challenge.currentProblem] = 1;
+          challenge.user2Result[problemIndex] = 1;
           challenge.user2Score++;
         } else {
-          challenge.user2Result[challenge.currentProblem] = 0;
+          challenge.user2Result[problemIndex] = 0;
         }
       }
 
@@ -57,6 +57,9 @@ const updateChallengeScore = (challengeId, correct, userTime) => {
           case 2:
             challenge.whoturn = 1;
         }
+        challenge.currentProblem = 0;
+        challenge.user1IsRead = false;
+        challenge.user2IsRead = false;
       }
       challenge.save();
     });
@@ -68,6 +71,12 @@ exports.checkAnswer = async (req, res, next) => {
   const userAnswer = req.body.userAnswer;
   const subtopic = req.body.subtopic;
   const mode = req.body.mode;
+
+  // ? For Challenge Mode ? //
+  const challengeId = req.body.challengeId;
+  const problemIndex = req.body.problemIndex;
+  const userTime = req.body.userTime
+
   let earnedExp = 0;
   let earnedCoins = 0;
 
@@ -85,15 +94,15 @@ exports.checkAnswer = async (req, res, next) => {
       break;
   }
 
-  if (mode === "challenge") {
-    problemId = getChallengeProblemId(challengeId);
-  }
+  // if (mode === "challenge") {
+  //   problemId = getChallengeProblemId(challengeId, problemIndex);
+  // }
 
   Answer.findOne({ problemId: problemId })
     .populate("problemId", "difficulty")
     .exec((err, answer) => {
       if (err) {
-        console.log(`errrrror`);
+        console.log(`error finding answer given problem id`);
         res.status(500).send({ error: err });
       } else if (!answer) {
         res
@@ -108,7 +117,7 @@ exports.checkAnswer = async (req, res, next) => {
           //   math.evaluate(userAnswer) === math.evaluate(answer.body))
           // math.compare(userAnswer, answer.body) === true)
         ) {
-        //  || subtopic === "การดำเนินการของเลขยกกำลัง") {
+          //  || subtopic === "การดำเนินการของเลขยกกำลัง") {
 
           // try {
           //    const eval = math.evaluate(userAnswer) === math.evaluate(answer.body)
@@ -116,7 +125,6 @@ exports.checkAnswer = async (req, res, next) => {
           // catch (err) {
           //   console.log(`Can't evaluate string: ${err}`)
           // }
-
 
           User.findById(userId)
             .exec()
@@ -168,7 +176,7 @@ exports.checkAnswer = async (req, res, next) => {
 
               // * Update Challenge Field * //
               if (mode === "challenge") {
-                updateChallengeScore(challengeId, true, userTime);
+                updateChallengeScore(challengeId, true, userTime, problemIndex);
               }
 
               const returnedSolution = {
@@ -189,7 +197,7 @@ exports.checkAnswer = async (req, res, next) => {
         } else {
           // * Update Challenge Field * //
           if (mode === "challenge") {
-            updateChallengeScore(challengeId, true, userTime);
+            updateChallengeScore(challengeId, false, userTime, problemIndex);
           }
 
           const user = User.findById(userId)
