@@ -56,16 +56,48 @@ exports.getTopicBySubjectName = async (req, res) => {
 };
 
 exports.getSubtopicByTopicName = async (req, res) => {
-  await Subtopic.find({ topic: req.query.topic }, { subtopicName: 1, availableDifficulty:1 },
+  await Subtopic.findOneAndUpdate(
+    {
+      topic: req.query.topic,
+      availableDifficulty: { $eq: [] },
+    },
+    {
+      $addToSet: {
+        availableDifficulty: {
+          $each: [
+            { isAvailable: false, difficulty: "EASY" },
+            { isAvailable: false, difficulty: "MEDIUM" },
+            { isAvailable: false, difficulty: "HARD" },
+          ],
+        },
+      },
+    },
+    { new: true },
     (err, subtopics) => {
       if (err) {
         return res.status(500).json({ success: false, error: err });
       }
-      if (!subtopics.length) {
-        return res.status(400).json({ success: false, data: "no subtopics" });
+      if (!subtopics) {
+        Subtopic.find(
+          { topic: req.query.topic },
+          { subtopicName: 1, availableDifficulty: 1 },
+          (err, subtopics) => {
+            if (err) {
+              return res.status(500).json({ success: false, error: err });
+            }
+            if (!subtopics.length) {
+              return res
+                .status(400)
+                .json({ success: false, data: "no subtopics" });
+            }
+            return res.status(200).json({ success: true, data: subtopics });
+          }
+        );
+      } else {
+        return res.status(200).json({ success: true, data: subtopics });
       }
-      return res.status(200).json({ success: true, data: subtopics });
-    })
+    }
+  );
 };
 
 exports.addSubtopic = (req, res, next) => {
