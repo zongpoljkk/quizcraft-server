@@ -41,7 +41,7 @@ router.put(
   ]),
   itemController.addFile
   );
-router.get("/", itemController.getAllItems);
-router.post("/add-item", itemController.addItem);
+router.get("/", [authJwt], itemController.getAllItems);
+router.post("/add-item", [authJwt, adminOnly], itemController.addItem);
 
 module.exports = router;
