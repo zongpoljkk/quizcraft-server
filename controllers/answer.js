@@ -10,25 +10,12 @@ const Challenge = require("../models/Challenge");
 const levelDictionary = levelSystem();
 const rankDictionary = rankSystem();
 
-// TODO: Handle checkChallengeAnswer
-const getChallengeProblemId = (challengeId, problemIndex) => {
-  let challengeProblemId = "";
-
-  Challenge.findById(challengeId)
-    .exec()
-    .then((challenge) => {
-      challengeProblemId = challenge.problems[problemIndex];
-    });
-
-  return challengeProblemId;
-};
-
 const updateChallengeScore = (challengeId, correct, userTime, problemIndex) => {
   Challenge.findById(challengeId)
     .exec()
     .then((challenge) => {
-      if (challenge.whoturn === 1) {
-        challenge.user1Time += userTime;
+      if (challenge.whoTurn === 1) {
+        challenge.user1Time += parseFloat(userTime);
         if (correct) {
           challenge.user1Result[problemIndex] = 1;
           challenge.user1Score++;
@@ -36,7 +23,7 @@ const updateChallengeScore = (challengeId, correct, userTime, problemIndex) => {
           challenge.user1Result[problemIndex] = 0;
         }
       } else {
-        challenge.user2Time += userTime;
+        challenge.user2Time += parseFloat(userTime);
         if (correct) {
           challenge.user2Result[problemIndex] = 1;
           challenge.user2Score++;
@@ -49,18 +36,20 @@ const updateChallengeScore = (challengeId, correct, userTime, problemIndex) => {
       challenge.currentProblem++;
 
       // Update whoTurn when player finished NUMBER_OR_PROBLEM
-      if (challenge.currentProblem === NUMBER_OF_PROBLEM - 1) {
-        switch (challenge.whoturn) {
+      if (challenge.currentProblem === NUMBER_OF_PROBLEM) {
+        switch (challenge.whoTurn) {
           case 1:
-            challenge.whoturn = 2;
+            console.log("KAO CASE WHOTURN")
+            challenge.whoTurn = 2;
             break;
           case 2:
-            challenge.whoturn = 1;
+            challenge.whoTurn = 1;
         }
         challenge.currentProblem = 0;
         challenge.user1IsRead = false;
         challenge.user2IsRead = false;
       }
+      console.log(challenge);
       challenge.save();
     });
 };
@@ -75,7 +64,7 @@ exports.checkAnswer = async (req, res, next) => {
   // ? For Challenge Mode ? //
   const challengeId = req.body.challengeId;
   const problemIndex = req.body.problemIndex;
-  const userTime = req.body.userTime
+  const userTime = req.body.userTime;
 
   let earnedExp = 0;
   let earnedCoins = 0;
@@ -93,10 +82,6 @@ exports.checkAnswer = async (req, res, next) => {
       mode_surplus = 0;
       break;
   }
-
-  // if (mode === "challenge") {
-  //   problemId = getChallengeProblemId(challengeId, problemIndex);
-  // }
 
   Answer.findOne({ problemId: problemId })
     .populate("problemId", "difficulty")
@@ -197,6 +182,7 @@ exports.checkAnswer = async (req, res, next) => {
         } else {
           // * Update Challenge Field * //
           if (mode === "challenge") {
+            console.log("Answer is wrong");
             updateChallengeScore(challengeId, false, userTime, problemIndex);
           }
 
