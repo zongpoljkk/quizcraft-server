@@ -68,10 +68,8 @@ exports.checkAnswer = async (req, res, next) => {
   const userAnswer = req.body.userAnswer;
   const subtopic = req.body.subtopic;
   const mode = req.body.mode;
-  const challengeId = req.body.challengeId;
-  const userTime = req.body.userTime;
-  let earned_exp = 0;
-  let earned_coins = 0;
+  let earnedExp = 0;
+  let earnedCoins = 0;
 
   // ------ Handle mode surplus ------ //
   let mode_surplus = 1;
@@ -110,28 +108,38 @@ exports.checkAnswer = async (req, res, next) => {
           //   math.evaluate(userAnswer) === math.evaluate(answer.body))
           // math.compare(userAnswer, answer.body) === true)
         ) {
+        //  || subtopic === "การดำเนินการของเลขยกกำลัง") {
+
+          // try {
+          //    const eval = math.evaluate(userAnswer) === math.evaluate(answer.body)
+          // }
+          // catch (err) {
+          //   console.log(`Can't evaluate string: ${err}`)
+          // }
+
+
           User.findById(userId)
             .exec()
             .then((user) => {
               // * Handle Earned coins * //
               switch (answer.problemId.difficulty) {
                 case "EASY":
-                  earned_exp = 10 * mode_surplus;
-                  earned_coins = 10 * mode_surplus;
-                  user.exp += earned_exp;
-                  user.coin += earned_coins;
+                  earnedExp = 10 * mode_surplus;
+                  earnedCoins = 10 * mode_surplus;
+                  user.exp += earnedExp;
+                  user.coin += earnedCoins;
                   break;
                 case "MEDIUM":
-                  earned_exp = 20 * mode_surplus;
-                  earned_coins = 20 * mode_surplus;
-                  user.exp += earned_exp;
-                  user.coin += earned_coins;
+                  earnedExp = 20 * mode_surplus;
+                  earnedCoins = 20 * mode_surplus;
+                  user.exp += earnedExp;
+                  user.coin += earnedCoins;
                   break;
                 case "HARD":
-                  earned_exp = 30 * mode_surplus;
-                  earned_coins = 30 * mode_surplus;
-                  user.exp += earned_exp;
-                  user.coin += earned_coins;
+                  earnedExp = 30 * mode_surplus;
+                  earnedCoins = 30 * mode_surplus;
+                  user.exp += earnedExp;
+                  user.coin += earnedCoins;
                   break;
               }
 
@@ -174,8 +182,8 @@ exports.checkAnswer = async (req, res, next) => {
               req.level_up = level_up;
               req.rank_up = rank_up;
               req.answer = answer.body;
-              req.earned_exp = earned_exp;
-              req.earned_coins = earned_coins;
+              req.earned_exp = earnedExp;
+              req.earned_coins = earnedCoins;
               next();
             });
         } else {
@@ -198,8 +206,8 @@ exports.checkAnswer = async (req, res, next) => {
               req.level_up = false;
               req.rank_up = false;
               req.answer = answer.body;
-              req.earned_exp = earned_exp;
-              req.earned_coins = earned_coins;
+              req.earned_exp = earnedExp;
+              req.earned_coins = earnedCoins;
               next();
             });
         }

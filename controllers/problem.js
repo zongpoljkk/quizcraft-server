@@ -116,8 +116,8 @@ exports.checkAnswerAndUpdateDifficulty = async (req, res, next) => {
     }
 
     // Time limit for a problem to be in the specific difficulty level
-    const EASY_CEIL = 13;
-    const MEDIUM_CEIL = 150;
+    const EASY_CEIL = 30;
+    const MEDIUM_CEIL = 60;
 
     const old_difficulty = problem.difficulty;
 
