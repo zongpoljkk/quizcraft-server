@@ -15,15 +15,20 @@ const updateChallengeScore = (challengeId, correct, userTime, problemIndex) => {
     .exec()
     .then((challenge) => {
       if (challenge.whoTurn === 1) {
-        challenge.user1Time += parseFloat(userTime);
+        console.log("ADD TIME:");
+        console.log(+challenge.user1Time.toString() + parseFloat(userTime));
+        challenge.user1Time =
+          +challenge.user1Time.toString() + parseFloat(userTime);
         if (correct) {
           challenge.user1Result[problemIndex] = 1;
           challenge.user1Score++;
         } else {
+          console.log("SHOULD KAO");
           challenge.user1Result[problemIndex] = 0;
         }
       } else {
-        challenge.user2Time += parseFloat(userTime);
+        challenge.user2Time =
+          +challenge.user2Time.toString() + parseFloat(userTime);
         if (correct) {
           challenge.user2Result[problemIndex] = 1;
           challenge.user2Score++;
@@ -32,14 +37,11 @@ const updateChallengeScore = (challengeId, correct, userTime, problemIndex) => {
         }
       }
 
-      // Update current_problem index
-      challenge.currentProblem++;
-
       // Update whoTurn when player finished NUMBER_OR_PROBLEM
-      if (challenge.currentProblem === NUMBER_OF_PROBLEM) {
+      if (challenge.currentProblem === NUMBER_OF_PROBLEM - 1) {
         switch (challenge.whoTurn) {
           case 1:
-            console.log("KAO CASE WHOTURN")
+            console.log("KAO CASE WHOTURN");
             challenge.whoTurn = 2;
             break;
           case 2:
@@ -49,6 +51,9 @@ const updateChallengeScore = (challengeId, correct, userTime, problemIndex) => {
         challenge.user1IsRead = false;
         challenge.user2IsRead = false;
       }
+
+      // No need to update current index because already did when getting problem by challenge id
+
       console.log(challenge);
       challenge.save();
     });
@@ -161,6 +166,7 @@ exports.checkAnswer = async (req, res, next) => {
 
               // * Update Challenge Field * //
               if (mode === "challenge") {
+                console.log("ANSWER IS RIGHT");
                 updateChallengeScore(challengeId, true, userTime, problemIndex);
               }
 
