@@ -37,8 +37,10 @@ const updateChallengeScore = (challengeId, correct, userTime, problemIndex) => {
         }
       }
 
-      // Update whoTurn when player finished NUMBER_OR_PROBLEM
-      if (challenge.currentProblem === NUMBER_OF_PROBLEM - 1) {
+      // Update whoTurn when player finished NUMBER_OF_PROBLEM
+      console.log(`challenge.currentProblem: ${challenge.currentProblem}`);
+      console.log(challenge.currentProblem === NUMBER_OF_PROBLEM);
+      if (challenge.currentProblem === NUMBER_OF_PROBLEM) {
         switch (challenge.whoTurn) {
           case 1:
             console.log("KAO CASE WHOTURN");
