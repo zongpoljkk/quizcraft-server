@@ -2,24 +2,16 @@ const Problem = require("../../models/Problem");
 const Answer = require("../../models/Answer");
 const Hint = require("../../models/Hint");
 const math = require("mathjs");
-const EASY = "EASY";
-const MEDIUM = "MEDIUM";
-const HARD = "HARD";
-const alphabet = "abcdefghijklmnopqrstuvwxyz";
-const SELECT_ONE = "SELECT_ONE";
-const RADIO_CHOICE = "RADIO_CHOICE";
-const MATH_INPUT = "MATH_INPUT";
-
-const randInt = (start, end, haveNegative) => {
-  if (haveNegative) {
-    return (
-      (Math.floor(Math.random() * (end - start + 1)) + start) *
-      (-1) ** Math.floor(Math.random() * 2)
-    );
-  } else {
-    return Math.floor(Math.random() * (end - start + 1)) + start;
-  }
-};
+const { randInt } = require("./globalFunction");
+const {
+  EASY,
+  MEDIUM,
+  HARD,
+  alphabet,
+  SELECT_ONE,
+  RADIO_CHOICE,
+  MATH_INPUT
+} = require("./const");
 
 const generateMeaningOfExponents = async (subtopicName, difficulty) => {
   var problemTitle,problemBody,answerBody,hintBody,solution, answerType;
@@ -32,17 +24,19 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
       switch (opt) {
         case 1:
           problemTitle = `จงหาว่าเลขยกกำลังต่อไปนี้แทนจำนวนใด`;
-          a = randInt(1,40,true);
+          a = randInt(1,30,true);
           positiveBase = Math.abs(a);
-          
-          if (1 <= positiveBase && positiveBase <= 10) {
-            n = randInt(0,12);
+          if (1 <= positiveBase && positiveBase <= 2) {
+            n = randInt(0,10);
           }
-          else if (10 < positiveBase && positiveBase <= 20) {
-            n = randInt(0,5);
+          else if (2 < positiveBase && positiveBase <= 5) {
+            n = randInt(0,4);
           }
-          else if (positiveBase > 20) {
-            n = randInt(0,4); 
+          else if (5 < positiveBase && positiveBase <= 11) {
+            n = randInt(0,3);
+          }
+          else if (11 < positiveBase) {
+            n = randInt(0,2);
           }
           rand = randInt(0,1);
           if (a < 0 && rand) {
@@ -56,7 +50,10 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           }
           problemBody = `${expo}`;
           answerBody = `${num}`;
-          answerType = MATH_INPUT;
+          answerType = randInt(0,1)? MATH_INPUT : RADIO_CHOICE;
+          if(answerType == RADIO_CHOICE) {
+            //gen list of choices
+          }
           solution = "";
           let bool = a < 0 && rand; //ex -3^[4] ?
           for (i=0 ;i<n; i++) {
@@ -74,8 +71,8 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           if (n !=1 ) {
             solution += n == 0? `${bool? `-(1)\n${answerBody}`: `${answerBody}`}` : `\n${answerBody}`;
           }
-          hintBody = "a^n = a*a*a*... --> a คูณกัน n ตัว";
-          if (n == 0) hintBody += "\na^0 = 1 เมื่อ a ไม่เท่ากับ 0";
+          hintBody = "a^[n] = a*a*a*... --> a คูณกัน n ตัว\nเช่น 3^[4] = 3*3*3*3";
+          if (n == 0) hintBody += "\na^[0] = 1 เมื่อ a ไม่เท่ากับ 0";
           break;
         case 2: 
           problemTitle = "จงเขียนผลคูณต่อไปนี้ในรูปเลขยกกำลัง"
