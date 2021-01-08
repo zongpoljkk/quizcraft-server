@@ -11,3 +11,8 @@ exports.ANSWER_TYPE = {
   RADIO_CHOICE: "RADIO_CHOICE",
   MATH_INPUT: "MATH_INPUT"
 }
+
+exports.SUBJECT = {
+  MATH: "คณิตศาสตร์",
+  ENG: "ภาษาอังกฤษ"
+}
