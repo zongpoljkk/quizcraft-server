@@ -91,21 +91,25 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
             choices = await shuffle(choices);
           }
           solution = `${problemBody}\n`;
+          temp = "";
           let bool = a < 0 && rand; //ex -3^[4] ?
           for (i=0 ;i<n; i++) {
             if (bool) {
-              solution += i == 0? `${positiveBase}` : `*${positiveBase}`
+              temp += i == 0? `${positiveBase}` : `*${positiveBase}`
             } else {
               if (i == 0) {
-                solution += a<0? `(${a})` : `${a}`;
+                temp += a<0? `(${a})` : `${a}`;
               } else {
-                solution += a<0? `*(${a})` : `*${a}`;
+                temp += a<0? `*(${a})` : `*${a}`;
               }
             }
-            if (i == n-1 && bool) solution = `-(${solution})`;
+            if (i == n-1 && bool) temp = `-(${temp})`;
           }
-          if (n !=1 ) {
+          solution += temp;
+          if (n !=1) {
             solution += n == 0? `${bool? `-(1)\n${answerBody}`: `${answerBody}`}` : `\n${answerBody}`;
+          } else if ((n == 1 && bool) || n == 1 && a<0) {
+            solution += `\n${answerBody}`;
           }
           hintBody = "a^[n] = a คูณกัน n ตัว\nเช่น 3^[4] = 3*3*3*3 --> 3 คูณกัน 4 ตัว";
           if (n == 0) hintBody += "\na^[0] = 1 เมื่อ a ไม่เท่ากับ 0 เช่น 3^[0] = 1";
