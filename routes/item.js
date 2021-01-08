@@ -23,7 +23,7 @@ const storage = new GridFsStorage({
         const filename = file.originalname;
         const fileInfo = {
           filename: filename,
-          bucketName: "uploads",
+          bucketName: "media",
         };
         resolve(fileInfo);
       });
@@ -36,11 +36,11 @@ const upload = multer({ storage });
 router.put(
   "/add-file",
   upload.fields([
-    { name: "image", maxCount: 1 }, 
-    { name: "lottie", maxCount: 1 }
+    { name: "image", maxCount: 1 },
+    { name: "lottie", maxCount: 1 },
   ]),
   itemController.addFile
-  );
+);
 router.get("/", [authJwt], itemController.getAllItems);
 router.post("/add-item", [authJwt, adminOnly], itemController.addItem);
 

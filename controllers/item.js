@@ -40,7 +40,7 @@ exports.getAllItems = async (req, res) => {
     [
       {
         $lookup: {
-          from: "uploads.chunks",
+          from: "media.chunks",
           localField: "image.id",
           foreignField: "files_id",
           as: "image_info",
@@ -49,7 +49,7 @@ exports.getAllItems = async (req, res) => {
       { $unwind: "$image_info" },
       {
         $lookup: {
-          from: "uploads.chunks",
+          from: "media.chunks",
           localField: "lottie.id",
           foreignField: "files_id",
           as: "lottie_info",
