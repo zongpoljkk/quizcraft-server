@@ -1,4 +1,3 @@
-const { null } = require("mathjs");
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
@@ -24,7 +23,7 @@ const AchievementSchema = new Schema({
     enum: ["STREAKS", "QUESTIONS", "OTHER"],
   },
   image: {
-    type: String,
+    type: Object,
     default: null,
   },
   lottie: {
