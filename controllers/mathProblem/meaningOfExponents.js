@@ -110,8 +110,6 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
         solution: solution,
       });
       hint = new Hint({ problemId: problemId, body: hintBody });
-      console.log(problem);
-
       // save to database
       // try {
       //   newProblem = await problem.save();
