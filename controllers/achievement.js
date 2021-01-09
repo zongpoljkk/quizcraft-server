@@ -52,20 +52,82 @@ exports.getAllAchievements = async (req, res) => {
     .catch((err) => console.log(err));
 };
 
-exports.getMyAchievements = (req, res) => {
-  console.log("KDSALDKAS");
+exports.getMyAchievements = async (req, res) => {
+  console.log("getMyAchievements");
   const userId = req.query.userId;
 
-  User.findById(userId)
+  await User.findById(userId)
     .exec()
-    .then((user) => {
+    .then(async (user) => {
       if (!user) {
         res.status(400).json({
           success: false,
           error: "There is a problem getting your achievements :(",
         });
       }
-      res.status(200).json({ success: true, data: user.achievements });
+
+      const user_achievement_names = user.achievements.map((achievement) => {
+        return achievement.achievementName;
+      });
+
+      console.log(user_achievement_names);
+
+      await Achievement.aggregate(
+        [
+          {
+            $match: { name: { $in: user_achievement_names } },
+          },
+          {
+            $lookup: {
+              from: "media.chunks",
+              localField: "image.id",
+              foreignField: "files_id",
+              as: "image_info",
+            },
+          },
+          { $unwind: "$image_info" },
+          {
+            $lookup: {
+              from: "media.chunks",
+              localField: "lottie.id",
+              foreignField: "files_id",
+              as: "lottie_info",
+            },
+          },
+          { $unwind: "$lottie_info" },
+          {
+            $project: {
+              _id: 1,
+              name: 1,
+              description: 1,
+              "image_info.data": 1,
+              "lottie_info.data": 1,
+            },
+          },
+        ],
+        (err, achievements) => {
+          if (err) {
+            return res.status(500).json({ success: false, error: err });
+          }
+          if (!achievements.length) {
+            return res
+              .status(400)
+              .json({ success: false, data: "no achievements" });
+          }
+          return res.status(200).json({ success: true, data: achievements });
+        }
+      );
+
+      // const res_achievement = user.achievements.map((achievement) => {
+      //   return {
+      //     id: achievement._id,
+      //     achievement_name: achievement.achievement_name
+      //     description:
+      //     image:
+      //     lottie:
+      //   }
+      // })
+      // res.status(200).json({ success: true, data: user.achievements });
     })
     .catch((err) => {
       console.log(err);
