@@ -160,7 +160,6 @@ exports.checkAnswer = async (req, res, next) => {
 
               // * Update Challenge Field * //
               if (mode === "challenge") {
-                console.log("ANSWER IS RIGHT");
                 updateChallengeScore(challengeId, true, userTime, problemIndex);
               }
 
@@ -182,7 +181,6 @@ exports.checkAnswer = async (req, res, next) => {
         } else {
           // * Update Challenge Field * //
           if (mode === "challenge") {
-            console.log("Answer is wrong");
             updateChallengeScore(challengeId, false, userTime, problemIndex);
           }
 
