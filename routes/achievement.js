@@ -34,7 +34,7 @@ const storage = new GridFsStorage({
 const upload = multer({ storage });
 
 router.get("/", achievementController.getAllAchievements);
-router.get("/my-acheivements", [authJwt], achievementController.getMyAchievements);
+router.get("/my-achievements", [authJwt], achievementController.getMyAchievements);
 router.post("/add-achievement", [authJwt], achievementController.addAchievement);
 router.put(
   "/add-file",
