@@ -1,4 +1,7 @@
 const Item = require("../models/Item");
+const User = require("../models/User");
+const Challenge = require("../models/Challenge");
+const { GAME_MODE, ITEM_NAME } = require("../utils/const");
 
 //Add item for testing
 exports.addItem = (req, res, next) => {
@@ -25,3 +28,36 @@ exports.getAllItems = async (req, res) => {
     .catch((err) => console.log(err));
 };
 
+exports.useSkipItem = async (req,res) => {
+  const userId = req.body.userId;
+  if (req.userId !== userId) {
+    return res.status(400).json({
+      success: false,
+      error: "userId not match userId that decoded from token!",
+    });
+  }
+  try {
+    const user = await User.findOne({ _id: userId });
+    let skipItem;
+    for (i in user.items) {
+      if (user.items[i].itemName == ITEM_NAME.SKIP) {
+        skipItem = user.items[i];
+        break;
+      }
+    }
+    if (!skipItem || skipItem.amount <= 0) {
+      return res.status(400).json({ success: false, error: "User not have skip item" });
+    }
+    const gameMode = req.body.gameMode;
+    if (gameMode == GAME_MODE.CHALLENGE) {
+      const challengeId = req.body.challengeId;
+      //todo
+    } else if (gameMode == GAME_MODE.QUIZ) {
+      //todo -> increase point 
+    }
+    return res.send(user.items)
+
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.toString() });
+  }
+}

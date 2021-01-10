@@ -16,3 +16,16 @@ exports.SUBJECT = {
   MATH: "คณิตศาสตร์",
   ENG: "ภาษาอังกฤษ"
 }
+
+exports.GAME_MODE = {
+  PRACTICE: "PRACTICE",
+  QUIZ: "QUIZ",
+  CHALLENGE: "CHALLENGE"
+}
+
+exports.ITEM_NAME = {
+  SKIP: "Skip",
+  HINT: "Hint",
+  DOUBLE: "Double",
+  REFRESH: "Refresh"
+}
