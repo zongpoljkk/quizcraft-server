@@ -46,14 +46,33 @@ exports.useSkipItem = async (req,res) => {
       }
     }
     if (!skipItem || skipItem.amount <= 0) {
-      return res.status(400).json({ success: false, error: "User not have skip item" });
+      return res.status(400).json({ success: false, error: "User do not has skip item" });
     }
     const gameMode = req.body.gameMode;
     if (gameMode == GAME_MODE.CHALLENGE) {
+      //todo update user result and update item in user
       const challengeId = req.body.challengeId;
-      //todo
+      const problemIndex = req.body.challengeId;
+      await Challenge.findOne({
+        _id: challengeId,
+        $or: [{ user1Id: userId }, { user2Id: userId }],
+      }).exec((err, challenge) => {
+        if (err) return res.status(500).json({ success: false, error: err });
+        else if (!challenge) return res.status(400).json({ success: false, error: "Challenge not exist" });
+        //update result and score in challenge
+        if (challenge.user1Id == userId) {
+          if (challenge.user1Result.length - problemIndex != 1) return res.status(400).json({ success: false, error: "Wrong problem index" });
+          challenge.user1Result[problemIndex] = 1;
+          challenge.user1Score++;
+        } else {
+          if (challenge.user2Result.length - problemIndex != 1) return res.status(400).json({ success: false, error: "Wrong problem index" });
+          challenge.user2Result[problemIndex] = 1;
+          challenge.user2Score++;
+        }
+
+      })
     } else if (gameMode == GAME_MODE.QUIZ) {
-      //todo -> increase point 
+      //todo -> increase point?
     }
     return res.send(user.items)
 
