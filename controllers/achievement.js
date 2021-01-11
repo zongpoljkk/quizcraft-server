@@ -1,5 +1,6 @@
 const Achievement = require("../models/Achievement");
 const User = require("../models/User");
+const Report = require("../models/Report");
 
 exports.addFile = (req, res) => {
   const achievementName = req.body.achievementName;
@@ -120,8 +121,6 @@ exports.getMyAchievements = async (req, res) => {
         return achievement.achievementName;
       });
 
-      console.log(user_achievement_names);
-
       await Achievement.aggregate(
         [
           {
@@ -174,25 +173,42 @@ exports.getMyAchievements = async (req, res) => {
 };
 
 exports.checkAchievement = async (req, res) => {
-  // Handle Streaks
+  console.log(req.query);
+  let user_achievement_names = [];
+
+  // Handle Streaks, Do when get to homepage
   const streaks = +req.query.streaks;
 
-  switch (streaks) {
-    case 7:
-      return res
-        .status(200)
-        .json({ success: true, data: "You got จับฉันให้ได้สิ" });
-    case 14:
-      return res
-        .status(200)
-        .json({ success: true, data: "You got จับฉันไม่ได้หรอก" });
-    case 28:
-      return res
-        .status(200)
-        .json({ success: true, data: "You got ให้ตายก็ไม่มีทางจับฉันได้" });
+  if (streaks >= 7) {
+    console.log("SHOULD KAOO");
+    user_achievement_names = [...user_achievement_names, "จับฉันให้ได้สิ"];
+  } else if (streaks >= 14) {
+    return res
+      .status(200)
+      .json({ success: true, data: "You got จับฉันไม่ได้หรอก" });
+  } else if (streaks >= 28) {
+    return res
+      .status(200)
+      .json({ success: true, data: "You got ให้ตายก็ไม่มีทางจับฉันได้" });
   }
 
-  const user_achievement_names = ["จับฉันให้ได้สิ", "จับฉันไม่ได้หรอก"];
+  // Handle Report related, Do when finish a game, like QUIZ type
+  const userId = req.query.user_id;
+
+  try {
+    await Report.find({ userId: userId })
+      .exec()
+      .then((reports) => {
+        if (reports.length >= 3) {
+          user_achievement_names = [...user_achievement_names, "ตาวิเศษเห็นนะ"];
+        }
+      });
+  } catch (err) {
+    console.log(err);
+  }
+
+  console.log("CHECK ACHIEVEMENT");
+  console.log(user_achievement_names);
 
   await Achievement.aggregate(
     [
@@ -222,11 +238,6 @@ exports.checkAchievement = async (req, res) => {
     (err, achievements) => {
       if (err) {
         return res.status(500).json({ success: false, error: err });
-      }
-      if (!achievements.length) {
-        return res
-          .status(400)
-          .json({ success: false, data: "no achievements" });
       }
       return res.status(200).json({ success: true, data: achievements });
     }
