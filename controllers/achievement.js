@@ -202,15 +202,6 @@ exports.checkAchievement = async (req, res) => {
       {
         $lookup: {
           from: "media.chunks",
-          localField: "image.id",
-          foreignField: "files_id",
-          as: "image_info",
-        },
-      },
-      { $unwind: "$image_info" },
-      {
-        $lookup: {
-          from: "media.chunks",
           localField: "lottie.id",
           foreignField: "files_id",
           as: "lottie_info",
@@ -222,7 +213,8 @@ exports.checkAchievement = async (req, res) => {
           _id: 1,
           name: 1,
           description: 1,
-          "image_info.data": 1,
+          rewardEXP: 1,
+          rewardCoin: 1,
           "lottie_info.data": 1,
         },
       },
