@@ -50,3 +50,31 @@ exports.createGroup = async (req, res) => {
     else return res.status(200).json({succes:true, data: {groupId: newGroup._id, pin: newGroup.pin} });
   })
 }
+
+exports.leaveGroup = async (req, res) => {
+  const body = req.body;
+  if (!body) {
+    return res.status(400).json({
+      success: false,
+      error: "You must provide a body to update",
+    });
+  }
+
+  Group.findOneAndUpdate(
+    {
+      _id: body.groupId,
+      members: { $elemMatch: { $eq: body.userId } },
+    },
+    { $pull: { members: body.userId } },
+    { new: true },
+    (err, user) => {
+      if (err) {
+        return res.status(500).json({ success: false, error: err });
+      }
+      if (!user) {
+        return res.status(400).json({ success: false, error: "no data" });
+      }
+      return res.status(200).json({ success: true, data: "leave group success!" });
+    }
+  );
+};
