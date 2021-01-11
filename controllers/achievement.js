@@ -173,6 +173,70 @@ exports.getMyAchievements = async (req, res) => {
     });
 };
 
-exports.checkAchievement = (req, res) => {
-  res.status(200).json({success: true, data: "This is check achievement"})
-}
+exports.checkAchievement = async (req, res) => {
+  // Handle Streaks
+  const streaks = +req.query.streaks;
+
+  switch (streaks) {
+    case 7:
+      return res
+        .status(200)
+        .json({ success: true, data: "You got จับฉันให้ได้สิ" });
+    case 14:
+      return res
+        .status(200)
+        .json({ success: true, data: "You got จับฉันไม่ได้หรอก" });
+    case 28:
+      return res
+        .status(200)
+        .json({ success: true, data: "You got ให้ตายก็ไม่มีทางจับฉันได้" });
+  }
+
+  const user_achievement_names = ["จับฉันให้ได้สิ", "จับฉันไม่ได้หรอก"];
+
+  await Achievement.aggregate(
+    [
+      {
+        $match: { name: { $in: user_achievement_names } },
+      },
+      {
+        $lookup: {
+          from: "media.chunks",
+          localField: "image.id",
+          foreignField: "files_id",
+          as: "image_info",
+        },
+      },
+      { $unwind: "$image_info" },
+      {
+        $lookup: {
+          from: "media.chunks",
+          localField: "lottie.id",
+          foreignField: "files_id",
+          as: "lottie_info",
+        },
+      },
+      { $unwind: "$lottie_info" },
+      {
+        $project: {
+          _id: 1,
+          name: 1,
+          description: 1,
+          "image_info.data": 1,
+          "lottie_info.data": 1,
+        },
+      },
+    ],
+    (err, achievements) => {
+      if (err) {
+        return res.status(500).json({ success: false, error: err });
+      }
+      if (!achievements.length) {
+        return res
+          .status(400)
+          .json({ success: false, data: "no achievements" });
+      }
+      return res.status(200).json({ success: true, data: achievements });
+    }
+  );
+};
