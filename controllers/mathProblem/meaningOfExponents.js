@@ -28,10 +28,10 @@ const multiplicationTerm = async (a, n) => {
 }
 
 const generateMeaningOfExponents = async (subtopicName, difficulty) => {
-  var problemTitle,problemBody,answerBody,hintBody,solution, answerType;
+  var problemTitle,problemBody,answerBody,hintBody,solution,answerType,answerForDisplay ;
   var expo, num,a ,n, rand, positiveBase, opt, selectedExpo, expoList, numList, choices;
   let problem, problemId, answer, hint, newProblem,newAnswer,newHint;
-  let i,temp;
+  let i,temp,termNum;
   switch (difficulty) {
     case EASY:
       opt = randInt(1,3);
@@ -64,6 +64,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           }
           problemBody = `${expo}`;
           answerBody = `${num}`;
+          answerForDisplay = answerBody;
           answerType = randInt(0,1)? MATH_INPUT : RADIO_CHOICE;
           if(answerType == RADIO_CHOICE) {
              //gen list of choices
@@ -128,6 +129,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           if (rand) {
             [answerBody,problemBody] = [problemBody,answerBody];
           }
+          answerForDisplay = answerBody;
           answerType = randInt(0,1)? MATH_INPUT : RADIO_CHOICE;
           if(answerType == RADIO_CHOICE) {
             //gen list of choices
@@ -177,6 +179,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           problemTitle = rand? `จงบอก "ฐาน" ของเลขยกกำลังต่อไปนี้` : `จงบอก "เลขชี้กำลัง" ของเลขยกกำลังต่อไปนี้`;
           problemBody = a<0? `(${a})^[${n}]` : `${a}^[${n}]`;
           answerBody = rand? `${a}` : `${n}`;
+          answerForDisplay = answerBody;
           answerType = randInt(0,1)? MATH_INPUT : RADIO_CHOICE;
           if (answerType = RADIO_CHOICE) {
             choices = [a,n];
@@ -199,6 +202,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
         problemId: problemId,
         body: answerBody,
         solution: solution,
+        answerForDisplay: answerForDisplay,
       });
       hint = new Hint({ problemId: problemId, body: hintBody });
 
@@ -214,29 +218,58 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
       }
     case MEDIUM:
       // opt = randInt(1,3);
-      opt = 1;
+      opt = 2;
       switch (opt) {
         case 1:
           problemTitle = "จงหาค่า x เมื่อ";
-          a = randInt(2,11,true);
+          a = randInt(2,25,true);
           positiveBase = Math.abs(a);
           if (1 <= positiveBase && positiveBase <= 2) {
-            n = randInt(0,10);
-          }
-          else if (2 < positiveBase && positiveBase <= 5) {
+            n = randInt(3,10);
+          } else if (2 < positiveBase && positiveBase <= 5) {
+            n = randInt(0,5);
+          } else if (5 < positiveBase && positiveBase <= 10) {
             n = randInt(0,4);
-          }
-          else if (5 < positiveBase && positiveBase <= 12) {
+          } else if (10 < positiveBase && positiveBase <= 15) {
             n = randInt(0,3);
+          } else {
+            n = randInt(0,2);
           }
           expo = a<0? `(${a})^[x]`: `${a}^[x]`;
           num = math.pow(math.bignumber(a),math.bignumber(n));
-          problemBody = `${expo} = ${num}`
-          console.log(problemBody);
+          problemBody = `${expo} = ${num}`;
+          answerBody = n;
+          answerForDisplay = n;
           break;
         case 2:
+          problemTitle = "จงเขียนจำนวนต่อไปนี้ ให้อยู่ในรูปเลขยกกำลังที่มีฐานเป็นจำนวนเฉพาะ"
+          let primeList = [2,3,5,7,11,13];
+          a = primeList[randInt(0,primeList.length-1)]*((-1) ** Math.floor(Math.random() * 2));
+          positiveBase = Math.abs(a);
+          if (2 <= positiveBase && positiveBase <= 3) { // 2 3
+            n = randInt(2,10);
+          } else if (3 < positiveBase && positiveBase <= 6) { // 5 
+            n = randInt(3,5);
+          } else if (6 < positiveBase && positiveBase <= 10) { // 7 
+            n = randInt(2,4);
+          } else if (10 < positiveBase && positiveBase <= 15) { // 11 13
+            n = randInt(2,3);
+          } else {
+            n = 2;
+          }
+          expo = a<0? `(${a})^[${n}]` : `${a}^[${n}]`;
+          answerBody = `${expo}`;
+          answerForDisplay = `${expo}`;
+          if (n%2 == 0) {
+            answerBody += a<0? `|${-a}^[${n}]` : `|(${-a})^[${n}]`;
+          }
+          num = math.pow(math.bignumber(a),math.bignumber(n));
+          problemBody = num;
           break;
-      }
+        }
+        console.log("problemBody",problemBody);
+        console.log("answerBody",answerBody);
+        console.log("answerForDisplay",answerForDisplay);
       
       return "Not Implement";
     case HARD:
@@ -286,8 +319,8 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
   }
 };
 
-generateMeaningOfExponents("ความหมายของเลขยกกำลัง","MEDIUM")
-return 0
+// generateMeaningOfExponents("ความหมายของเลขยกกำลัง","MEDIUM")
+// return 0
 
 module.exports = {generateMeaningOfExponents};
 

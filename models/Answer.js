@@ -18,6 +18,9 @@ const AnswerSchema = new Schema({
     type: String,
     enum: ["MATH_EVALUATE","EQUAL_STRING","RULE_BASE"],
     default: "EQUAL_STRING",
+  },
+  answerForDisplay: {
+    type: String,
   }
 });
 
