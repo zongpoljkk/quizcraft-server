@@ -77,7 +77,7 @@ exports.getAllGroupMembers = async (req, res) => {
       }
     ]);
     group = group[0].MembersInfo;
-    return res.status(200).json({succes:true, data: {members: group} });
+    return res.status(200).json({succes:true, data: {members: group, numberOfMembers: group.length} });
   } catch (err) {
     return res.status(500).json({succes:false, error:err.toString()});
   }
