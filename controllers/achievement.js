@@ -1,3 +1,5 @@
+const mongoose = require("mongoose");
+
 const Achievement = require("../models/Achievement");
 const User = require("../models/User");
 const Report = require("../models/Report");
@@ -172,6 +174,14 @@ exports.getMyAchievements = async (req, res) => {
     });
 };
 
+// checkAchievement Helper
+function add(arr, name) {
+  const { length } = arr;
+  const id = mongoose.Types.ObjectId();
+  const found = arr.some((el) => el.achievementName === name);
+  if (!found) arr.push({ _id: id, achievementName: name });
+}
+
 exports.checkAchievement = async (req, res) => {
   console.log(req.query);
   let user_achievement_names = [];
@@ -193,7 +203,7 @@ exports.checkAchievement = async (req, res) => {
   }
 
   // Handle Report related, Do when finish a game, like QUIZ type
-  const userId = req.query.user_id;
+  const userId = req.query.userId;
 
   try {
     await Report.find({ userId: userId })
@@ -209,6 +219,21 @@ exports.checkAchievement = async (req, res) => {
 
   console.log("CHECK ACHIEVEMENT");
   console.log(user_achievement_names);
+  console.log(userId);
+
+  // * UPDATE User's achievement * //
+  try {
+    User.findById(userId)
+      .exec()
+      .then((user) => {
+        user_achievement_names.forEach((achievement_name) => {
+          add(user.achievements, achievement_name);
+        });
+        user.save();
+      });
+  } catch (error) {
+    console.log(error);
+  }
 
   await Achievement.aggregate(
     [
