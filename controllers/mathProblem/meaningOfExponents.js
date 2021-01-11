@@ -213,6 +213,31 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
         return err;
       }
     case MEDIUM:
+      // opt = randInt(1,3);
+      opt = 1;
+      switch (opt) {
+        case 1:
+          problemTitle = "จงหาค่า x เมื่อ";
+          a = randInt(2,11,true);
+          positiveBase = Math.abs(a);
+          if (1 <= positiveBase && positiveBase <= 2) {
+            n = randInt(0,10);
+          }
+          else if (2 < positiveBase && positiveBase <= 5) {
+            n = randInt(0,4);
+          }
+          else if (5 < positiveBase && positiveBase <= 12) {
+            n = randInt(0,3);
+          }
+          expo = a<0? `(${a})^[x]`: `${a}^[x]`;
+          num = math.pow(math.bignumber(a),math.bignumber(n));
+          problemBody = `${expo} = ${num}`
+          console.log(problemBody);
+          break;
+        case 2:
+          break;
+      }
+      
       return "Not Implement";
     case HARD:
       //TODO
@@ -260,6 +285,9 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
       return "Not Implement";
   }
 };
+
+generateMeaningOfExponents("ความหมายของเลขยกกำลัง","MEDIUM")
+return 0
 
 module.exports = {generateMeaningOfExponents};
 
