@@ -172,3 +172,7 @@ exports.getMyAchievements = async (req, res) => {
       console.log(err);
     });
 };
+
+exports.checkAchievement = (req, res) => {
+  res.status(200).json({success: true, data: "This is check achievement"})
+}

@@ -35,6 +35,7 @@ const upload = multer({ storage });
 
 router.get("/", achievementController.getAllAchievements);
 router.get("/my-achievements", [authJwt], achievementController.getMyAchievements);
+router.get("/check-achievement", [authJwt], achievementController.checkAchievement);
 router.post("/add-achievement", [authJwt], achievementController.addAchievement);
 router.put(
   "/add-file",
