@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const Achievement = require("../models/Achievement");
 const User = require("../models/User");
 const Report = require("../models/Report");
+const Problem = require("../models/Problem");
 
 exports.addFile = (req, res) => {
   const achievementName = req.body.achievementName;
@@ -186,37 +187,67 @@ function add(arr, name) {
 exports.checkAchievement = async (req, res) => {
   console.log(req.query);
   let user_achievement_names = [];
+  const type = req.query.type;
+  const userId = req.query.userId;
 
-  // Handle Streaks, Do when get to homepage
-  const streaks = +req.query.streaks;
+  if (type === "questions") {
+    // TODO: Handle Question related, Do on answer page or on result page
+    // นักแก้โจทย์
+    const subtopic = req.query.subtopic;
+    //   Person.find({
+    // members: {
+    //    $elemMatch: { id: id1 }
+    // }
+    //  });
+    await Problem.find({
+      // "users.id": mongoose.Types.ObjectId(userId),
+      users: userId,
+    })
+      .exec()
+      .then((problems) => {
+        console.log("GOT IN");
+        console.log(problems);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
-  if (streaks >= 7) {
-    console.log("SHOULD KAOO");
-    user_achievement_names = [...user_achievement_names, "จับฉันให้ได้สิ"];
-  }
-  if (streaks >= 14) {
-    user_achievement_names = [...user_achievement_names, "จับฉันไม่ได้หรอก"];
-  }
-  if (streaks >= 28) {
-    user_achievement_names = [
-      ...user_achievement_names,
-      "ให้ตายก็ไม่มีทางจับฉันได้",
-    ];
+  if (type === "streak") {
+    // Handle Streaks, Do when get to homepage
+    const streaks = +req.query.streaks;
+
+    if (streaks >= 7) {
+      console.log("SHOULD KAOO");
+      user_achievement_names = [...user_achievement_names, "จับฉันให้ได้สิ"];
+    }
+    if (streaks >= 14) {
+      user_achievement_names = [...user_achievement_names, "จับฉันไม่ได้หรอก"];
+    }
+    if (streaks >= 28) {
+      user_achievement_names = [
+        ...user_achievement_names,
+        "ให้ตายก็ไม่มีทางจับฉันได้",
+      ];
+    }
   }
 
   // Handle Report related, Do when finish a game, like QUIZ type
-  const userId = req.query.userId;
-
-  try {
-    await Report.find({ userId: userId })
-      .exec()
-      .then((reports) => {
-        if (reports.length >= 3) {
-          user_achievement_names = [...user_achievement_names, "ตาวิเศษเห็นนะ"];
-        }
-      });
-  } catch (err) {
-    console.log(err);
+  if (type === "report") {
+    try {
+      await Report.find({ userId: userId })
+        .exec()
+        .then((reports) => {
+          if (reports.length >= 3) {
+            user_achievement_names = [
+              ...user_achievement_names,
+              "ตาวิเศษเห็นนะ",
+            ];
+          }
+        });
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   // * UPDATE User's achievement * //
@@ -252,7 +283,7 @@ exports.checkAchievement = async (req, res) => {
       console.log(error);
     });
 
-  console.log(user_achievement_names);
+  // console.log(user_achievement_names);
 
   await Achievement.aggregate(
     [
