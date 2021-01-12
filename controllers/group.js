@@ -56,28 +56,9 @@ exports.createGroup = async (req, res) => {
 exports.getAllGroupMembers = async (req, res) => {
   const groupId = req.query.groupId;
   try {
-    var group = await Group.aggregate([
-      {
-        $match: {
-          _id: ObjectId(groupId),
-        },
-      },
-      {
-        $lookup: {
-          from: "users",
-          localField: "members",
-          foreignField: "_id",
-          as: "MembersInfo",
-        },
-      },
-      {
-        $project: {
-          "MembersInfo.username": 1,
-        }
-      }
-    ]);
-    group = group[0].MembersInfo;
-    return res.status(200).json({succes:true, data: {members: group, numberOfMembers: group.length} });
+    var group = await Group.findById(groupId);
+    console.log(group)
+    return res.status(200).json({succes:true, data: {members: group.members, numberOfMembers: group.members.length} });
   } catch (err) {
     return res.status(500).json({succes:false, error:err.toString()});
   }
