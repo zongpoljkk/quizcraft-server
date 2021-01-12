@@ -70,6 +70,7 @@ exports.getAllGroupMembers = async (req, res) => {
     return res.status(500).json({succes:false, error:err.toString()});
   }
 }
+
 exports.deleteGroup = async (req, res) => {
   const body = req.body;
   if (!body) {
