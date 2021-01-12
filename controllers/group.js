@@ -50,3 +50,29 @@ exports.createGroup = async (req, res) => {
     else return res.status(200).json({succes:true, data: {groupId: newGroup._id, pin: newGroup.pin} });
   })
 }
+
+exports.deleteGroup = async (req, res) => {
+  const body = req.body;
+  if (!body) {
+    return res.status(400).json({
+      success: false,
+      error: "You must provide a body to update",
+    });
+  }
+
+  Group.findOneAndDelete(
+    {
+      _id: body.groupId,
+      creatorId: body.userId,
+    },
+    (err, user) => {
+      if (err) {
+        return res.status(500).json({ success: false, error: err });
+      }
+      if (!user) {
+        return res.status(400).json({ success: false, error: "no data" });
+      }
+      return res.status(200).json({ success: true, data: "delete group success!" });
+    }
+  );
+};
