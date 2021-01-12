@@ -4,6 +4,7 @@ const Answer = require("../models/Answer");
 const Hint = require("../models/Hint");
 const { mathGenerate } = require("./mathProblem/mathProblemGenerator");
 const { englishGenerate } = require("./englishProblem/englishProblemGenerator");
+const { MATH_INPUT } = require("./mathProblem/const");
 const MATH = "คณิตศาสตร์";
 const ENG = "ภาษาอังกฤษ";
 
@@ -227,11 +228,15 @@ exports.getProblemForUser = async (req, res, next) => {
               },
             }
           );
-          answer = await Answer.findOne({ problemId: problem._id });
-          return res.status(200).json({
-            success: true,
-            data: { problem, correctAnswer: answer.body },
-          });
+          if (problem.answerType == MATH_INPUT) {
+            answer = await Answer.findOne({ problemId: problem._id });
+            return res.status(200).json({
+              success: true,
+              data: { problem, correctAnswer: answer.body },
+            });
+          } else {
+            return res.status(200).json({ success: true, data: { problem } });
+          }
         } catch (err) {
           if (!problem) return res.status(404).json({ success: false, error: "Problem out of stock and cannot generate problem" });
           else if (err) return res.status(500).json({ success: false, error: err.toString() });
@@ -273,7 +278,7 @@ exports.getProblemForUser = async (req, res, next) => {
           .json({ success: false, error: "Problem out of stock" });
     }
   } else {
-    if (subject == MATH) {
+    if (problem.answerType == MATH_INPUT) {
       answer = await Answer.findOne({ problemId: problem._id });
       return res
         .status(200)
