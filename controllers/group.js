@@ -136,6 +136,11 @@ exports.getGroupScoreboard = async (req, res) => {
           _id: ObjectId(groupId),
         },
       },
+      {
+        $addFields: {
+          isCreated: { $eq: [ "$creatorId", ObjectId(userId) ] },
+        },
+      },
       { $unwind: "$members" },
       { $sort: { "members.point": -1 } },
       {
@@ -143,6 +148,7 @@ exports.getGroupScoreboard = async (req, res) => {
           _id: "$_id",
           members: { $push: "$members" },
           numberOfProblem: { $first: "$numberOfProblem" },
+          isCreated: { $first: "$isCreated"}
         },
       },
       {
