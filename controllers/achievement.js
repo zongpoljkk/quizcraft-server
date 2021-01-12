@@ -174,12 +174,13 @@ exports.getMyAchievements = async (req, res) => {
     });
 };
 
-// checkAchievement Helper
+// Add achievement to user if not already exists
 function add(arr, name) {
-  const { length } = arr;
+  const new_achivement = new Achievement();
   const id = mongoose.Types.ObjectId();
   const found = arr.some((el) => el.achievementName === name);
-  if (!found) arr.push({ _id: id, achievementName: name });
+  if (!found)
+    arr.push({ _id: mongoose.Schema.Types.ObjectId, achievementName: name });
 }
 
 exports.checkAchievement = async (req, res) => {
@@ -217,23 +218,38 @@ exports.checkAchievement = async (req, res) => {
     console.log(err);
   }
 
-  console.log("CHECK ACHIEVEMENT");
-  console.log(user_achievement_names);
-  console.log(userId);
-
   // * UPDATE User's achievement * //
-  try {
-    User.findById(userId)
-      .exec()
-      .then((user) => {
-        user_achievement_names.forEach((achievement_name) => {
-          add(user.achievements, achievement_name);
-        });
-        user.save();
+  await User.findById(userId)
+    .exec()
+    .then((user) => {
+      // Pick achievement that user just got to the FE to show modal (user haven't already got it)
+      user_achievement_names.forEach((new_achievement_name) => {
+        if (
+          user.achievements.some((ach) => {
+            return ach.achievementName === new_achievement_name;
+          })
+        ) {
+          user_achievement_names = user_achievement_names.filter(
+            (new_achievement) => new_achievement !== new_achievement_name
+          );
+        }
       });
-  } catch (error) {
-    console.log(error);
-  }
+
+      // Update User achievements field
+      user_achievement_names.forEach((new_achievement_name) => {
+        user.achievements = [
+          ...user.achievements,
+          {
+            _id: mongoose.Types.ObjectId,
+            achievementName: new_achievement_name,
+          },
+        ];
+      });
+      user.save();
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 
   await Achievement.aggregate(
     [
