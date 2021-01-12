@@ -3,6 +3,8 @@ const Pin = require("../models/Pin");
 const User = require("../models/User");
 const moment = require("moment");
 const { MIN_PROBLEM, MAX_PROBLEM } = require("../utils/group");
+const mongoose = require("mongoose");
+const ObjectId = mongoose.Types.ObjectId;
 
 const getPin = async (date) => {
   let prefix = moment(date).format('DDMMYY');
@@ -57,6 +59,16 @@ exports.createGroup = async (req, res) => {
     else if (!newGroup) return res.status(400).json({succes:false, error: "Cannot create group"});
     else return res.status(200).json({succes:true, data: {groupId: newGroup._id, pin: newGroup.pin} });
   })
+}
+
+exports.getAllGroupMembers = async (req, res) => {
+  const groupId = req.query.groupId;
+  try {
+    var group = await Group.findById(groupId, { "members.username": 1 });
+    return res.status(200).json({succes:true, data: {members: group.members, numberOfMembers: group.members.length} });
+  } catch (err) {
+    return res.status(500).json({succes:false, error:err.toString()});
+  }
 }
 
 exports.deleteGroup = async (req, res) => {
