@@ -14,8 +14,24 @@ const GroupSchema = new Schema({
     required: true,
   },
   members: [{
-    type: Schema.Types.ObjectId,
-    ref: "User"
+    _id: false,
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    username: {
+      type: String,
+      require: true,
+    },
+    score: {
+      type: Number,
+      default: 0,
+    },
+    point: {
+      type: Number,
+      default: 0,
+    }
   }],
   subject: {
     type: String,

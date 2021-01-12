@@ -1,5 +1,6 @@
 const Group = require("../models/Group");
 const Pin = require("../models/Pin");
+const User = require("../models/User");
 const moment = require("moment");
 const { MIN_PROBLEM, MAX_PROBLEM } = require("../utils/group");
 const mongoose = require("mongoose");
@@ -35,6 +36,10 @@ exports.createGroup = async (req, res) => {
   if (numberOfProblem < MIN_PROBLEM || numberOfProblem > MAX_PROBLEM) {
     return res.status(400).json({succes:false, error: "The number of problems should be from 1 to 30"});
   }
+  const user = await User.findById(creatorId);
+  if (!user) {
+    return res.status(400).json({succes:false, error: "Wrong creatorId, cannot find the user"});
+  }
   const group = new Group({
     pin: pin,
     creatorId: creatorId,
@@ -44,7 +49,10 @@ exports.createGroup = async (req, res) => {
     difficulty: difficulty,
     numberOfProblem: numberOfProblem,
     timePerProblem: timePerProblem,
-    members: isPlay? [creatorId] : [],
+    members: isPlay? [{
+      userId: creatorId,
+      username: user.username}] 
+      : [],
   })
   group.save((err, newGroup) => {
     if (err) return res.status(500).json({succes:false, error:err});
