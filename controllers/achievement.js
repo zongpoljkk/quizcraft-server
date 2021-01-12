@@ -193,14 +193,15 @@ exports.checkAchievement = async (req, res) => {
   if (streaks >= 7) {
     console.log("SHOULD KAOO");
     user_achievement_names = [...user_achievement_names, "จับฉันให้ได้สิ"];
-  } else if (streaks >= 14) {
-    return res
-      .status(200)
-      .json({ success: true, data: "You got จับฉันไม่ได้หรอก" });
-  } else if (streaks >= 28) {
-    return res
-      .status(200)
-      .json({ success: true, data: "You got ให้ตายก็ไม่มีทางจับฉันได้" });
+  }
+  if (streaks >= 14) {
+    user_achievement_names = [...user_achievement_names, "จับฉันไม่ได้หรอก"];
+  }
+  if (streaks >= 28) {
+    user_achievement_names = [
+      ...user_achievement_names,
+      "ให้ตายก็ไม่มีทางจับฉันได้",
+    ];
   }
 
   // Handle Report related, Do when finish a game, like QUIZ type
@@ -250,6 +251,8 @@ exports.checkAchievement = async (req, res) => {
     .catch((error) => {
       console.log(error);
     });
+
+  console.log(user_achievement_names);
 
   await Achievement.aggregate(
     [
