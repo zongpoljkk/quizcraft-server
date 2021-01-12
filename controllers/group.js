@@ -109,9 +109,9 @@ exports.leaveGroup = async (req, res) => {
   Group.findOneAndUpdate(
     {
       _id: body.groupId,
-      members: { $elemMatch: { $eq: body.userId } },
+      members: { $elemMatch: { userId: { $eq: body.userId } } },
     },
-    { $pull: { members: body.userId } },
+    { $pull: { members: { userId: body.userId } } },
     { new: true },
     (err, user) => {
       if (err) {
