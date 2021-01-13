@@ -5,6 +5,8 @@ const User = require("../models/User");
 const Report = require("../models/Report");
 const Problem = require("../models/Problem");
 
+const NUMBER_OF_ITEMS = 5;
+
 exports.addFile = (req, res) => {
   const achievementName = req.body.achievementName;
   const image = req.files.image;
@@ -205,14 +207,14 @@ exports.checkAchievement = async (req, res) => {
     })
       .exec()
       .then((problems) => {
-        console.log("GOT IN");
+        console.log("GOT IN QUESTION TYPE");
         console.log(problems.length);
         const filtered = problems.filter(
           (problem) => problem.subtopicName === subtopic
         );
         console.log(filtered.length);
         if (filtered.length >= 10) {
-          console.log("HEY SHOULD KAO");
+          console.log("DID MORE THAN 10 PROBLEMS");
           user_achievement_names = [
             ...user_achievement_names,
             `นักแก้โจทย์${subtopic}มือสมัครเล่น`,
@@ -274,11 +276,26 @@ exports.checkAchievement = async (req, res) => {
   }
 
   // Handle Item related, Do when useEffect Shop page {
+  // Check if user has more than 10 basic items and more than 3 advance items
   if (type === "item") {
     console.log("KAO TYPE ITEM");
     const items = req.body.items;
+    let check = 0;
     for (const [key, value] of Object.entries(items)) {
       console.log(`${key}: ${value}`);
+      if (["hint", "skip", "refresh"].includes(key)) {
+        if (value >= 10) {
+          check++;
+        }
+      } else {
+        if (value >= 3) {
+          check++;
+        }
+      }
+    }
+    console.log(check);
+    if (check === NUMBER_OF_ITEMS) {
+      user_achievement_names = [...user_achievement_names, "นักสะสมไอเทม"];
     }
   }
 
