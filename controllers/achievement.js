@@ -206,7 +206,20 @@ exports.checkAchievement = async (req, res) => {
       .exec()
       .then((problems) => {
         console.log("GOT IN");
-        console.log(problems);
+        console.log(problems.length);
+        const filtered = problems.filter(
+          (problem) => problem.subtopicName === subtopic
+        );
+        console.log(filtered.length);
+        if (filtered.length >= 5) {
+          user_achievement_names = [...user_achievement_names, `นักแก้โจทย์${subtopic}มือสมัครเล่น`];
+        }
+        if (filtered.length >= 50) {
+          user_achievement_names = [...user_achievement_names, `นักแก้โจทย์${subtopic}ธรรมดา`];
+        }
+        if (filtered.length >= 100) {
+          user_achievement_names = [...user_achievement_names, `นักแก้โจทย์${subtopic}ปรมาจารย์`];
+        }
       })
       .catch((err) => {
         console.log(err);
@@ -283,7 +296,7 @@ exports.checkAchievement = async (req, res) => {
       console.log(error);
     });
 
-  // console.log(user_achievement_names);
+  console.log(user_achievement_names);
 
   await Achievement.aggregate(
     [
