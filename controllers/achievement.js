@@ -211,7 +211,8 @@ exports.checkAchievement = async (req, res) => {
           (problem) => problem.subtopicName === subtopic
         );
         console.log(filtered.length);
-        if (filtered.length >= 5) {
+        if (filtered.length >= 2) {
+          console.log("HEY SHOULD KAO")
           user_achievement_names = [...user_achievement_names, `นักแก้โจทย์${subtopic}มือสมัครเล่น`];
         }
         if (filtered.length >= 50) {
