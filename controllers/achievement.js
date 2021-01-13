@@ -185,15 +185,15 @@ function add(arr, name) {
 }
 
 exports.checkAchievement = async (req, res) => {
-  console.log(req.query);
+  console.log(req.body);
   let user_achievement_names = [];
-  const type = req.query.type;
-  const userId = req.query.userId;
+  const type = req.body.type;
+  const userId = req.body.userId;
 
   if (type === "questions") {
     // TODO: Handle Question related, Do on answer page or on result page
     // นักแก้โจทย์
-    const subtopic = req.query.subtopic;
+    const subtopic = req.body.subtopic;
     //   Person.find({
     // members: {
     //    $elemMatch: { id: id1 }
@@ -211,15 +211,24 @@ exports.checkAchievement = async (req, res) => {
           (problem) => problem.subtopicName === subtopic
         );
         console.log(filtered.length);
-        if (filtered.length >= 2) {
-          console.log("HEY SHOULD KAO")
-          user_achievement_names = [...user_achievement_names, `นักแก้โจทย์${subtopic}มือสมัครเล่น`];
+        if (filtered.length >= 10) {
+          console.log("HEY SHOULD KAO");
+          user_achievement_names = [
+            ...user_achievement_names,
+            `นักแก้โจทย์${subtopic}มือสมัครเล่น`,
+          ];
         }
         if (filtered.length >= 50) {
-          user_achievement_names = [...user_achievement_names, `นักแก้โจทย์${subtopic}ธรรมดา`];
+          user_achievement_names = [
+            ...user_achievement_names,
+            `นักแก้โจทย์${subtopic}ธรรมดา`,
+          ];
         }
         if (filtered.length >= 100) {
-          user_achievement_names = [...user_achievement_names, `นักแก้โจทย์${subtopic}ปรมาจารย์`];
+          user_achievement_names = [
+            ...user_achievement_names,
+            `นักแก้โจทย์${subtopic}ปรมาจารย์`,
+          ];
         }
       })
       .catch((err) => {
@@ -229,7 +238,7 @@ exports.checkAchievement = async (req, res) => {
 
   if (type === "streak") {
     // Handle Streaks, Do when get to homepage
-    const streaks = +req.query.streaks;
+    const streaks = +req.body.streaks;
 
     if (streaks >= 7) {
       console.log("SHOULD KAOO");
@@ -261,6 +270,15 @@ exports.checkAchievement = async (req, res) => {
         });
     } catch (err) {
       console.log(err);
+    }
+  }
+
+  // Handle Item related, Do when useEffect Shop page {
+  if (type === "item") {
+    console.log("KAO TYPE ITEM");
+    const items = req.body.items;
+    for (const [key, value] of Object.entries(items)) {
+      console.log(`${key}: ${value}`);
     }
   }
 
