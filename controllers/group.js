@@ -124,3 +124,32 @@ exports.leaveGroup = async (req, res) => {
     }
   );
 };
+
+exports.joinGroup = async (req, res) => {
+  const body = req.body;
+  if (!body) {
+    return res.status(400).json({
+      success: false,
+      error: "You must provide a body to update",
+    });
+  }
+
+  var user = await User.findById(body.userId);
+
+  Group.findOneAndUpdate(
+    {
+      pin: body.pin
+    },
+    { $addToSet: { members: { userId: body.userId, username: user.username } } },
+    { new: true },
+    (err, group) => {
+      if (err) {
+        return res.status(500).json({ success: false, error: err });
+      }
+      if (!group) {
+        return res.status(400).json({ success: false, error: "no data" });
+      }
+      return res.status(200).json({ success: true, groupId: group._id });
+    }
+  );
+};
