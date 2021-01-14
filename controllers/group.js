@@ -149,7 +149,7 @@ exports.joinGroup = async (req, res) => {
       if (!group) {
         return res.status(400).json({ success: false, error: "no data" });
       }
-      return res.status(200).json({ success: true, groupId: group._id });
+      return res.status(200).json({ success: true, data: { groupId: group._id } });
     }
   );
 };
