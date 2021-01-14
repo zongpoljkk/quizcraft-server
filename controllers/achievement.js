@@ -187,7 +187,7 @@ function add(arr, name) {
 }
 
 exports.checkAchievement = async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   let user_achievement_names = [];
   const type = req.body.type;
   const userId = req.body.userId;
@@ -243,7 +243,7 @@ exports.checkAchievement = async (req, res) => {
     const streaks = +req.body.streaks;
 
     if (streaks >= 7) {
-      console.log("SHOULD KAOO");
+      // console.log("SHOULD KAOO");
       user_achievement_names = [...user_achievement_names, "จับฉันให้ได้สิ"];
     }
     if (streaks >= 14) {
