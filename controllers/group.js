@@ -190,3 +190,49 @@ exports.genProblemsWhenGroupStart = async (req, res) => {
     return res.status(500).json({ success: false, error: err.toString() });
   }
 }
+
+exports.getGroupScoreboard = async (req, res) => {
+  const groupId = req.query.groupId;
+  const userId = req.query.userId;
+  
+  Group.aggregate(
+    [
+      {
+        $match: {
+          _id: ObjectId(groupId),
+        },
+      },
+      {
+        $addFields: {
+          isCreator: { $eq: [ "$creatorId", ObjectId(userId) ] },
+        },
+      },
+      { $unwind: "$members" },
+      { $sort: { "members.point": -1 } },
+      {
+        $group: {
+          _id: "$_id",
+          members: { $push: "$members" },
+          numberOfProblem: { $first: "$numberOfProblem" },
+          isCreator: { $first: "$isCreator"}
+        },
+      },
+      {
+        $addFields: {
+          userIndex: {
+            $add: [{ $indexOfArray: ["$members.userId", ObjectId(userId)] }, 1],
+          },
+        },
+      },
+    ],
+    (err, group) => {
+      if (err) {
+        return res.status(500).json({ success: false, error: err });
+      }
+      if (!group) {
+        return res.status(400).json({ success: false, error: "no data" });
+      }
+      return res.status(200).json({ success: true, data: group });
+    }
+  );
+};

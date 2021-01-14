@@ -11,5 +11,6 @@ router.get("/get-all-group-members/", [authJwt], groupController.getAllGroupMemb
 router.delete("/delete-group", [authJwt], groupController.deleteGroup);
 router.put("/leave-group", [authJwt], groupController.leaveGroup);
 router.post("/gen-problems-when-group-start", [authJwt], groupController.genProblemsWhenGroupStart);
+router.get("/group-scoreboard/", [authJwt], groupController.getGroupScoreboard);
 
 module.exports = router;
