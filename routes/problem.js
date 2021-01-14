@@ -14,4 +14,5 @@ router.post("/generate-problem", [authJwt, adminOnly], problemController.generat
 router.post("/add-problem-answer-hint", [authJwt, adminOnly], problemController.addProblemAnswerHint)
 router.post("/get-problem-for-user", [authJwt], problemController.getProblemForUser)
 router.post("/get-and-check-answer", [authJwt], checkAnswer,problemController.checkAnswerAndUpdateDifficulty);
+router.get("/get-problem-answer-hint/", [authJwt], problemController.getProblemAnswerHint)
 module.exports = router;

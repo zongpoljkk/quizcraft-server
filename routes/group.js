@@ -10,5 +10,6 @@ router.post("/create-group", [authJwt], groupController.createGroup);
 router.get("/get-all-group-members/", [authJwt], groupController.getAllGroupMembers);
 router.delete("/delete-group", [authJwt], groupController.deleteGroup);
 router.put("/leave-group", [authJwt], groupController.leaveGroup);
+router.post("/gen-problems-when-group-start", [authJwt], groupController.genProblemsWhenGroupStart);
 
 module.exports = router;
