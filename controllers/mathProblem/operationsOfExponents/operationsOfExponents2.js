@@ -42,17 +42,14 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
         case 2: //(3^[5])/(3^[2]) = 3^[3]
           base = randInt(2, 10);
           degreeList = Array.from({ length: 2 }, () => randInt(1, 5, true));
-          console.log(degreeList)
           problemBody =
             base < 0
               ? `((${base})^[${degreeList[0]}])/((${base})^[${degreeList[1]}])`
               : `(${base}^[${degreeList[0]}])/(${base}^[${degreeList[1]}])`;
-          [{ solution, solutionList }] = genSolution([base], [degreeList[0]], 
-            [base], [degreeList[1]]
-            );
+          [{ solution, solutionList }] = genSolution([base], [degreeList[0]], [base], [degreeList[1]]);
           answerBody = solutionList[solutionList.length - 1];
           //create hint
-          hintBody = `(a^[m])/(a^[n]) = a^[(m-n)] | สมบัติการหารของเลขยกกำลัง`;
+          hintBody = `(a^[m])/(a^[n]) = a^[(m-n)] เมื่อ a ไม่เท่ากับ 0 | สมบัติการหารของเลขยกกำลัง`;
           break;
       }
       break;
