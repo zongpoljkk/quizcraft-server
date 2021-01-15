@@ -1,6 +1,7 @@
 const {generateScientificNotation} = require("./scientificNotation");
 const {generateMeaningOfExponents} = require("./meaningOfExponents");
-const {generateOperationsOfExponents} = require("./operationsOfExponents")
+// const {generateOperationsOfExponents} = require("./operationsOfExponents")
+const {generateOperationsOfExponents} = require("./operationsOfExponents/operationsOfExponents2");
 
 const mathGenerate = ({ subtopicName, difficulty }) => {
   switch (subtopicName) {
