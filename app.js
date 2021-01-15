@@ -17,6 +17,8 @@ const achievementRouter = require("./routes/achievement");
 const leaderboardRouter = require("./routes/leaderBoard");
 const englishRouter = require("./routes/english");
 const challengeRouter = require("./routes/challenge");
+const reportRouter = require("./routes/report");
+const groupRouter = require("./routes/group");
 
 mongoose.set("useNewUrlParser", true);
 mongoose.set("useFindAndModify", false);
@@ -60,6 +62,8 @@ app.use("/api/achievement", achievementRouter);
 app.use("/api/leader-board", leaderboardRouter);
 app.use("/api/english", englishRouter);
 app.use("/api/challenge", challengeRouter);
+app.use("/api/report", reportRouter);
+app.use("/api/group", groupRouter);
 
 // app.use((req, res, next) => {
 //   res.status(404).render('404', { pageTitle: ' Page Not Found'});
