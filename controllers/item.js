@@ -7,7 +7,7 @@ const { levelSystem, rankSystem, MAX_LEVEL } = require("../utils/level");
 const levelDictionary = levelSystem();
 const rankDictionary = rankSystem();
 const { updateCoinAndExp } = require("./user");
-const { earn } = require("synonyms/dictionary");
+const { NUMBER_OF_PROBLEM } = require("../utils/challenge");
 
 //Add item for testing
 exports.addItem = (req, res, next) => {
@@ -37,9 +37,14 @@ exports.getAllItems = async (req, res) => {
 exports.useSkipItemForChallenge = async (req,res) => {
   try {
     const userId = req.userId;
+    const challengeId = req.body.challengeId;
+    const problemIndex = req.body.problemIndex;
+    if (problemIndex < 0 || problemIndex >= NUMBER_OF_PROBLEM) {
+      return res.status(400).json({ success: false, error: "Wrong problem index" });
+    }
     var user = await User.findOne(
       { _id: userId }, 
-      { level:1, rank:1, exp:1, maxExp:1, coin:1, items:1}
+      { level:1, rank:1, exp:1, maxExp:1, coin:1, items:1, usedItems:1 }
     );
     let skipItem, indexOfSkipItem, i;
     for (i in user.items) {
@@ -52,15 +57,30 @@ exports.useSkipItemForChallenge = async (req,res) => {
     if (!skipItem || skipItem.amount <= 0) {
       return res.status(400).json({ success: false, error: "User does not has skip item" });
     }
-    const challengeId = req.body.challengeId;
-    const problemIndex = req.body.problemIndex;
     var challenge = await Challenge.findOne({ _id: challengeId, $or: [{ user1Id: userId }, { user2Id: userId }] });
     if (!challenge) return res.status(400).json({ success: false, error: "Challenge not exist" });
 
     // * Handle used item * //
     user.items[indexOfSkipItem].amount -= 1;
+    let foundUsedItem = false;
+    for (i in user.usedItems) {
+      if (user.usedItems[i].itemName = ITEM_NAME.SKIP) {
+        user.usedItems[i].problems.push(challenge.problems[problemIndex]);
+        user.usedItems[i].amount++;
+        foundUsedItem = true;
+        break;
+      }
+    }
+    if (!foundUsedItem) {
+      user.usedItems.push({
+        itemName: ITEM_NAME.SKIP,
+        amount: 1,
+        problems: challenge.problems[problemIndex]
+      })
+    }
 
-    let [{ updatedUser, levelUp, rankUp, earnedCoins, earnedExp }] = await updateCoinAndExp(user, GAME_MODE.CHALLENGE, challenge.difficulty);
+    let levelUp, rankUp, earnedCoins, earnedExp;
+    [{ user, levelUp, rankUp, earnedCoins, earnedExp }] = await updateCoinAndExp(user, GAME_MODE.CHALLENGE, challenge.difficulty);
     
     //update result and score in challenge
     if (challenge.user1Id == userId) {
@@ -102,17 +122,21 @@ exports.useSkipItemForChallenge = async (req,res) => {
         gainExp: challenge.user2GainExp,
       }
     }
-
-    return res.status(200).json({ success: true, data: { updatedchallenge, updatedUser, levelUp, rankUp, earnedCoins, earnedExp  } });    
+    return res.status(200).json({ success: true, data: { updatedchallenge, updatedUser: user, levelUp, rankUp, earnedCoins, earnedExp  } });    
   } catch (err) {
     return res.status(500).json({ success: false, error: err.toString() });
   }
 }
 
-exports.useSkipItem = async (req,res) => {
-  const userId = req.userId;
+exports.useSkipItemForQuiz = async (req,res) => {
   try {
-    const user = await User.findOne({ _id: userId });
+    const userId = req.userId;
+    const difficulty = req.body.difficulty;
+    const problemId = req.body.problemId;
+    var user = await User.findOne(
+      { _id: userId }, 
+      { level:1, rank:1, exp:1, maxExp:1, coin:1, items:1, usedItems:1}
+    );
     let skipItem, indexOfSkipItem, i;
     for (i in user.items) {
       if (user.items[i].itemName == ITEM_NAME.SKIP) {
@@ -124,81 +148,31 @@ exports.useSkipItem = async (req,res) => {
     if (!skipItem || skipItem.amount <= 0) {
       return res.status(400).json({ success: false, error: "User does not has skip item" });
     }
-    let earnedCoins, earnedExp, modeSurplus;
-    const gameMode = req.body.gameMode;
-    switch (gameMode) {
-      case GAME_MODE.CHALLENGE:
-        const challengeId = req.body.challengeId;
-        const problemIndex = req.body.problemIndex;
-        var challenge = await Challenge.findOne({ _id: challengeId, $or: [{ user1Id: userId }, { user2Id: userId }] });
-        if (!challenge) return res.status(400).json({ success: false, error: "Challenge not exist" });
-
-        //update result and score in challenge
-        if (challenge.user1Id == userId) {
-          if (challenge.user1Result.length - problemIndex != 1) return res.status(400).json({ success: false, error: "Wrong problem index" });
-          challenge.user1Result[problemIndex] = 1;
-          challenge.user1Score++;
-        } else {
-          if (challenge.user2Result.length - problemIndex != 1) return res.status(400).json({ success: false, error: "Wrong problem index" });
-          challenge.user2Result[problemIndex] = 1;
-          challenge.user2Score++;
-        }
-
-        //save to database
-        await challenge.save();
-        modeSurplus = MODE_SURPLUS.CHALLENGE;
-        break;
-      case GAME_MODE.QUIZ:
-        modeSurplus = MODE_SURPLUS.QUIZ;
-        break;
-      default:
-        return res.status(400).json({ success: false, error: "Provided game mode did not exist or cannot use skip item in that game mode" });
-    }
 
     // * Handle used item * //
     user.items[indexOfSkipItem].amount -= 1;
-
-    // * Handle Earned coins and exp * //
-    switch (challenge.difficulty) {
-      case DIFFICULTY.EASY:
-        earnedCoins = DIFFICULTY_COIN.EASY * modeSurplus;
-        earnedExp = DIFFICULTY_EXP.EASY * modeSurplus;
+    let foundUsedItem = false;
+    for (i in user.usedItems) {
+      if (user.usedItems[i].itemName = ITEM_NAME.SKIP) {
+        user.usedItems[i].problems.push(problemId);
+        user.usedItems[i].amount++;
+        foundUsedItem = true;
         break;
-      case DIFFICULTY.MEDIUM:
-        earnedCoins = DIFFICULTY_COIN.MEDIUM * modeSurplus;
-        earnedExp = DIFFICULTY_EXP.MEDIUM * modeSurplus;
-        break;
-      case DIFFICULTY.HARD:
-        earnedCoins = DIFFICULTY_COIN.HARD * modeSurplus;
-        earnedExp = DIFFICULTY_EXP.HARD * modeSurplus;  
-        break;
-    }
-    user.exp += earnedExp;
-    user.coin += earnedCoins;
-
-    // * Handle Level up * //
-    // Compare user exp if it exceeds the limit of his/her level
-    let levelUp = false;
-    let rankUp = false;
-    if (user.exp >= levelDictionary[parseInt(user.level)]) {
-      if (user.level == MAX_LEVEL) {
-      } else {
-        levelUp = true;
-        user.exp -= levelDictionary[parseInt(user.level)];
-        user.maxExp = levelDictionary[parseInt(user.level + 1)];
-        user.level += 1;
-        // ? Handle Rank up ? //
-        if (user.level in rankDictionary) {
-          user.rank = rankDictionary[user.level];
-          rankUp = true;
-        }
       }
     }
+    if (!foundUsedItem) {
+      user.usedItems.push({
+        itemName: ITEM_NAME.SKIP,
+        amount: 1,
+        problems: problemId
+      })
+    }
+    let levelUp, rankUp, earnedCoins, earnedExp;
+    [{ user, levelUp, rankUp, earnedCoins, earnedExp }] = await updateCoinAndExp(user, GAME_MODE.QUIZ, difficulty);
 
     //save to database
     await user.save()
-
-    return res.status(200).json({ success: true, data: { levelUp, rankUp, userItem: user.items } })
+    return res.status(200).json({ success: true, data: { levelUp, rankUp, earnedCoins, earnedExp  } }); 
   } catch (err) {
     return res.status(500).json({ success: false, error: err.toString() });
   }

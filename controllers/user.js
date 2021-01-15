@@ -488,5 +488,5 @@ exports.updateCoinAndExp = (user, gameMode, difficulty) => {
       }
     }
   }
-  return [{ updatedUser: user, levelUp, rankUp, earnedCoins, earnedExp }];
+  return [{ user, levelUp, rankUp, earnedCoins, earnedExp }];
 }
