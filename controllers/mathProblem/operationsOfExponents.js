@@ -1,37 +1,16 @@
 const Problem = require("../../models/Problem");
 const Answer = require("../../models/Answer");
 const Hint = require("../../models/Hint");
-const EASY = "EASY";
-const MEDIUM = "MEDIUM";
-const HARD = "HARD";
-const alphabet = "abcdefghijklmnopqrstuvwxyz";
-
-
-
-const baseSelector = () => {
-  let rand = Math.floor(Math.random() * 4) + 1; //choose base
-  let a, b, c;
-  switch (rand) {
-    case 1: //int
-      a = randInt(2, 10, true); //random (+-)[2,10]
-      break;
-    case 2: //float
-      a =
-        (Math.random() * 9 + 1.01).toFixed(2) *
-        (-1) ** Math.floor(Math.random() * 2); //random (+-)[1.01,10.00)
-      break;
-    case 3: //fraction
-      b = randInt(1, 10, true); //random (+-)[1,10]
-      c = randInt(2, 10, false); //random [2,10]
-      c = c == b ? c + 1 : c;
-      a = `(${b}/${c})`;
-      break;
-    case 4: //alphabet
-      a = alphabet[Math.floor(Math.random() * alphabet.length)];
-      break;
-  }
-  return a;
-};
+const { randInt, shuffle, baseSelector } = require("./globalFunction");
+const {
+  EASY,
+  MEDIUM,
+  HARD,
+  alphabet,
+  SELECT_ONE,
+  RADIO_CHOICE,
+  MATH_INPUT
+} = require("./const");
 
 const concat = (base, i, degree) => {
   if (i == 0) {
@@ -50,17 +29,6 @@ const concat = (base, i, degree) => {
       if (degree == 1) return `*${base}`;
       return `*${base}^[${degree}]`;
     }
-  }
-};
-
-const randInt = (start, end, haveNegative) => {
-  if (haveNegative) {
-    return (
-      (Math.floor(Math.random() * (end - start + 1)) + start) *
-      (-1) ** Math.floor(Math.random() * 2)
-    );
-  } else {
-    return Math.floor(Math.random() * (end - start + 1)) + start;
   }
 };
 
