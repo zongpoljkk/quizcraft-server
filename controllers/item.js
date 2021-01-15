@@ -1,11 +1,7 @@
 const Item = require("../models/Item");
 const User = require("../models/User");
 const Challenge = require("../models/Challenge");
-const { GAME_MODE, ITEM_NAME, DIFFICULTY } = require("../utils/const");
-const { DIFFICULTY_EXP, DIFFICULTY_COIN, MODE_SURPLUS } = require("../utils/gameConfig");
-const { levelSystem, rankSystem, MAX_LEVEL } = require("../utils/level");
-const levelDictionary = levelSystem();
-const rankDictionary = rankSystem();
+const { GAME_MODE, ITEM_NAME } = require("../utils/const");
 const { updateCoinAndExp } = require("./user");
 const { NUMBER_OF_PROBLEM } = require("../utils/challenge");
 
