@@ -36,6 +36,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           [{ solution, solutionList }] = genSolution(baseList, degreeList);
           solution = problemBody + "\n" + solution;
           answerBody = solutionList[solutionList.length - 1];
+          answerType = ANSWER_TYPE.MATH_INPUT;
           //create hint
           hintBody = `a^[m]*a^[n] = a^[(m+n)] | สมบัติการคูณของเลขยกกำลัง`;
           break;
@@ -48,9 +49,13 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
               : `(${base}^[${degreeList[0]}])/(${base}^[${degreeList[1]}])`;
           [{ solution, solutionList }] = genSolution([base], [degreeList[0]], [base], [degreeList[1]]);
           answerBody = solutionList[solutionList.length - 1];
+          answerType = ANSWER_TYPE.MATH_INPUT;
           //create hint
           hintBody = `(a^[m])/(a^[n]) = a^[(m-n)] เมื่อ a ไม่เท่ากับ 0 | สมบัติการหารของเลขยกกำลัง`;
           break;
+        case 3: //3^[0] = 1;
+          base = randInt(2, 10);
+          expo = base<0? `(${base})^[0]` : `${base}^[0]`;
       }
       break;
     case DIFFICULTY.MEDIUM:
