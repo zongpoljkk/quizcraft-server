@@ -83,46 +83,29 @@ exports.useSkipItemForChallenge = async (req,res) => {
     [{ user, levelUp, rankUp, earnedCoins, earnedExp }] = await updateCoinAndExp(user, GAME_MODE.CHALLENGE, challenge.difficulty);
     
     //update result and score in challenge
+    if (problemIndex == NUMBER_OF_PROBLEM - 1) {
+      challenge.whoTurn = challenge.whoTurn == 1? 2 : 1;
+      challenge.user1IsRead = false;
+      challenge.user2IsRead = false;
+    }
     if (challenge.user1Id == userId) {
       if (challenge.user1Result.length - problemIndex != 1) return res.status(400).json({ success: false, error: "Wrong problem index" });
-      challenge.user1Result[problemIndex] = 1;
+      challenge.user1Result.set(problemIndex, 1);
       challenge.user1Score++;
       challenge.user1GainCoin += earnedCoins;
       challenge.user1GainExp += earnedExp;
     } else {
       if (challenge.user2Result.length - problemIndex != 1) return res.status(400).json({ success: false, error: "Wrong problem index" });
-      challenge.user2Result[problemIndex] = 1;
+      challenge.user2Result.set(problemIndex, 1);
       challenge.user2Score++;
       challenge.user2GainCoin += earnedCoins;
       challenge.user2GainExp += earnedExp;
     }
     
     //save to database
-    // await challenge.save();
-    // await user.save()
-    let updatedchallenge = {
-      _id: challenge._id,
-      whoTurn: challenge.whoTurn,
-      user1 : {
-        userId: challenge.user1Id,
-        score: challenge.user1Score,
-        result: challenge.user1Result,
-        time: parseFloat(challenge.user1Time),
-        isRead: challenge.user1IsRead,
-        gainCoin: challenge.user1GainCoin,
-        gainExp: challenge.user1GainExp,
-      },
-      user2 : {
-        userId: challenge.user2Id,
-        score: challenge.user2Score,
-        result: challenge.user2Result,
-        time: parseFloat(challenge.user2Time),
-        isRead: challenge.user2IsRead,
-        gainCoin: challenge.user2GainCoin,
-        gainExp: challenge.user2GainExp,
-      }
-    }
-    return res.status(200).json({ success: true, data: { updatedchallenge, updatedUser: user, levelUp, rankUp, earnedCoins, earnedExp  } });    
+    await challenge.save();
+    await user.save();
+    return res.status(200).json({ success: true, data: { levelUp, rankUp, earnedCoins, earnedExp  } });    
   } catch (err) {
     return res.status(500).json({ success: false, error: err.toString() });
   }
@@ -171,7 +154,7 @@ exports.useSkipItemForQuiz = async (req,res) => {
     [{ user, levelUp, rankUp, earnedCoins, earnedExp }] = await updateCoinAndExp(user, GAME_MODE.QUIZ, difficulty);
 
     //save to database
-    await user.save()
+    await user.save();
     return res.status(200).json({ success: true, data: { levelUp, rankUp, earnedCoins, earnedExp  } }); 
   } catch (err) {
     return res.status(500).json({ success: false, error: err.toString() });
