@@ -87,6 +87,7 @@ exports.useSkipItemForChallenge = async (req,res) => {
       challenge.whoTurn = challenge.whoTurn == 1? 2 : 1;
       challenge.user1IsRead = false;
       challenge.user2IsRead = false;
+      challenge.currentProblem = 0;
     }
     if (challenge.user1Id == userId) {
       if (challenge.user1Result.length - problemIndex != 1) return res.status(400).json({ success: false, error: "Wrong problem index" });
