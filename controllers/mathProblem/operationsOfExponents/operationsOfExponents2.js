@@ -19,7 +19,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
     case DIFFICULTY.EASY:
       problemTitle = "จงทำเลขยกกำลังต่อไปนี้ให้เป็นรูปอย่างง่าย";
       // opt = randInt(1, 4);
-      opt = 2;
+      opt = 4;
       switch (opt) {
         case 1: // 3^[2]*3^[3] = 3^[5]
           termNum = randInt(2, 4);
@@ -54,8 +54,25 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           hintBody = `(a^[m])/(a^[n]) = a^[(m-n)] เมื่อ a ไม่เท่ากับ 0 | สมบัติการหารของเลขยกกำลัง`;
           break;
         case 3: //3^[0] = 1;
+          problemTitle = "จงหาค่าของเลขยกกำลงต่อไปนี้";
           base = randInt(2, 10);
-          expo = base<0? `(${base})^[0]` : `${base}^[0]`;
+          expo = base < 0? `(${base})^[0]` : `${base}^[0]`;
+          // answerType = randInt(0,1)? ANSWER_TYPE.MATH_INPUT : ANSWER_TYPE.RADIO_CHOICE;
+          answerType = ANSWER_TYPE.MATH_INPUT;
+          problemBody = expo;
+          answerBody = 1;
+          hintBody = `a^[0] = 1 เมื่อ a ไม่เท่ากับ 0`;
+          break;
+        case 4: //3^[-2] = 1/(3^[2]) or 1/9
+          base = randInt(2, 10);
+          degree = -1*randInt(2, 10);
+          // answerType = randInt(0,1)? ANSWER_TYPE.MATH_INPUT : ANSWER_TYPE.RADIO_CHOICE;
+          answerType = ANSWER_TYPE.MATH_INPUT;
+          problemBody = base < 0? `(${base})^[${degree}` : `${base}^[${degree}]`;
+          answerBody = base < 0? `1/((${base})^[${-degree}])` : `1/(${base}^[${-degree}])`;
+          hintBody = `a^[-n] = 1/(a^[n])`;
+          break;
+
       }
       break;
     case DIFFICULTY.MEDIUM:
