@@ -10,7 +10,12 @@ const Challenge = require("../models/Challenge");
 const levelDictionary = levelSystem();
 const rankDictionary = rankSystem();
 
-const updateChallengeScore = async (challengeId, correct, userTime, problemIndex) => {
+const updateChallengeScore = async (
+  challengeId,
+  correct,
+  userTime,
+  problemIndex
+) => {
   await Challenge.findById(challengeId)
     .exec()
     .then((challenge) => {
@@ -18,27 +23,23 @@ const updateChallengeScore = async (challengeId, correct, userTime, problemIndex
         challenge.user1Time =
           +challenge.user1Time.toString() + parseFloat(userTime);
         if (correct) {
-          challenge.user1Result[problemIndex] = 1;
-          // challenge.user1Result = [...challenge.user1Result, 1];
-          // challenge.user1Result.push(1)
+          console.log("IF");
+          console.log(`problemIndex: ${problemIndex}`);
+          challenge.user1Result.set(problemIndex, 1);
           challenge.user1Score++;
         } else {
           console.log("ELSE");
           console.log(`problemIndex: ${problemIndex}`);
-          // challenge.user1Result.push(0)
-          // challenge.user1Result = [...challenge.user1Result, 0];
+          challenge.user1Result.set(problemIndex, 0);
         }
       } else {
         challenge.user2Time =
           +challenge.user2Time.toString() + parseFloat(userTime);
         if (correct) {
-          challenge.user2Result[problemIndex] = 1;
-          // challenge.user1Result = [...challenge.user1Result, 1];
-          // challenge.user1Result.push(1)
+          challenge.user2Result.set(problemIndex, 1);
           challenge.user2Score++;
         } else {
-          // challenge.user1Result.push(0)
-          // challenge.user1Result = [...challenge.user1Result, 0];
+          challenge.user2Result.set(problemIndex, 0);
         }
       }
 

@@ -186,24 +186,26 @@ exports.getProblemByChallengeId = (req, res) => {
           });
         }
 
-        if (challenge.whoTurn === 1) {
-          // challenge.user1Result.push(0);
-          challenge.user1Result = [...challenge.user1Result, 0];
-        } else {
-          // challenge.user2Result.push(0);
-          challenge.user2Result = [...challenge.user2Result, 0];
-        }
-
         // ? Handle user lost connection by skip user's current problem and mark as incorrect  ? //
-        // if(challenge.currentProblem === NUMBER_OF_PROBLEM) {
-        //   console.log("===")
-        //   challenge.whoTurn === 1 ? challenge.user1IsRead = false : challenge.user2IsRead = false;
-        //   challenge.whoTurn === 1 ? challenge.whoTurn = 2 : challenge.whoTurn = 1;
-        //   challenge.currentProblem = 0;
-        // }
-        if (challenge.currentProblem < NUMBER_OF_PROBLEM) {
-          console.log("< NUM")
+        if (challenge.currentProblem === NUMBER_OF_PROBLEM) {
+          console.log("===");
+          challenge.whoTurn === 1
+            ? (challenge.user1IsRead = false)
+            : (challenge.user2IsRead = false);
+          challenge.whoTurn === 1
+            ? (challenge.whoTurn = 2)
+            : (challenge.whoTurn = 1);
+          challenge.currentProblem = 0;
+        } else if (challenge.currentProblem < NUMBER_OF_PROBLEM) {
+          console.log("< NUM");
           challenge.currentProblem++;
+          if (challenge.whoTurn === 1) {
+            // challenge.user1Result.push(0);
+            challenge.user1Result = [...challenge.user1Result, 0];
+          } else {
+            // challenge.user2Result.push(0);
+            challenge.user2Result = [...challenge.user2Result, 0];
+          }
         }
 
         challenge.save();
@@ -400,15 +402,13 @@ exports.readChallenge = async (req, res) => {
         return res
           .status(400)
           .json({ success: false, error: "Cannot update challenge" });
-      return res
-        .status(200)
-        .json({
-          success: true,
-          isRead:
-            newChallenge.user1Id == userId
-              ? newChallenge.user1IsRead
-              : newChallenge.user2IsRead,
-        });
+      return res.status(200).json({
+        success: true,
+        isRead:
+          newChallenge.user1Id == userId
+            ? newChallenge.user1IsRead
+            : newChallenge.user2IsRead,
+      });
     });
   });
 };
