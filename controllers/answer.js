@@ -10,8 +10,8 @@ const Challenge = require("../models/Challenge");
 const levelDictionary = levelSystem();
 const rankDictionary = rankSystem();
 
-const updateChallengeScore = (challengeId, correct, userTime, problemIndex) => {
-  Challenge.findById(challengeId)
+const updateChallengeScore = async (challengeId, correct, userTime, problemIndex) => {
+  await Challenge.findById(challengeId)
     .exec()
     .then((challenge) => {
       if (challenge.whoTurn === 1) {
@@ -19,23 +19,31 @@ const updateChallengeScore = (challengeId, correct, userTime, problemIndex) => {
           +challenge.user1Time.toString() + parseFloat(userTime);
         if (correct) {
           challenge.user1Result[problemIndex] = 1;
+          // challenge.user1Result = [...challenge.user1Result, 1];
+          // challenge.user1Result.push(1)
           challenge.user1Score++;
         } else {
-          challenge.user1Result[problemIndex] = 0;
+          console.log("ELSE");
+          console.log(`problemIndex: ${problemIndex}`);
+          // challenge.user1Result.push(0)
+          // challenge.user1Result = [...challenge.user1Result, 0];
         }
       } else {
         challenge.user2Time =
           +challenge.user2Time.toString() + parseFloat(userTime);
         if (correct) {
           challenge.user2Result[problemIndex] = 1;
+          // challenge.user1Result = [...challenge.user1Result, 1];
+          // challenge.user1Result.push(1)
           challenge.user2Score++;
         } else {
-          challenge.user2Result[problemIndex] = 0;
+          // challenge.user1Result.push(0)
+          // challenge.user1Result = [...challenge.user1Result, 0];
         }
       }
 
       // Update whoTurn when player finished NUMBER_OF_PROBLEM
-      if (challenge.currentProblem === NUMBER_OF_PROBLEM) {
+      if (problemIndex === NUMBER_OF_PROBLEM) {
         switch (challenge.whoTurn) {
           case 1:
             challenge.whoTurn = 2;
@@ -48,6 +56,7 @@ const updateChallengeScore = (challengeId, correct, userTime, problemIndex) => {
         challenge.user2IsRead = false;
       }
 
+      console.log(challenge);
       // No need to update current index because already did when getting problem by challenge id
       challenge.save();
     });
