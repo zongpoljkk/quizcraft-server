@@ -152,7 +152,54 @@ exports.useSkipItemForQuiz = async (req,res) => {
 
     //save to database
     await user.save();
-    return res.status(200).json({ success: true, data: { levelUp, rankUp, earnedCoins, earnedExp  } }); 
+    return res.status(200).json({ success: true, data: { levelUp, rankUp, earnedCoins, earnedExp } }); 
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.toString() });
+  }
+}
+
+exports.useRefreshItem = async (req,res) => {
+  try {
+    const userId = req.userId;
+    const problemId = req.body.problemId;
+    var user = await User.findOne(
+      { _id: userId }, 
+      { items:1, usedItems:1}
+    );
+    let refreshItem, indexOfRefreshItem, i;
+    for (i in user.items) {
+      if (user.items[i].itemName == ITEM_NAME.REFRESH) {
+        refreshItem = user.items[i];
+        indexOfRefreshItem = i;
+        break;
+      }
+    }
+    if (!refreshItem || refreshItem.amount <= 0) {
+      return res.status(400).json({ success: false, error: "User does not has refresh item" });
+    }
+    
+    // * Handle used item * //
+    user.items[indexOfRefreshItem].amount -= 1;
+    let foundUsedItem = false;
+    for (i in user.usedItems) {
+      if (user.usedItems[i].itemName = ITEM_NAME.REFRESH) {
+        user.usedItems[i].problems.push(problemId);
+        user.usedItems[i].amount++;
+        foundUsedItem = true;
+        break;
+      }
+    }
+    if (!foundUsedItem) {
+      user.usedItems.push({
+        itemName: ITEM_NAME.REFRESH,
+        amount: 1,
+        problems: problemId
+      })
+    }
+  
+    //save to database
+    await user.save();
+    return res.status(200).json({ success: true, data: user.items[indexOfRefreshItem] }); 
   } catch (err) {
     return res.status(500).json({ success: false, error: err.toString() });
   }
