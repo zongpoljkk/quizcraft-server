@@ -10,12 +10,12 @@ const {
 } = require("./operationsOfExponentsFunction");
 
 const generateOperationsOfExponents = async (subtopicName, difficulty) => {
-  let problemTitle, problemBody, answerBody, hintBody, solution, answerType;
+  let problemTitle, problemBody, answerBody, hintBody, solution, answerType, answerForDisplay;
   let expo, num, rand, positiveBase, opt;
   let problem, problemId, answer, hint, newProblem, newAnswer, newHint;
   let i, temp;
   let expoList, numList, choices, solutionList;
-  let base, degree, randList, baseList, degreeList, termNum;
+  let base, degree, randList, baseList, degreeList, termNum, degreeListOut;
   switch (difficulty) {
     case DIFFICULTY.EASY:
       problemTitle = "จงทำเลขยกกำลังต่อไปนี้ให้เป็นรูปอย่างง่าย";
@@ -104,7 +104,6 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
             }
             degreeList.push(degree);
             baseList.push(base);
-            // degreeSum += degree;
             if (randList[i]) {
               problemBody += multipleConcat(base ** degree, 1, i);
             } else problemBody += multipleConcat(base, degree, i);
@@ -113,6 +112,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           }
           [{ solution, solutionList }] = genSolution(baseList, degreeList);
           solution = problemBody + "\n" + temp + "\n" + solution;
+          answerType = ANSWER_TYPE.MATH_INPUT;
           answerBody = solutionList[solutionList.length-1];
           hintBody = `ลองเปลี่ยนเลขธรรมดาให้เป็นเลขยกกำลังที่ฐานเท่ากับเลขยกกำลังตัวอื่นดูสิ`;
           break;
