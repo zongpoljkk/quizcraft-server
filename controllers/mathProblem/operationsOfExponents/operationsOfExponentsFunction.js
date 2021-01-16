@@ -239,4 +239,26 @@ const genSolution = (baseList, degreeList, baseList2, degreeList2) => {
   return [{ solution: out, solutionList: outList, baseListOut, degreeListOut }];
 };
 
-module.exports = { multipleConcat, multipleExponentialString, genSolution };
+const diverse = (termNum) => {
+  let randList = Array.from({ length: termNum }, () =>
+    Math.floor(Math.random() * 2)
+  );
+  let sum = randList.reduce((a, b) => a + b, 0);
+  if (sum == 0) {
+    randList.push(1);
+    termNum += 1;
+  } else if (sum == termNum) {
+    randList.push(0);
+    termNum += 1;
+  }
+  return [{ randList, termNum }];
+};
+
+module.exports = { 
+  multipleConcat, 
+  multipleExponentialString, 
+  plusDegreeString,
+  minusDegreeString,
+  genSolution,
+  diverse,
+};

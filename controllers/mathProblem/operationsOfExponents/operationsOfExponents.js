@@ -6,6 +6,7 @@ const { DIFFICULTY, ANSWER_TYPE, ALPHABET } = require("../../../utils/const");
 const {
   multipleConcat,
   genSolution,
+  diverse
 } = require("./operationsOfExponentsFunction");
 
 const generateOperationsOfExponents = async (subtopicName, difficulty) => {
@@ -72,11 +73,56 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           answerBody = base < 0? `1/((${base})^[${-degree}])` : `1/(${base}^[${-degree}])`;
           hintBody = `a^[-n] = 1/(a^[n])`;
           break;
-
       }
       break;
     case DIFFICULTY.MEDIUM:
-      return "Not Implement";
+      problemTitle = "จงทำเลขยกกำลังต่อไปนี้ให้เป็นรูปอย่างง่าย";
+      termNum = randInt(3, 4);
+      // opt = randInt(1, 4);
+      opt = 1;
+      switch (opt) {
+        case 1: //49*7^[2]
+          base = randInt(2, 25, true); //random (+-)[2,25]
+          positiveBase = Math.abs(base);
+          [{ randList, termNum }] = diverse(termNum);
+          degreeList = [];
+          baseList = [];
+          solution = "";
+          problemBody = "";
+          temp = "";
+          for (i = 0; i < termNum; i++) {
+            if (randList[i]) {
+              if(1 <= positiveBase && positiveBase <= 7) {
+                degree = randInt(2, 4);
+              } else if (7 < positiveBase && positiveBase <= 11) {
+                degree = randInt(2, 3);
+              } else if (11 < positiveBase) {
+                degree = 2;
+              }
+            } else {
+              degree = randInt(0, 10, true); // (+,-)[0,50]
+            }
+            degreeList.push(degree);
+            baseList.push(base);
+            // degreeSum += degree;
+            if (randList[i]) {
+              problemBody += multipleConcat(base ** degree, 1, i);
+            } else problemBody += multipleConcat(base, degree, i);
+
+            temp += multipleConcat(base, degree, i);
+          }
+          [{ solution, solutionList }] = genSolution(baseList, degreeList);
+          solution = problemBody + "\n" + temp + "\n" + solution;
+          answerBody = solutionList[solutionList.length-1];
+          hintBody = `ลองเปลี่ยนเลขธรรมดาให้เป็นเลขยกกำลังที่ฐานเท่ากับเลขยกกำลังตัวอื่นดูสิ`;
+          break;
+        case 2:
+          break;
+        case 3:
+          break;
+        case 4:
+          break;
+      }
       break;
     case DIFFICULTY.HARD:
       return "Not Implement";
@@ -97,7 +143,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
 // console.log(baseListOut)
 // console.log(degreeListOut)
 // console.log("...")
-generateOperationsOfExponents("การดำเนินการของเลขยกกำลัง", "EASY");
+generateOperationsOfExponents("การดำเนินการของเลขยกกำลัง", "MEDIUM");
 return 0;
 
 module.exports = { generateOperationsOfExponents };
