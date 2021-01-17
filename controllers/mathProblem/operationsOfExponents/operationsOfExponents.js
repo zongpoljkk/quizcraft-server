@@ -1,8 +1,9 @@
 const Problem = require("../../../models/Problem");
 const Answer = require("../../../models/Answer");
 const Hint = require("../../../models/Hint");
+const math = require("mathjs");
 const { randInt, shuffle, baseSelector } = require("../globalFunction");
-const { DIFFICULTY, ANSWER_TYPE, ALPHABET } = require("../../../utils/const");
+const { CHECK_ANSWER_TYPE, DIFFICULTY, ANSWER_TYPE, ALPHABET } = require("../../../utils/const");
 const {
   multipleConcat,
   genSolution,
@@ -10,7 +11,7 @@ const {
 } = require("./operationsOfExponentsFunction");
 
 const generateOperationsOfExponents = async (subtopicName, difficulty) => {
-  let problemTitle, problemBody, answerBody, hintBody, solution, answerType, answerForDisplay;
+  let problemTitle, problemBody, answerBody, hintBody, solution, answerType, answerForDisplay, checkAnswerType;
   let expo, num, rand, positiveBase, opt;
   let problem, problemId, answer, hint, newProblem, newAnswer, newHint;
   let i, temp;
@@ -37,6 +38,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           [{ solution, solutionList }] = genSolution(baseList, degreeList);
           solution = problemBody + "\n" + solution;
           answerBody = solutionList[solutionList.length - 1];
+          answerForDisplay = answerBody;
           answerType = ANSWER_TYPE.MATH_INPUT;
           //create hint
           hintBody = `a^[m]*a^[n] = a^[(m+n)] | สมบัติการคูณของเลขยกกำลัง`;
@@ -50,6 +52,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
               : `(${base}^[${degreeList[0]}])/(${base}^[${degreeList[1]}])`;
           [{ solution, solutionList }] = genSolution([base], [degreeList[0]], [base], [degreeList[1]]);
           answerBody = solutionList[solutionList.length - 1];
+          answerForDisplay = answerBody;
           answerType = ANSWER_TYPE.MATH_INPUT;
           //create hint
           hintBody = `(a^[m])/(a^[n]) = a^[(m-n)] เมื่อ a ไม่เท่ากับ 0 | สมบัติการหารของเลขยกกำลัง`;
@@ -62,6 +65,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           answerType = ANSWER_TYPE.MATH_INPUT;
           problemBody = expo;
           answerBody = 1;
+          answerForDisplay = answerBody;
           hintBody = `a^[0] = 1 เมื่อ a ไม่เท่ากับ 0`;
           break;
         case 4: //3^[-2] = 1/(3^[2]) or 1/9
@@ -71,15 +75,17 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           answerType = ANSWER_TYPE.MATH_INPUT;
           problemBody = base < 0? `(${base})^[${degree}` : `${base}^[${degree}]`;
           answerBody = base < 0? `1/((${base})^[${-degree}])` : `1/(${base}^[${-degree}])`;
+          answerForDisplay = answerBody;
           hintBody = `a^[-n] = 1/(a^[n])`;
           break;
       }
       break;
     case DIFFICULTY.MEDIUM:
       problemTitle = "จงทำเลขยกกำลังต่อไปนี้ให้เป็นรูปอย่างง่าย";
+      problemBody = "";
       termNum = randInt(3, 4);
       // opt = randInt(1, 4);
-      opt = 1;
+      opt = 2;
       switch (opt) {
         case 1: //49*7^[2]
           base = randInt(2, 25, true); //random (+-)[2,25]
@@ -88,7 +94,6 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           degreeList = [];
           baseList = [];
           solution = "";
-          problemBody = "";
           temp = "";
           for (i = 0; i < termNum; i++) {
             if (randList[i]) {
@@ -112,11 +117,45 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           }
           [{ solution, solutionList }] = genSolution(baseList, degreeList);
           solution = problemBody + "\n" + temp + "\n" + solution;
+          
+          // create answer
           answerType = ANSWER_TYPE.MATH_INPUT;
           answerBody = solutionList[solutionList.length-1];
+          answerForDisplay = answerBody;
+          checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
+          
+          // create hint
           hintBody = `ลองเปลี่ยนเลขธรรมดาให้เป็นเลขยกกำลังที่ฐานเท่ากับเลขยกกำลังตัวอื่นดูสิ`;
           break;
-        case 2:
+        case 2: //(1/2)^2*(0.5)^[3]
+          let bList = [2, 4, 5, 10, 20, 25, 50, 100];
+          let b = bList[randInt(0,bList.length-1)];
+          let a = randInt(1, 99, true); //random (+-)[1,99]
+          let fraction = `(${a}/${b})`;
+          let decimal = math.divide(math.bignumber(a),math.bignumber(b));
+
+          [{ randList, termNum }] = diverse(termNum);
+          temp = "";
+          degreeList = [];
+          baseList = Array.from({ length: termNum }, () => decimal);
+          for (i = 0; i < termNum; i++) {
+            base = randList[i] ? fraction : decimal;
+            degree = randInt(0, 10, true);
+            degreeList.push(degree);
+            problemBody += multipleConcat(base, degree, i);
+            temp += multipleConcat(decimal, degree, i);
+          }
+          [{ solution, solutionList }] = genSolution(baseList, degreeList);
+          solution = problemBody + "\n" + temp + "\n" + solution;
+          
+          //create answer
+          answerType = ANSWER_TYPE.MATH_INPUT;
+          answerBody = solutionList[solutionList.length-1];
+          answerForDisplay = answerBody;
+          checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
+          
+          //create hint
+          hintBody = `ถ้าสังเกตดี ๆ จะเห็นว่าฐานเท่ากันนะ,\na^[m]*a^[n] = a^[(m+n)] | สมบัติการคูณของเลขยกกำลัง`;
           break;
         case 3:
           break;
@@ -134,6 +173,10 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
   console.log("answerBody", answerBody);
   console.log("solution", solution);
   console.log("hintBody", hintBody);
+  console.log("answerForDisplay", answerForDisplay);
+  console.log("checkAnswerType", checkAnswerType);
+  console.log("answerType", answerType);
+  console.log("choices", choices);
   console.log("---------------------------------------------");
 };
 
