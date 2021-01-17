@@ -103,6 +103,9 @@ exports.useSkipItemForChallenge = async (req,res) => {
     }
     
     var problem = await Problem.findOne({ _id: problemId });
+    if (!problem) {
+      return res.status(400).json({ success: false, error: "problem not founded" });
+    }
     foundUsedItem = false;
     for (i in problem.usedItems) {
       if (problem.usedItems[i].itemName = ITEM_NAME.SKIP) {
@@ -131,7 +134,6 @@ exports.useSkipItemForChallenge = async (req,res) => {
 exports.useSkipItemForQuiz = async (req,res) => {
   try {
     const userId = req.userId;
-    const difficulty = req.body.difficulty;
     const problemId = req.body.problemId;
     var user = await User.findOne(
       { _id: userId }, 
@@ -148,10 +150,29 @@ exports.useSkipItemForQuiz = async (req,res) => {
     if (!skipItem || skipItem.amount <= 0) {
       return res.status(400).json({ success: false, error: "User does not has skip item" });
     }
+    
+    var problem = await Problem.findOne({ _id: problemId });
+    if (!problem) {
+      return res.status(400).json({ success: false, error: "problem not founded" });
+    }
+    let foundUsedItem = false;
+    for (i in problem.usedItems) {
+      if (problem.usedItems[i].itemName = ITEM_NAME.SKIP) {
+        problem.usedItems[i].amount++;
+        foundUsedItem = true;
+        break;
+      }
+    }
+    if (!foundUsedItem) {
+      problem.usedItems.push({
+        itemName: ITEM_NAME.SKIP,
+        amount: 1
+      })
+    }
 
     // * Handle used item * //
     user.items[indexOfSkipItem].amount -= 1;
-    let foundUsedItem = false;
+    foundUsedItem = false;
     for (i in user.usedItems) {
       if (user.usedItems[i].itemName = ITEM_NAME.SKIP) {
         user.usedItems[i].problems.push(problemId);
@@ -167,11 +188,13 @@ exports.useSkipItemForQuiz = async (req,res) => {
         problems: problemId
       })
     }
+
     let levelUp, rankUp, earnedCoins, earnedExp;
-    [{ user, levelUp, rankUp, earnedCoins, earnedExp }] = await updateCoinAndExp(user, GAME_MODE.QUIZ, difficulty);
+    [{ user, levelUp, rankUp, earnedCoins, earnedExp }] = await updateCoinAndExp(user, GAME_MODE.QUIZ, problem.difficulty);
 
     //save to database
     await user.save();
+    await problem.save();
     return res.status(200).json({ success: true, data: { levelUp, rankUp, earnedCoins, earnedExp } }); 
   } catch (err) {
     return res.status(500).json({ success: false, error: err.toString() });
