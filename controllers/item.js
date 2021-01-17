@@ -1,6 +1,7 @@
 const Item = require("../models/Item");
 const User = require("../models/User");
 const Challenge = require("../models/Challenge");
+const Problem = require("../models/Problem");
 const { GAME_MODE, ITEM_NAME } = require("../utils/const");
 const { updateCoinAndExp } = require("./user");
 const { NUMBER_OF_PROBLEM } = require("../utils/challenge");
@@ -56,12 +57,14 @@ exports.useSkipItemForChallenge = async (req,res) => {
     var challenge = await Challenge.findOne({ _id: challengeId, $or: [{ user1Id: userId }, { user2Id: userId }] });
     if (!challenge) return res.status(400).json({ success: false, error: "Challenge not exist" });
 
+    const problemId = challenge.problems[problemIndex];
+
     // * Handle used item * //
     user.items[indexOfSkipItem].amount -= 1;
     let foundUsedItem = false;
     for (i in user.usedItems) {
       if (user.usedItems[i].itemName = ITEM_NAME.SKIP) {
-        user.usedItems[i].problems.push(challenge.problems[problemIndex]);
+        user.usedItems[i].problems.push(problemId);
         user.usedItems[i].amount++;
         foundUsedItem = true;
         break;
@@ -71,7 +74,7 @@ exports.useSkipItemForChallenge = async (req,res) => {
       user.usedItems.push({
         itemName: ITEM_NAME.SKIP,
         amount: 1,
-        problems: challenge.problems[problemIndex]
+        problems: problemId
       })
     }
 
@@ -99,9 +102,26 @@ exports.useSkipItemForChallenge = async (req,res) => {
       challenge.user2GainExp += earnedExp;
     }
     
+    var problem = await Problem.findOne({ _id: problemId });
+    foundUsedItem = false;
+    for (i in problem.usedItems) {
+      if (problem.usedItems[i].itemName = ITEM_NAME.SKIP) {
+        problem.usedItems[i].amount++;
+        foundUsedItem = true;
+        break;
+      }
+    }
+    if (!foundUsedItem) {
+      problem.usedItems.push({
+        itemName: ITEM_NAME.SKIP,
+        amount: 1
+      })
+    }
+
     //save to database
     await challenge.save();
     await user.save();
+    await problem.save();
     return res.status(200).json({ success: true, data: { levelUp, rankUp, earnedCoins, earnedExp  } });    
   } catch (err) {
     return res.status(500).json({ success: false, error: err.toString() });
