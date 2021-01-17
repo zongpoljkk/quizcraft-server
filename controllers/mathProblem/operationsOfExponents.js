@@ -258,10 +258,10 @@ const genSolutionSubtopic2 = (baseList, degreeList, baseList2, degreeList2) => {
 const generateOperationsOfExponents = async (subtopicName, difficulty) => {
   var termNum = randInt(2, 5, false); //random 2-5
   var problemBody = "", problemTitle = "จงทำเลขยกกำลังต่อไปนี้ให้เป็นรูปอย่างง่าย";
-  var answerBody;
+  var answerBody,answerForDisplay;
   var hintBody;
-  var solution = "",
-    solutionButtom = "";
+  var solution = "";
+  var solutionButtom = "";
   var base, degree, randList, baseList, degreeList;
   var baseList2, degreeList2;
   var degreeSum = 0;
@@ -307,15 +307,15 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
         degreeSum -= degreeSum2;
       }
       // create answer
-      answerBody =
-        base < 0 ? `(${base})^[${degreeSum}]` : `${base}^[${degreeSum}]`;
+      answerBody = base < 0 ? `(${base})^[${degreeSum}]` : `${base}^[${degreeSum}]`;
+      answerForDisplay = answerBody;
       solution += `\n${answerBody}`;
 
       //create hint
       hintBody = `a^m*a^n = a^(m+n) | สมบัติการคูณของเลขยกกำลัง`;
-      if (isDivided)
+      if (isDivided) {
         hintBody += `\n(a^m)/(a^n) = a^(m-n) | สมบัติการหารของเลขยกกำลัง`;
-
+      }
       //create model
       problem = new Problem({
         body: problemBody,
@@ -329,6 +329,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
         problemId: problemId,
         body: answerBody,
         solution: solution,
+        answerForDisplay: answerForDisplay,
       });
       hint = new Hint({ problemId: problemId, body: hintBody });
       //save to database
@@ -417,8 +418,8 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           }
 
           // create answer
-          answerBody =
-            base < 0 ? `(${base})^[${degreeSum}]` : `${base}^[${degreeSum}]`;
+          answerBody = base < 0 ? `(${base})^[${degreeSum}]` : `${base}^[${degreeSum}]`;
+          answerForDisplay = answerBody;
           solution += `\n${answerBody}`;
 
           //create hint
@@ -495,14 +496,15 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
                 : `\n${base}^${plusDegreeString(degreeList)}`;
           }
           // create answer
-          answerBody =
-            base < 0 ? `(${base})^[${degreeOut}]` : `${base}^[${degreeOut}]`;
+          answerBody = base < 0 ? `(${base})^[${degreeOut}]` : `${base}^[${degreeOut}]`;
+          answerForDisplay = answerBody;
           solution += `\n${answerBody}`;
 
           //create hint
           hintBody = `ถ้าสังเกตดี ๆ เศษส่วนกับทศนิยมเท่ากันนะ\na^m*a^n = a^(m+n) | สมบัติการคูณของเลขยกกำลัง`;
-          if (isDivided)
+          if (isDivided) {
             hintBody += `\n(a^m)/(a^n) = a^(m-n) | สมบัติการหารของเลขยกกำลัง`;
+          }
           break;
 
         case 3: // (-3)^2*(3)^2
@@ -576,6 +578,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           answerBody = isLessThanZero
             ? `-${base1}^[${degreeSum}]`
             : `${base1}^[${degreeSum}]`;
+          answerForDisplay = answerBody;
           solution += `\n${answerBody}`;
 
           //create hint
@@ -598,6 +601,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
         problemId: problemId,
         body: answerBody,
         solution: solution,
+        answerForDisplay: answerForDisplay,
       });
       hint = new Hint({ problemId: problemId, body: hintBody });
       //save to database
