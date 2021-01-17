@@ -315,3 +315,15 @@ exports.addProblemAnswerHint = async (req, res, next) => {
     return res.status(500).json({ success: false, error: err });
   }
 };
+
+exports.getProblemAnswerHint = async (req, res) => {
+  const problemId = req.query.problemId;
+  try {
+    const problem = await Problem.findById(problemId);
+    const answer = await Answer.findOne({ problemId: problemId });
+    const hint = await Hint.findOne({ problemId: problemId });
+    return res.status(200).json({ success: true, data: { problem, answer, hint } });
+  } catch {
+    return res.status(500).json({ success: false, error: err.toString() });
+  }
+}
