@@ -232,7 +232,7 @@ exports.getProblemForUser = async (req, res, next) => {
             answer = await Answer.findOne({ problemId: problem._id });
             return res.status(200).json({
               success: true,
-              data: { problem, correctAnswer: answer.body },
+              data: { problem, correctAnswer: answer.answerForDisplay },
             });
           } else {
             return res.status(200).json({ success: true, data: { problem } });
@@ -282,7 +282,7 @@ exports.getProblemForUser = async (req, res, next) => {
       answer = await Answer.findOne({ problemId: problem._id });
       return res
         .status(200)
-        .json({ success: true, data: { problem, correctAnswer: answer.body } });
+        .json({ success: true, data: { problem, correctAnswer: answer.answerForDisplay } });
     } else {
       return res.status(200).json({ success: true, data: { problem } });
     }
