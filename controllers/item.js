@@ -221,9 +221,28 @@ exports.useRefreshItem = async (req,res) => {
       return res.status(400).json({ success: false, error: "User does not has refresh item" });
     }
     
+    var problem = await Problem.findOne({ _id: problemId });
+    if (!problem) {
+      return res.status(400).json({ success: false, error: "problem not founded" });
+    }
+    let foundUsedItem = false;
+    for (i in problem.usedItems) {
+      if (problem.usedItems[i].itemName = ITEM_NAME.SKIP) {
+        problem.usedItems[i].amount++;
+        foundUsedItem = true;
+        break;
+      }
+    }
+    if (!foundUsedItem) {
+      problem.usedItems.push({
+        itemName: ITEM_NAME.SKIP,
+        amount: 1
+      })
+    }
+
     // * Handle used item * //
     user.items[indexOfRefreshItem].amount -= 1;
-    let foundUsedItem = false;
+    foundUsedItem = false;
     for (i in user.usedItems) {
       if (user.usedItems[i].itemName = ITEM_NAME.REFRESH) {
         user.usedItems[i].problems.push(problemId);
@@ -242,6 +261,7 @@ exports.useRefreshItem = async (req,res) => {
   
     //save to database
     await user.save();
+    await problem.save();
     return res.status(200).json({ success: true, data: user.items[indexOfRefreshItem] }); 
   } catch (err) {
     return res.status(500).json({ success: false, error: err.toString() });
