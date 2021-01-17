@@ -1,3 +1,6 @@
+const { ALPHABET } = require("../../../utils/const");
+const { randInt } = require("../globalFunction");
+
 const multipleConcat = (base, degree, i) => {
   if (i == 0) {
     if (base < 0) {
@@ -254,6 +257,28 @@ const diverse = (termNum) => {
   return [{ randList, termNum }];
 };
 
+const baseSelectorNoInt = () => {
+  let rand = randInt(1,3); //choose base
+  let a, b, c;
+  switch (rand) {
+    case 1: //float
+      a =
+        (Math.random() * 9 + 1.01).toFixed(2) *
+        (-1) ** Math.floor(Math.random() * 2); //random (+-)[1.01,10.00)
+      break;
+    case 2: //fraction
+      b = randInt(1, 10, true); //random (+-)[1,10]
+      c = randInt(2, 10, false); //random [2,10]
+      c = c == b ? c + 1 : c;
+      a = `(${b}/${c})`;
+      break;
+    case 3: //alphabet
+      a = ALPHABET[randInt(0,ALPHABET.length-1)];
+      break;
+  }
+  return a;
+};
+
 module.exports = { 
   multipleConcat, 
   multipleExponentialString, 
@@ -261,4 +286,5 @@ module.exports = {
   minusDegreeString,
   genSolution,
   diverse,
+  baseSelectorNoInt,
 };
