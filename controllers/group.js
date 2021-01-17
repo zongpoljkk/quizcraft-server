@@ -236,3 +236,119 @@ exports.getGroupScoreboard = async (req, res) => {
     }
   );
 };
+
+exports.joinGroup = async (req, res) => {
+  const body = req.body;
+  if (!body) {
+    return res.status(400).json({
+      success: false,
+      error: "You must provide a body to update",
+    });
+  }
+
+  var user = await User.findById(body.userId);
+
+  Group.findOneAndUpdate(
+    {
+      pin: body.pin
+    },
+    { $addToSet: { members: { userId: body.userId, username: user.username } } },
+    { new: true },
+    (err, group) => {
+      if (err) {
+        return res.status(500).json({ success: false, error: err });
+      }
+      if (!group) {
+        return res.status(400).json({ success: false, error: "no data" });
+      }
+      return res.status(200).json({ success: true, data: { groupId: group._id } });
+    }
+  );
+};
+
+exports.getGroupGame = async (req, res) => {
+  const groupId = req.query.groupId;
+  const userId = req.query.userId;
+  try {
+    var group = await Group.aggregate([
+      {
+        $match: {
+          _id: ObjectId(groupId)
+        },
+      },
+      {
+        $addFields: {
+          problemId: { $arrayElemAt: [ "$problems" , "$currentIndex" ] }
+        }
+      },
+      {
+        $lookup: {
+          from: "problems",
+          localField: "problemId",
+          foreignField: "_id",
+          as: "problem",
+        },
+      },
+      { $unwind: "$problem" },
+      {
+        $lookup: {
+          from: "answers",
+          localField: "problemId",
+          foreignField: "problemId",
+          as: "answer",
+        },
+      },
+      { $unwind: "$answer" },
+      {
+        $project: {
+          _id: 1,
+          currentIndex: 1,
+          numberOfProblem: 1,
+          timePerProblem: 1,
+          user: {
+            $filter: {
+              input: "$members",
+              as: "member",
+              cond: { $eq: [ "$$member.userId", ObjectId(userId) ] }
+            }
+          },
+          problem: {
+            _id: 1,
+            choices: 1,
+            body: 1,
+            answerType: 1,
+            title: 1
+          },
+          answer: {
+            body: 1
+          }
+        }
+      },
+    ]);
+
+    group = group[0];
+    var groupGame = {
+      _id: group._id,
+      currentIndex: group.currentIndex,
+      numberOfProblem: group.numberOfProblem,
+      timePerProblem: parseFloat(group.timePerProblem),
+      user: group.user[0],
+      problem: {
+        _id: group.problem._id,
+        choices: group.problem.choices,
+        body: group.problem.body,
+        answerType: group.problem.answerType,
+        title: group.problem.title,
+        correctAnswer: group.answer.body
+      }
+    };
+    return res.status(200).json({ success: true, data: groupGame });
+  } catch (err) {
+    if (!group)
+      return res.status(400).json({ success: false, error: "Cannot find this group" });
+    else if (err)
+      return res.status(500).json({ success: false, error: err.toString() });
+    else
+      return res.status(400).json({ succes: false, error: "Something went wrong" });
+  };
+};
