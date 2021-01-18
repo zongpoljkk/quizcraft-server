@@ -13,7 +13,7 @@ const {
 
 const generateOperationsOfExponents = async (subtopicName, difficulty) => {
   let problemTitle, problemBody, answerBody, hintBody, solution, answerType, answerForDisplay, checkAnswerType;
-  let expo, num, rand, positiveBase, opt;
+  let expo, num, rand, positiveBase, opt,top,buttom;
   let problem, problemId, answer, hint, newProblem, newAnswer, newHint;
   let i, temp, allPos;
   let expoList, numList, choices, solutionList;
@@ -98,11 +98,11 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
     case DIFFICULTY.MEDIUM:
       problemTitle = "จงทำเลขยกกำลังต่อไปนี้ให้เป็นรูปอย่างง่าย";
       problemBody = "";
-      termNum = randInt(3, 4);
-      // opt = randInt(1, 4);
-      opt = 4;
+      // opt = randInt(1, 5);
+      opt = 5;
       switch (opt) {
         case 1: //49*7^[2]
+          termNum = randInt(3, 4);
           base = randInt(2, 25, true); //random (+-)[2,25]
           positiveBase = Math.abs(base);
           [{ randList, termNum }] = diverse(termNum);
@@ -148,7 +148,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           let a = randInt(1, 99, true); //random (+-)[1,99]
           let fraction = `(${a}/${b})`;
           let decimal = math.divide(math.bignumber(a),math.bignumber(b));
-
+          termNum = randInt(3, 4);
           [{ randList, termNum }] = diverse(termNum);
           temp = "";
           degreeList = [];
@@ -209,6 +209,42 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           hintBody = `(a^[m])/(a^[n]) = a^[(m-n)] เมื่อ a ไม่เท่ากับ 0 | สมบัติการหารของเลขยกกำลัง`;
           break;
         case 5:
+          problemTitle = "จงหาค่าของเลขยกกำลงต่อไปนี้";
+          termNum = randInt(2, 3);
+          base = baseSelector();
+          baseList = [];
+          degreeList = [];
+          degreeSum = 0;
+          buttom = "";
+          for (i=0; i<termNum; i++) {
+            degree = randInt(2,10);
+            degreeSum += degree;
+            degreeList.push(degree);
+            baseList.push(base);
+            problemBody += multipleConcat(base, degree, i);
+          }
+          termNum = randInt(1, 2);
+          if (termNum == 1) {
+            baseList2 = [base];
+            degreeList2 = [degreeSum];
+            buttom += multipleConcat(base, degreeSum, 0);
+          } else if (termNum == 2) {
+            temp = randInt(1,degreeSum-1);
+            baseList2 = [base,base];
+            degreeList2 = [temp,degreeSum-temp];
+            buttom += multipleConcat(base, temp, 0);
+            buttom += multipleConcat(base, degreeSum-temp, 1);
+          }
+          problemBody = `(${problemBody})/(${buttom})`;
+          [{ solution, solutionList }] = genSolution(baseList, degreeList, baseList2, degreeList2);
+          answerBody = 1;
+          answerForDisplay = answerBody;
+          answerType = ANSWER_TYPE.MATH_INPUT;
+          checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
+          solution = problemBody + "\n" + solution + "\n1";
+          hintBody = `a^[m]*a^[n] = a^[(m+n)] | สมบัติการคูณของเลขยกกำลัง`;
+          hintBody += `\n(a^[m])/(a^[n]) = a^[(m-n)] เมื่อ a ไม่เท่ากับ 0 | สมบัติการหารของเลขยกกำลัง`
+
           break;
       }
       break;
