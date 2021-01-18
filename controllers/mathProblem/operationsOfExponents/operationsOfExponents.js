@@ -172,7 +172,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           //create hint
           hintBody = `ถ้าสังเกตดี ๆ จะเห็นว่าฐานเท่ากันนะ,\na^[m]*a^[n] = a^[(m+n)] | สมบัติการคูณของเลขยกกำลัง`;
           break;
-        case 3: //similar to easy but harder and base is not int
+        case 3: //similar to easy but harder and base is not int -> multiply
           termNum = randInt(2, 4);
           baseList = [];
           degreeList = [];
@@ -193,7 +193,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           //create hint
           hintBody = `a^[m]*a^[n] = a^[(m+n)] | สมบัติการคูณของเลขยกกำลัง`;
           break;
-        case 4:
+        case 4: //similar to easy but harder and base is not int -> divided
           base = baseSelectorNoInt();
           degreeList = Array.from({ length: 2 }, () => randInt(1, 5, true));
           problemBody =
