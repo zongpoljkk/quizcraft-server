@@ -188,7 +188,6 @@ exports.getProblemByChallengeId = (req, res) => {
 
         // ? Handle user lost connection by skip user's current problem and mark as incorrect  ? //
         if (challenge.currentProblem === NUMBER_OF_PROBLEM) {
-          console.log("===");
           challenge.whoTurn === 1
             ? (challenge.user1IsRead = false)
             : (challenge.user2IsRead = false);
@@ -197,7 +196,6 @@ exports.getProblemByChallengeId = (req, res) => {
             : (challenge.whoTurn = 1);
           challenge.currentProblem = 0;
         } else if (challenge.currentProblem < NUMBER_OF_PROBLEM) {
-          console.log("< NUM");
           challenge.currentProblem++;
           if (challenge.whoTurn === 1) {
             // challenge.user1Result.push(0);
