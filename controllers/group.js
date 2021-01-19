@@ -320,9 +320,7 @@ exports.getGroupGame = async (req, res) => {
             answerType: 1,
             title: 1
           },
-          answer: {
-            body: 1
-          }
+          answer: 1
         }
       },
     ]);
@@ -340,7 +338,7 @@ exports.getGroupGame = async (req, res) => {
         body: group.problem.body,
         answerType: group.problem.answerType,
         title: group.problem.title,
-        correctAnswer: group.answer.body
+        correctAnswer: group.answer.answerForDisplay
       }
     };
     return res.status(200).json({ success: true, data: groupGame });
