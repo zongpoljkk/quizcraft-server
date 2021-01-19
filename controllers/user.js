@@ -48,8 +48,16 @@ exports.getProfileByUID = async (req, res) => {
         },
       },
       {
+        $lookup: {
+          from: "media.chunks",
+          localField: "fromItems.image.id",
+          foreignField: "files_id",
+          as: "itemImages",
+        },
+      },
+      {
         $addFields: {
-          itemInfos: {
+          itemInfoWithoutImgs: {
             $map: {
               input: "$items",
               as: "item",
@@ -80,11 +88,73 @@ exports.getProfileByUID = async (req, res) => {
           fromItems: 0,
           achievements: 0,
           __v: 0,
-          "itemInfos.name": 0,
-          "itemInfos.price": 0,
-          "itemInfos.description": 0,
-          "itemInfos.__v": 0,
+          "itemInfoWithoutImgs.name": 0,
+          "itemInfoWithoutImgs.price": 0,
+          "itemInfoWithoutImgs.description": 0,
+          "itemInfoWithoutImgs.__v": 0,
+          "itemInfoWithoutImgs._id": 0,
+          "itemInfoWithoutImgs.lottie": 0,
+        },
+      },
+      {$unwind: "$itemInfoWithoutImgs"},
+      {$unwind: "$itemInfoWithoutImgs.image"},
+      {
+        $group: {
+          _id: "$_id",
+          school: { $first: "$school" },
+          class: { $first: "$class" },
+          rank: { $first: "$rank" },
+          coin: { $first: "$coin" },
+          photo: { $first: "$photo" },
+          streak: { $first: "$streak" },
+          role: { $first: "$role" },
+          firstname: { $first: "$firstname" },
+          lastname: { $first: "$lastname" },
+          smartSchoolAccount: { $first: "$smartSchoolAccount" },
+          username: { $first: "$username" },
+          lastLogin: { $first: "$lastLogin" },
+          exp: { $first: "$exp" },
+          level: { $first: "$level" },
+          maxExp: { $first: "$maxExp" },
+          itemInfoWithoutImgs: { $push: "$itemInfoWithoutImgs" },
+          itemImages: { $first: "$itemImages"}
+        },
+      },
+      {
+        $addFields: {
+          itemInfos: {
+            $map: {
+              input: "$itemInfoWithoutImgs",
+              as: "item",
+              in: {
+                $mergeObjects: [
+                  "$$item",
+                  {
+                    $arrayElemAt: [
+                      {
+                        $filter: {
+                          input: "$itemImages",
+                          as: "image",
+                          cond: { $eq: ["$$image.files_id", "$$item.image.id"] },
+                        },
+                      },
+                      0,
+                    ],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          itemInfoWithoutImgs: 0,
+          itemImages: 0,
+          "itemInfos.image": 0,
           "itemInfos._id": 0,
+          "itemInfos.files_id": 0,
+          "itemInfos.n": 0
         },
       },
     ],
