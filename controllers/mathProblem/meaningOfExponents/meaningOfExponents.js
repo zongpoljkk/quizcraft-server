@@ -251,6 +251,9 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           } else {
             n = 2;
           }
+          if (a < 0 && n % 2 == 0) {
+            a = -a;
+          }
           expo = a<0? `(${a})^[${n}]` : `${a}^[${n}]`;
           num = math.pow(math.bignumber(a),math.bignumber(n));
           problemBody = num;
