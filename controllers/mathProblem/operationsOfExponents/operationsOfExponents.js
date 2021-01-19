@@ -21,11 +21,11 @@ const { PROPERTY_EXPO, PROBLEM_TITLE } = require("./const");
 const generateOperationsOfExponents = async (subtopicName, difficulty) => {
   let problemTitle, problemBody, answerBody, hintBody;
   let solution, answerType, answerForDisplay, checkAnswerType;
-  let expo, num, rand, positiveBase, opt, top, buttom;
+  let expo, positiveBase, opt, buttom;
   let problem, problemId, answer, hint, newProblem, newAnswer, newHint;
-  let i, temp, allPos, degreeSum, degreeSum2;
-  let expoList, numList, choices, solutionList;
-  let base, degree, randList, baseList, degreeList, termNum, degreeListOut;
+  let i, temp, temp2, allPos, degreeSum, degreeSum2;
+  let choices, solutionList;
+  let base, degree, randList, baseList, degreeList, termNum;
   let base1, base2, isLessThanZero, isDivided;
   switch (difficulty) {
     case DIFFICULTY.EASY:
@@ -447,7 +447,6 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
             randList.push(randInt(0, 2));
           }
           randList = await shuffle(randList);
-          console.log(randList);
           degreeSum = 0;
           for (i = 0; i < termNum; i++) {
             if (randList[i] == 1) {
@@ -492,17 +491,87 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
               temp += multipleConcat(base1, degree, i);
             }
           }
-          console.log(baseList);
-          console.log(degreeList);
+
+          if (isDivided) {
+            termNum = randInt(1, 3);
+            randList = [];
+            while (randList.length < termNum) {
+              randList.push(randInt(0, 2));
+            }
+            degreeList2 = [];
+            baseList2 = [];
+            degreeSum2 = 0;
+            buttom = "";
+            temp2 = "";
+            for (i = 0; i < termNum; i++) {
+              if (randList[i] == 1) {
+                //-5 base2
+                degree = randInt(1, 15, true);
+                degreeList2.push(degree);
+                baseList2.push(base2);
+                degreeSum2 += degree;
+                buttom += multipleConcat(base2, degree, i);
+                temp2 += multipleConcat(base2, degree, i);
+                if (degree % 2 != 0) {
+                  //พจน์นี้ติดลบ
+                  isLessThanZero = isLessThanZero ? 0 : 1;
+                }
+              } else if (randList[i] == 2) {
+                //25
+                if (1 <= base1 && base1 <= 7) {
+                  degree = randInt(2, 4);
+                } else if (7 < base1 && base1 <= 11) {
+                  degree = randInt(2, 3);
+                } else if (11 < base1) {
+                  degree = 2;
+                }
+                if (degree % 2 != 0) {
+                  base = base2;
+                  isLessThanZero = isLessThanZero ? 0 : 1;
+                } else {
+                  base = base1;
+                }
+                degreeList2.push(degree);
+                baseList2.push(base);
+                degreeSum2 += degree;
+                buttom += multipleConcat(base ** degree, 1, i);
+                temp2 += multipleConcat(base, degree, i);
+              } else {
+                //5
+                degree = randInt(1, 15, true);
+                degreeList2.push(degree);
+                baseList2.push(base1);
+                degreeSum2 += degree;
+                buttom += multipleConcat(base1, degree, i);
+                temp2 += multipleConcat(base1, degree, i);
+              }
+            }
+            problemBody = `(${problemBody})/(${buttom})`;
+            temp = `(${temp})/(${temp2})`;
+            degreeSum -= degreeSum2;
+          }
+
           solution = "";
-          [
-            {
-              solution,
-              solutionList,
-              baseListOut: baseList,
-              degreeListOut: degreeList,
-            },
-          ] = genSolution(baseList, degreeList);
+          if (isDivided) {
+            [
+              {
+                solution,
+                solutionList,
+                baseListOut: baseList,
+                degreeListOut: degreeList,
+              },
+            ] = genSolution(baseList, degreeList, baseList2, degreeList2);
+          } else {
+            [
+              {
+                solution,
+                solutionList,
+                baseListOut: baseList,
+                degreeListOut: degreeList,
+              },
+            ] = genSolution(baseList, degreeList);
+          }
+
           solution = problemBody + "\n" + temp + "\n" + solution;
           baseList.forEach((e, i) => {
             if (e < 0) {
@@ -515,6 +584,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
             }
           });
           solution += `\n${multipleExponentialString(baseList, degreeList)}`;
+          
           // create answer
           answerBody = isLessThanZero
             ? `-${base1}^[${degreeSum}]`
@@ -523,6 +593,13 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
           answerType = ANSWER_TYPE.MATH_INPUT;
           solution += `\n${answerBody}`;
+
+          // create hint 
+          hintBody = `ลองเปลี่ยนเลขธรรมดาให้เป็นเลขยกกำลังที่ฐานเท่ากับเลขยกกำลังตัวอื่นดูสิ`;
+          hintBody += `\nถ้าเลขติดลบยกกำลังด้วยเลขคู่จะกลายเป็นค่าบวก เช่น (-3)^[2] = 9 = 3^[2]`;
+          hintBody += `\nแต่ถ้าเลขติดลบยกกำลังด้วยเลขคี่จะกลายเป็นค่าลบ เช่น (-3)^[3] = -27 = -(3^[3])`;
+          hintBody += `\n${PROPERTY_EXPO.MULTIPLY}`;
+          if (isDivided) hintBody += `\n${PROPERTY_EXPO.DIVIDE}`;
           break;
       }
       break;
@@ -531,7 +608,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
   console.log("problemTitle", problemTitle);
   console.log("problemBody", problemBody);
   console.log("answerBody", answerBody);
-  console.log("solution", solution);
+  console.log("solution", `\n${solution}`);
   console.log("hintBody", hintBody);
   console.log("answerForDisplay", answerForDisplay);
   console.log("checkAnswerType", checkAnswerType);

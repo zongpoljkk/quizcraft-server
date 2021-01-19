@@ -186,7 +186,7 @@ const genSolution = (baseList, degreeList, baseList2, degreeList2) => {
             degreeListTemp.push(degree - degree2);
           }
         } else {
-          top += concat(base, i, degree);
+          top += multipleConcat(base, degree, i);
           if (!baseListTemp.includes(base)) {
             baseListTemp.push(base);
             degreeListTemp.push(degree);
@@ -206,7 +206,7 @@ const genSolution = (baseList, degreeList, baseList2, degreeList2) => {
             degreeListTemp.push(degree - degree2);
           }
         } else {
-          top += concat(base, i, degree);
+          top += multipleConcat(base, degree, i);
           if (!baseListTemp.includes(base)) {
             baseListTemp.push(base);
             degreeListTemp.push(degree);
@@ -218,7 +218,7 @@ const genSolution = (baseList, degreeList, baseList2, degreeList2) => {
       if (!e) {
         base = baseListButtom[i];
         degree = degreeListButtom[i];
-        top += concat(base, 1, degree * -1);
+        top += multipleConcat(base, degree * -1, 1);
         if (!baseListTemp.includes(base)) {
           baseListTemp.push(base);
           degreeListTemp.push(degree * -1);
