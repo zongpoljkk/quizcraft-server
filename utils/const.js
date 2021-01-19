@@ -16,3 +16,10 @@ exports.SUBJECT = {
   MATH: "คณิตศาสตร์",
   ENG: "ภาษาอังกฤษ"
 }
+
+exports.CHECK_ANSWER_TYPE = {
+  MATH_EVALUATE: "MATH_EVALUATE",
+  EQUAL_STRING: "EQUAL_STRING",
+  RULE_BASE: "RULE_BASE",
+  POWER_OVER_ONE: "POWER_OVER_ONE"
+}

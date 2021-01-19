@@ -4,14 +4,9 @@ const Hint = require("../../models/Hint");
 const math = require("mathjs");
 const { randInt, shuffle, baseSelector } = require("./globalFunction");
 const {
-  EASY,
-  MEDIUM,
-  HARD,
   alphabet,
-  SELECT_ONE,
-  RADIO_CHOICE,
-  MATH_INPUT
 } = require("./const");
+const { CHECK_ANSWER_TYPE, DIFFICULTY, ANSWER_TYPE } = require("../../utils/const");
 const { bignumber } = require("mathjs");
 
 const multiplicationTerm = async (a, n) => {
@@ -28,12 +23,12 @@ const multiplicationTerm = async (a, n) => {
 }
 
 const generateMeaningOfExponents = async (subtopicName, difficulty) => {
-  var problemTitle,problemBody,answerBody,hintBody,solution, answerType;
+  var problemTitle,problemBody,answerBody,hintBody,solution,answerType,answerForDisplay, checkAnswerType ;
   var expo, num,a ,n, rand, positiveBase, opt, selectedExpo, expoList, numList, choices;
   let problem, problemId, answer, hint, newProblem,newAnswer,newHint;
-  let i,temp;
+  let i,temp,primeList;
   switch (difficulty) {
-    case EASY:
+    case DIFFICULTY.EASY:
       opt = randInt(1,3);
       switch (opt) {
         case 1:  //3^[4] = 81
@@ -63,9 +58,12 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
             num = math.pow(math.bignumber(a),math.bignumber(n));
           }
           problemBody = `${expo}`;
+
+          //create answer
           answerBody = `${num}`;
-          answerType = randInt(0,1)? MATH_INPUT : RADIO_CHOICE;
-          if(answerType == RADIO_CHOICE) {
+          answerForDisplay = answerBody;
+          answerType = randInt(0,1)? ANSWER_TYPE.MATH_INPUT : ANSWER_TYPE.RADIO_CHOICE;
+          if(answerType == ANSWER_TYPE.RADIO_CHOICE) {
              //gen list of choices
             choices = [answerBody];
             temp = `${math.multiply(math.bignumber(a),math.bignumber(n))}`;
@@ -111,6 +109,8 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           } else if ((n == 1 && bool) || n == 1 && a<0) {
             solution += `\n${answerBody}`;
           }
+
+          //create hint
           hintBody = "a^[n] = a คูณกัน n ตัว\nเช่น 3^[4] = 3*3*3*3 --> 3 คูณกัน 4 ตัว";
           if (n == 0) hintBody += "\na^[0] = 1 เมื่อ a ไม่เท่ากับ 0 เช่น 3^[0] = 1";
           break;
@@ -124,12 +124,15 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           }
           n = randInt(2,7);
           problemBody = await multiplicationTerm(a,n);
+
+          //create answer
           answerBody = a<0? `(${a})^[${n}]` : `${a}^[${n}]`;
           if (rand) {
             [answerBody,problemBody] = [problemBody,answerBody];
           }
-          answerType = randInt(0,1)? MATH_INPUT : RADIO_CHOICE;
-          if(answerType == RADIO_CHOICE) {
+          answerForDisplay = answerBody;
+          answerType = randInt(0,1)? ANSWER_TYPE.MATH_INPUT : ANSWER_TYPE.RADIO_CHOICE;
+          if(answerType == ANSWER_TYPE.RADIO_CHOICE) {
             //gen list of choices
             choices = [answerBody];
             if (rand) {
@@ -167,6 +170,8 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
             }
             choices = await shuffle(choices);
           }
+
+          //create hint
           hintBody = rand? "a^[n] = a คูณกัน n ตัว\nเช่น 3^[4] = 3*3*3*3 --> 3 คูณกัน 4 ตัว" 
                     : "a*a*a = a^[3]\na คูณกันสามตัว เท่ากับ a ยกกำลัง 3";
           break;
@@ -176,88 +181,233 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           rand = randInt(0,1);
           problemTitle = rand? `จงบอก "ฐาน" ของเลขยกกำลังต่อไปนี้` : `จงบอก "เลขชี้กำลัง" ของเลขยกกำลังต่อไปนี้`;
           problemBody = a<0? `(${a})^[${n}]` : `${a}^[${n}]`;
+
+          //create answer
           answerBody = rand? `${a}` : `${n}`;
-          answerType = randInt(0,1)? MATH_INPUT : RADIO_CHOICE;
-          if (answerType = RADIO_CHOICE) {
+          answerForDisplay = answerBody;
+          answerType = randInt(0,1)? ANSWER_TYPE.MATH_INPUT : ANSWER_TYPE.RADIO_CHOICE;
+          if (answerType =  ANSWER_TYPE.RADIO_CHOICE) {
             choices = [a,n];
             choices = await shuffle(choices);
           }
+
+          //create hint
           hintBody = "จาก a^[n]\nจะได้ว่า a คือ ฐาน และ n คือ เลขชี้กำลัง";
           break;
       }
-      // create model
-      problem = new Problem({
-        body: problemBody,
-        subtopicName: subtopicName,
-        difficulty: difficulty,
-        answerType: answerType,
-        title: problemTitle,
-        choices: answerType == RADIO_CHOICE? choices : [],
-      });
-      problemId = problem._id;
-      answer = new Answer({
-        problemId: problemId,
-        body: answerBody,
-        solution: solution,
-      });
-      hint = new Hint({ problemId: problemId, body: hintBody });
+      break;
+    case DIFFICULTY.MEDIUM:
+      opt = randInt(1,3);
+      switch (opt) {
+        case 1:
+          problemTitle = "จงหาค่าของ x เมื่อ";
+          a = randInt(2,25,true);
+          positiveBase = Math.abs(a);
+          if (1 <= positiveBase && positiveBase <= 2) {
+            n = randInt(3,10);
+          } else if (2 < positiveBase && positiveBase <= 5) {
+            n = randInt(0,5);
+          } else if (5 < positiveBase && positiveBase <= 10) {
+            n = randInt(0,4);
+          } else if (10 < positiveBase && positiveBase <= 15) {
+            n = randInt(0,3);
+          } else {
+            n = randInt(0,2);
+          }
+          expo = a<0? `(${a})^[x]`: `${a}^[x]`;
+          num = math.pow(math.bignumber(a),math.bignumber(n));
+          problemBody = `${expo} = ${num}`;
 
-      // save to database
-      try {
-        newProblem = await problem.save();
-        newAnswer = await answer.save();
-        newHint = await hint.save();
-        return [{ problem:newProblem, answer:newAnswer, hint:newHint }];
-      } catch (err) {
-        console.log(err)
-        return err;
+          //create answer
+          answerBody = n;
+          answerForDisplay = n;
+          answerType = ANSWER_TYPE.MATH_INPUT;
+          break;
+        case 2:
+          problemTitle = "จงเขียนจำนวนต่อไปนี้ ให้อยู่ในรูปเลขยกกำลังที่มีฐานเป็นจำนวนเฉพาะ"
+          primeList = [2,3,5,7,11,13,17,19,23];
+          a = primeList[randInt(0,primeList.length-1)]*((-1) ** Math.floor(Math.random() * 2));
+          positiveBase = Math.abs(a);
+          if (2 <= positiveBase && positiveBase <= 3) { // 2 3
+            n = randInt(2,10);
+          } else if (3 < positiveBase && positiveBase <= 6) { // 5 
+            n = randInt(2,5);
+          } else if (6 < positiveBase && positiveBase <= 10) { // 7 
+            n = randInt(2,4);
+          } else if (10 < positiveBase && positiveBase <= 15) { // 11 13
+            n = randInt(2,3);
+          } else {
+            n = 2;
+          }
+          expo = a<0? `(${a})^[${n}]` : `${a}^[${n}]`;
+          num = math.pow(math.bignumber(a),math.bignumber(n));
+          problemBody = num;
+          
+          //create answer
+          answerBody = `${expo}`;
+          answerForDisplay = `${expo}`;
+          if (n%2 == 0) {
+            answerBody += a<0? `|${-a}^[${n}]` : `|(${-a})^[${n}]`;
+          }
+          answerType = ANSWER_TYPE.MATH_INPUT;
+          break;
+        case 3:
+          problemTitle = "จงเขียนจำนวนต่อไปนี้ให้อยู่ในรูปเลขยกกำลังที่มีเลขชี้กำลังมากกว่า 1";
+          a = randInt(2,25,true);
+          positiveBase = Math.abs(a);
+          if (positiveBase == 2) {
+            n = randInt(2,10);
+          } else if (2 < positiveBase && positiveBase <= 5) {
+            n = randInt(2,5);
+          } else if (5 < positiveBase && positiveBase <= 8) {
+            n = randInt(2,4);
+          } else if (8 < positiveBase && positiveBase <= 11) {
+            n = randInt(2,3);
+          } else {
+            n = 2;
+          }
+          expo = a<0? `(${a})^[${n}]` : `${a}^[${n}]`;
+          num = math.pow(math.bignumber(a),math.bignumber(n));
+          problemBody = num;
+          
+          //create answer
+          answerBody = `${expo}`;
+          answerForDisplay = `${expo}`;
+          checkAnswerType = CHECK_ANSWER_TYPE.POWER_OVER_ONE;
+          answerType = ANSWER_TYPE.MATH_INPUT;
+          break;
       }
-    case MEDIUM:
-      return "Not Implement";
-    case HARD:
-      //TODO
-      // problemTitle = "จงหาว่าเลขยกกำลังต่อไปนี้มีค่าเท่ากันหรือไม่"
-      // let indexList;
-      // a = randInt(1,500);
-      // n = randInt(0,15);
-      // indexList = [];
-      // expoList = []; 
-      // numList = [];
-      // expoList.push(`${a}^[${n}]`); // 3^[2]
-      // numList.push(1);
-      // expoList.push(`(-${a})^[${n}]`); //(-3)^[2]
-      // if (n % 2 == 0) {
-      //   numList.push(1);
-      // } else {
-      //   numList.push(-1)
-      // }
-      // expoList.push(`-${a}^[${n}]`); // -3^[2]
-      // numList.push(-1);
-      // selectedExpo = [];
-      // do {
-      //   rand = randInt(0,expoList.length-1);
-      //   expo = expoList[rand];
-      //   if (!selectedExpo.includes(expo)) {
-      //     selectedExpo.push(expo);
-      //     indexList.push(rand);
-      //   }
-      // } while (selectedExpo.length < 2);
+      break;
+    case DIFFICULTY.HARD:
+      // opt = randInt(1,3);
+      opt = 3;
+      switch (opt) {
+        case 1:
+          problemTitle = "จงหาว่าเลขยกกำลังต่อไปนี้มีค่าเท่ากันหรือไม่"
+          let indexList;
+          a = randInt(1,500);
+          n = randInt(0,15);
+          indexList = [];
+          expoList = []; 
+          numList = [];
+          expoList.push(`${a}^[${n}]`); // 3^[2]
+          numList.push(1);
+          expoList.push(`(-${a})^[${n}]`); //(-3)^[2]
+          if (n % 2 == 0) {
+            numList.push(1);
+          } else {
+            numList.push(-1)
+          }
+          expoList.push(`-${a}^[${n}]`); // -3^[2]
+          numList.push(-1);
+          selectedExpo = [];
+          do {
+            rand = randInt(0,expoList.length-1);
+            expo = expoList[rand];
+            if (!selectedExpo.includes(expo)) {
+              selectedExpo.push(expo);
+              indexList.push(rand);
+            }
+          } while (selectedExpo.length < 2);
 
-      // problemBody = `${selectedExpo[0]} และ ${selectedExpo[1]}`
-      // //create answer
-      // answerBody = numList[indexList[0]] == numList[indexList[1]] ? "เท่ากัน" : "ไม่เท่า";
-      // answerType = RADIO_CHOICE;
-      // choices = ["เท่ากัน","ไม่เท่า"]
-      // solution = `${selectedExpo[0]} มีค่าเป็น${numList[indexList[0]]==1? `บวก`:`ลบ`} `
-      //           + `${answerBody==`เท่ากัน`? `และ`:`ในขณะที่`} `
-      //           +`${selectedExpo[1]} ${answerBody==`เท่ากัน`? `ก็`:``}มีค่าเป็น`
-      //           +`${numList[indexList[1]]==1? `บวก`:`ลบ`}${answerBody==`เท่ากัน`? `เช่นเดียวกัน`:``}`;
-                
-      // //create hint
-      // hintBody = `ถ้าเลขติดลบยกกำลังด้วยเลขคู่จะได้ค่าบวก`
-      //           +`\nถ้าเลขติดลบยกกำลังด้วยเลขคี่จะได้ค่าลบ`
-      //           +`\n(-${a})^[2] = (-${a})*(-${a}) แต่ -${a}^[2] = -(${a}*${a})`;
-      return "Not Implement";
+          problemBody = `${selectedExpo[0]} และ ${selectedExpo[1]}`
+          //create answer
+          answerBody = numList[indexList[0]] == numList[indexList[1]] ? "เท่ากัน" : "ไม่เท่า";
+          answerType = ANSWER_TYPE.RADIO_CHOICE;
+          choices = ["เท่ากัน","ไม่เท่า"]
+          solution = `${selectedExpo[0]} มีค่าเป็น${numList[indexList[0]]==1? `บวก`:`ลบ`} `
+                    + `${answerBody==`เท่ากัน`? `และ`:`ในขณะที่`} `
+                    +`${selectedExpo[1]} ${answerBody==`เท่ากัน`? `ก็`:``}มีค่าเป็น`
+                    +`${numList[indexList[1]]==1? `บวก`:`ลบ`}${answerBody==`เท่ากัน`? `เช่นเดียวกัน`:``}`;
+                    
+          //create hint
+          hintBody = `ถ้าเลขติดลบยกกำลังด้วยเลขคู่จะได้ค่าบวก`
+                    +`\nถ้าเลขติดลบยกกำลังด้วยเลขคี่จะได้ค่าลบ`
+                    +`\nเช่น (-${a})^[2] = (-${a})*(-${a}) แต่ -${a}^[2] = -(${a}*${a})`;
+          break;
+        case 2:
+          problemTitle = "จงหาว่าเลขยกกำลังต่อไปนี้เป็นจำนวนเต็มประเภทใด";
+          a = randInt(1,500);
+          n = randInt(0,15);
+          expoList = []; 
+          numList = [];
+          expoList.push(`${a}^[${n}]`); // 3^[2]
+          numList.push(1);
+          expoList.push(`(-${a})^[${n}]`); //(-3)^[2]
+          if (n % 2 == 0) {
+            numList.push(1);
+          } else {
+            numList.push(-1)
+          }
+          expoList.push(`-${a}^[${n}]`); // -3^[2]
+          numList.push(-1);
+          rand = randInt(0,expoList.length-1);
+          problemBody = expoList[rand];
+          //create answer
+          answerBody = expoList[rand] == 1? "จำนวนเต็มบวก" : "จำนวนเต็มลบ";
+          answerType = ANSWER_TYPE.RADIO_CHOICE;
+          choices = ["จำนวนเต็มบวก","จำนวนเต็มลบ"];
+          //create hint
+          hintBody = `ถ้าเลขติดลบยกกำลังด้วยเลขคู่จะได้ค่าบวก`
+                  +`\nถ้าเลขติดลบยกกำลังด้วยเลขคี่จะได้ค่าลบ`
+                  +`\nเช่น (-${a})^[2] = (-${a})*(-${a}) แต่ -${a}^[2] = -(${a}*${a})`;
+          break;
+        case 3:
+          problemTitle = "จงหาค่าของ x เมื่อ";
+          a = randInt(2,25,true);
+          positiveBase = Math.abs(a);
+          if (1 <= positiveBase && positiveBase <= 2) {
+            n = randInt(4,10);
+          } else if (2 < positiveBase && positiveBase <= 5) {
+            n = randInt(4,6);
+          } else if (5 < positiveBase && positiveBase <= 10) {
+            n = randInt(2,4);
+          } else if (10 < positiveBase) {
+            n = randInt(2,3);
+          }
+          expo = `x^[${n}]`;
+          num = math.pow(math.bignumber(a),math.bignumber(n));
+          problemBody = `${expo} = ${num}`;
+
+          //create answer
+          answerBody = a;
+          answerForDisplay = a;
+          if (n%2 == 0) {
+            answerBody += `|${-a}`;
+          }
+          answerType = ANSWER_TYPE.MATH_INPUT;
+          break;
+      }
+      break;
+  }
+  // create model
+  problem = new Problem({
+    body: problemBody,
+    subtopicName: subtopicName,
+    difficulty: difficulty,
+    answerType: answerType,
+    title: problemTitle,
+    choices: answerType == ANSWER_TYPE.RADIO_CHOICE? choices : [],
+  });
+  problemId = problem._id;
+  answer = new Answer({
+    problemId: problemId,
+    body: answerBody,
+    solution: solution,
+    answerForDisplay: answerForDisplay,
+    checkAnswerType: checkAnswerType
+  });
+  hint = new Hint({ problemId: problemId, body: hintBody });
+  
+  // save to database
+  try {
+    newProblem = await problem.save();
+    newAnswer = await answer.save();
+    newHint = await hint.save();
+    return [{ problem:newProblem, answer:newAnswer, hint:newHint }];
+  } catch (err) {
+    console.log(err)
+    return err;
   }
 };
 

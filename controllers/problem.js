@@ -232,7 +232,7 @@ exports.getProblemForUser = async (req, res, next) => {
             answer = await Answer.findOne({ problemId: problem._id });
             return res.status(200).json({
               success: true,
-              data: { problem, correctAnswer: answer.body },
+              data: { problem, correctAnswer: answer.answerForDisplay },
             });
           } else {
             return res.status(200).json({ success: true, data: { problem } });
@@ -282,7 +282,7 @@ exports.getProblemForUser = async (req, res, next) => {
       answer = await Answer.findOne({ problemId: problem._id });
       return res
         .status(200)
-        .json({ success: true, data: { problem, correctAnswer: answer.body } });
+        .json({ success: true, data: { problem, correctAnswer: answer.answerForDisplay } });
     } else {
       return res.status(200).json({ success: true, data: { problem } });
     }
@@ -315,3 +315,15 @@ exports.addProblemAnswerHint = async (req, res, next) => {
     return res.status(500).json({ success: false, error: err });
   }
 };
+
+exports.getProblemAnswerHint = async (req, res) => {
+  const problemId = req.query.problemId;
+  try {
+    const problem = await Problem.findById(problemId);
+    const answer = await Answer.findOne({ problemId: problemId });
+    const hint = await Hint.findOne({ problemId: problemId });
+    return res.status(200).json({ success: true, data: { problem, answer, hint } });
+  } catch {
+    return res.status(500).json({ success: false, error: err.toString() });
+  }
+}
