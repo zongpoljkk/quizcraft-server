@@ -14,7 +14,9 @@ const updateChallengeScore = async (
   challengeId,
   correct,
   userTime,
-  problemIndex
+  problemIndex,
+  earnedExp,
+  earnedCoins,
 ) => {
   await Challenge.findById(challengeId)
     .exec()
@@ -27,6 +29,8 @@ const updateChallengeScore = async (
           console.log(`problemIndex: ${problemIndex}`);
           challenge.user1Result.set(problemIndex, 1);
           challenge.user1Score++;
+          challenge.user1GainExp += earnedExp;
+          challenge.user1GainCoin += earnedCoins;
         } else {
           console.log("ELSE");
           console.log(`problemIndex: ${problemIndex}`);
@@ -38,6 +42,8 @@ const updateChallengeScore = async (
         if (correct) {
           challenge.user2Result.set(problemIndex, 1);
           challenge.user2Score++;
+          challenge.user2GainExp += earnedExp;
+          challenge.user2GainCoin += earnedCoins;
         } else {
           challenge.user2Result.set(problemIndex, 0);
         }
@@ -171,7 +177,7 @@ exports.checkAnswer = async (req, res, next) => {
 
               // * Update Challenge Field * //
               if (mode === "challenge") {
-                updateChallengeScore(challengeId, true, userTime, problemIndex);
+                updateChallengeScore(challengeId, true, userTime, problemIndex, earnedExp, earnedCoins);
               }
 
               const returnedSolution = {
@@ -192,7 +198,7 @@ exports.checkAnswer = async (req, res, next) => {
         } else {
           // * Update Challenge Field * //
           if (mode === "challenge") {
-            updateChallengeScore(challengeId, false, userTime, problemIndex);
+            updateChallengeScore(challengeId, false, userTime, problemIndex, earnedExp, earnedCoins);
           }
 
           const user = User.findById(userId)
