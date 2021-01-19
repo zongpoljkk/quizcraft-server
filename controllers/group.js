@@ -306,6 +306,7 @@ exports.getGroupGame = async (req, res) => {
           currentIndex: 1,
           numberOfProblem: 1,
           timePerProblem: 1,
+          creatorId: 1,
           user: {
             $filter: {
               input: "$members",
@@ -331,6 +332,7 @@ exports.getGroupGame = async (req, res) => {
       currentIndex: group.currentIndex,
       numberOfProblem: group.numberOfProblem,
       timePerProblem: parseFloat(group.timePerProblem),
+      isCreator: userId == group.creatorId,
       user: group.user[0],
       problem: {
         _id: group.problem._id,
