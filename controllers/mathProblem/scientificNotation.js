@@ -93,7 +93,7 @@ const genAddSubStn = (termNum, m) => {
 }
 
 const generateScientificNotation = async (subtopicName, difficulty) => {
-  var problemTitle,problemBody,answerBody,hintBody,solution;
+  var problemTitle,problemBody,answerBody,hintBody,solution,answerForDisplay;
   var a,n,stn,num,opt,nn,ff;
   let i, m, min, baseOut, positiveBase;
   let problem, problemId, answer, hint, newProblem,newAnswer,newHint;
@@ -118,6 +118,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           problemTitle = "จงเขียนจำนวนต่อไปนี้ให้อยู่ในรูปสัญกรณ์วิทยาศาสตร์"
           problemBody = num;
           answerBody = stn; 
+          answerForDisplay = stn.replace("*","{*}");
           hintBody = `เขียนเลขให้อยู่ในรูป a*10^[n] โดยที่ 1 <= a < 10 \nเลื่อนจุดไปทาง${n<0? `ขวา ${-n} หน่วย`:`ซ้าย ${n} หน่วย`}`;
           solution = '';
           temp = num;
@@ -131,6 +132,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           problemTitle = "จงเขียนตัวเลขแทนจำนวนต่อไปนี้โดยไม่ใช้เลขยกกำลัง";
           problemBody = stn;
           answerBody = num;
+          answerForDisplay = answerBody;
           hintBody = `เลื่อนจุดไปทาง${n<0? `ซ้าย ${-n} หน่วย`:`ขวา ${n} หน่วย`}`
           solution = '';
           temp = a;
@@ -158,8 +160,10 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
         problemId: problemId,
         body: answerBody,
         solution: solution,
+        answerForDisplay: answerForDisplay,
       });
       hint = new Hint({ problemId: problemId, body: hintBody });
+      
       // save to database
       try {
         newProblem = await problem.save();
@@ -239,6 +243,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           solution += `\n${answerBody}`;
         }
       }
+      answerForDisplay = answerBody.replace("*","{*}");
 
       //create hint
       hintBody = `ทำให้เลขยกกำลังเท่ากันก่อน แล้วจึงนำเลขข้างหน้ามาบวกลบกัน\nเช่น 3*10^[4] + 5.6*10^[6]\n= 3*10^[4] + 560*10[4]\n= 563*10[4]\n= 5.63*10^[6]`;
@@ -256,6 +261,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
         problemId: problemId,
         body: answerBody,
         solution: solution,
+        answerForDisplay: answerForDisplay,
       });
       hint = new Hint({ problemId: problemId, body: hintBody });
 
@@ -383,6 +389,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           solution += `\n${answerBody}`;
         }
       }
+      answerForDisplay = answerBody.replace("*","{*}");
 
       //create hint
       hintBody = `ทำให้เลขยกกำลังของ 10 เท่ากันก่อน แล้วจึงนำเลขข้างหน้า 10 มาบวกลบกัน จากนั้นค่อยนำเลขมา${isMul? `คูณ`: ``}${isDiv? `หาร`:``}กัน แล้วจัดให้อยู่ในรูปสัญกรณ์วิทยาศาสตร์`;
@@ -402,6 +409,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
         problemId: problemId,
         body: answerBody,
         solution: solution,
+        answerForDisplay: answerForDisplay,
       });
       hint = new Hint({ problemId: problemId, body: hintBody });
 

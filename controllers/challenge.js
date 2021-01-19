@@ -222,7 +222,7 @@ exports.getProblemByChallengeId = (req, res) => {
               const answer = await Answer.findOne({ problemId: problem._id });
               return res.status(200).json({
                 success: true,
-                data: { problem: problem, correct_answer: answer.body },
+                data: { problem: problem, correct_answer: answer.answerForDisplay },
               });
             }
             return res.status(200).json({ success: true, data: problem });
