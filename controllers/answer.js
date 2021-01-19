@@ -44,7 +44,8 @@ const updateChallengeScore = async (
       }
 
       // Update whoTurn when player finished NUMBER_OF_PROBLEM
-      if (problemIndex === NUMBER_OF_PROBLEM) {
+      if (problemIndex === NUMBER_OF_PROBLEM - 1) {
+        console.log(`probleMIndex: ${problemIndex}`)
         switch (challenge.whoTurn) {
           case 1:
             challenge.whoTurn = 2;
