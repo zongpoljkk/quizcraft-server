@@ -67,9 +67,10 @@ exports.createGroup = async (req, res) => {
 
 exports.getAllGroupMembers = async (req, res) => {
   const groupId = req.query.groupId;
+  const userId = req.query.userId;
   try {
-    var group = await Group.findById(groupId, { "members.username": 1 });
-    return res.status(200).json({succes:true, data: {members: group.members, numberOfMembers: group.members.length} });
+    var group = await Group.findById(groupId, { "members.username": 1, "creatorId": 1 });
+    return res.status(200).json({succes:true, data: {members: group.members, numberOfMembers: group.members.length, isCreator: userId == group.creatorId} });
   } catch (err) {
     return res.status(500).json({succes:false, error:err.toString()});
   }
