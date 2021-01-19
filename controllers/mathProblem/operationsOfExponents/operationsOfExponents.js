@@ -604,27 +604,38 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
       }
       break;
   }
-  console.log("---------------------------------------------");
-  console.log("problemTitle", problemTitle);
-  console.log("problemBody", problemBody);
-  console.log("answerBody", answerBody);
-  console.log("solution", `\n${solution}`);
-  console.log("hintBody", hintBody);
-  console.log("answerForDisplay", answerForDisplay);
-  console.log("checkAnswerType", checkAnswerType);
-  console.log("answerType", answerType);
-  console.log("choices", choices);
-  console.log("allPos", allPos);
-  console.log("---------------------------------------------");
+  // create model
+  problem = new Problem({
+    body: problemBody,
+    subtopicName: subtopicName,
+    difficulty: difficulty,
+    answerType: answerType,
+    title: problemTitle,
+    choices: answerType == ANSWER_TYPE.RADIO_CHOICE? choices : [],
+  });
+  problemId = problem._id;
+  answer = new Answer({
+    problemId: problemId,
+    body: answerBody,
+    solution: solution,
+    answerForDisplay: answerForDisplay,
+    checkAnswerType: checkAnswerType
+  });
+  hint = new Hint({ problemId: problemId, body: hintBody });
+  
+  console.log(problem)
+  console.log(answer)
+  console.log(hint)
+  // save to database
+  try {
+    newProblem = await problem.save();
+    newAnswer = await answer.save();
+    newHint = await hint.save();
+    return [{ problem:newProblem, answer:newAnswer, hint:newHint }];
+  } catch (err) {
+    console.log(err)
+    return err;
+  }
 };
-
-// let [{solution, solutionList, baseListOut, degreeListOut}] = genSolution([2,3,2,4],[3,2,1,1])
-// console.log(solution)
-// console.log(solutionList)
-// console.log(baseListOut)
-// console.log(degreeListOut)
-// console.log("...")
-generateOperationsOfExponents("การดำเนินการของเลขยกกำลัง", DIFFICULTY.HARD);
-return 0;
 
 module.exports = { generateOperationsOfExponents };
