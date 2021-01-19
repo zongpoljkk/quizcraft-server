@@ -8,6 +8,8 @@ const User = require("../models/User");
 const levelDictionary = levelSystem();
 const rankDictionary = rankSystem();
 
+const { CHECK_ANSWER_TYPE, DIFFICULTY } = require("../utils/const");
+
 exports.checkAnswer = async (req, res, next) => {
   const problemId = req.body.problemId;
   const userId = req.body.userId;
@@ -43,9 +45,22 @@ exports.checkAnswer = async (req, res, next) => {
           .send("The answer with the given problem id was not found");
         return;
       } else {
+        // TODO: Check answer by type
+        let correctFlag = false;
+        switch (answer.checkAnswerType) {
+          case CHECK_ANSWER_TYPE.EQUAL_STRING: 
+            if (userAnswer === answer.body) {
+              correctFlag = true;
+            }
+            break;
+          case CHECK_ANSWER_TYPE.MATH_EVALUATE:
+            {}
+          case CHECK_ANSWER_TYPE.POWER_OVER_ONE:
+            {}
+        }
+
         if (
-          userAnswer === answer.body
-          // TODO: Evaluate Math expression for subtopic "การดำเนินการของเลขยกกำลัง"
+          userAnswer === answer.body      
           // (subtopic === "การดำเนินการของเลขยกกำลัง" && // For this topic, there are many possible answers
           //   math.evaluate(userAnswer) === math.evaluate(answer.body))
           // math.compare(userAnswer, answer.body) === true)
@@ -65,19 +80,19 @@ exports.checkAnswer = async (req, res, next) => {
             .then((user) => {
               // * Handle Earned coins * //
               switch (answer.problemId.difficulty) {
-                case "EASY":
+                case DIFFICULTY.EASY:
                   earnedExp = 10 * mode_surplus;
                   earnedCoins = 10 * mode_surplus;
                   user.exp += earnedExp;
                   user.coin += earnedCoins;
                   break;
-                case "MEDIUM":
+                case DIFFICULTY.MEDIUM:
                   earnedExp = 20 * mode_surplus;
                   earnedCoins = 20 * mode_surplus;
                   user.exp += earnedExp;
                   user.coin += earnedCoins;
                   break;
-                case "HARD":
+                case DIFFICULTY.HARD:
                   earnedExp = 30 * mode_surplus;
                   earnedCoins = 30 * mode_surplus;
                   user.exp += earnedExp;
