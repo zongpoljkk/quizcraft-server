@@ -354,10 +354,7 @@ exports.changeProfilePicture = (req, res, next) => {
     });
 };
 
-// TODO: DELETE later, used for uploading subject image
-exports.uploadMedia = (req, res, next) => {
-    res.status(200).send({ success: true, data: "Upload Media succeeded" });
-};
+
 
 exports.getAmountOfItems = (req, res) => {
   const userId = req.query.userId;

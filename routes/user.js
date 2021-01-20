@@ -45,10 +45,5 @@ router.put(
   upload.single("image"),
   userController.changeProfilePicture
 );
-router.post(
-  "/upload-media",
-  upload.single("image"),
-  userController.uploadMedia
-);
 
 module.exports = router;

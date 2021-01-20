@@ -25,7 +25,7 @@ exports.addFile = (req, res) => {
       } else if (!item) {
         res.status(400).send({
           success: false,
-          error: "Unable to find user with the given ID",
+          error: "Unable to find item with the given itemName",
         });
       }
       item.image = image;
