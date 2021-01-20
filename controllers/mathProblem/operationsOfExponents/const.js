@@ -6,6 +6,6 @@ exports.PROPERTY_EXPO = {
 };
 
 exports.PROBLEM_TITLE = {
-  FIND_VALUE_EXPO: "จงหาค่าของเลขยกกำลงต่อไปนี้",
+  FIND_VALUE_EXPO: "จงหาค่าของเลขยกกำลังต่อไปนี้",
   SIMPLE_EXPO: "จงทำเลขยกกำลังต่อไปนี้ให้เป็นรูปอย่างง่าย",
 };
