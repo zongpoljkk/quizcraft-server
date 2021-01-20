@@ -3,11 +3,10 @@ const { DIFFICULTY } = require("../utils/const");
 
 exports.addFile = (req, res) => {
   const subtopicName = req.body.subtopicName;
-  console.log(req.files)
   const subjectImage = req.files.subjectImage;
   const topicImage = req.files.topicImage;
   Subtopic.findOne({subtopicName: subtopicName})
-    .select("_id")
+    .select("_id photo")
     .exec((err, subtopic) => {
       if (err) {
         res
