@@ -4,7 +4,6 @@ const Hint = require("../../models/Hint");
 const English = require("../../models/English");
 const WordPOS = require("wordpos");
 const pos = require('pos');
-const synonyms = require("synonyms");
 const EASY = "EASY";
 const MEDIUM = "MEDIUM";
 const HARD = "HARD";

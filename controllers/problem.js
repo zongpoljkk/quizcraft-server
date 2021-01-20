@@ -187,7 +187,7 @@ exports.generateProblem = async (req, res, next) => {
       } catch (err) {
         return res.status(500).json({ success: false, error: err });
       }
-     default: return res.send("Not Implement");
+     default: return res.send("Default");
   }
 };
 
