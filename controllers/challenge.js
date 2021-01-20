@@ -55,10 +55,16 @@ exports.randomChallenge = async (req, res) => {
     ]);
     let count = await User.countDocuments({ _id: { $ne: user1Id } });
     let random = randInt(0, count - 1);
-    const randomUser = await User.aggregate([
+    const randomUser = await User.findOne(
+      { _id: { $ne: user1Id } },
+      { _id: 1, firstname: 1, lastname: 1, username: 1, photo: 1 }
+    ).skip(random);
+    const user2Id = randomUser._id;
+
+    const randomUserInfo = await User.aggregate([
       {
         $match: {
-         _id: { $ne: ObjectId(user1Id)}
+          _id: ObjectId(user2Id)
         },
       },
       {
@@ -84,8 +90,7 @@ exports.randomChallenge = async (req, res) => {
           "photo.data":1
         }
       }
-    ]).skip(random);
-    const user2Id = randomUser[0]._id;
+    ]);
 
     //step2: get <NUMBER_OF_PROBLEM> question for both user (both user should never seen all questions before)
     do {
@@ -134,7 +139,7 @@ exports.randomChallenge = async (req, res) => {
     await challenge.save();
     return res.status(200).json({
       success: true,
-      data: { challengeId: challenge._id, user1, user2: randomUser },
+      data: { challengeId: challenge._id, user1, user2: randomUserInfo },
     });
   } catch (err) {
     return res.status(400).json({ success: false, error: err.toString() });
