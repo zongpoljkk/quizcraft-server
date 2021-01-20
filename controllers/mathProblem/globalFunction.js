@@ -1,4 +1,4 @@
-const { alphabet } = require("./const");
+const { ALPHABET } = require("../../utils/const");
 
 const randInt = (start, end, haveNegative) => {
   if (haveNegative) {
@@ -45,7 +45,7 @@ const baseSelector = () => {
       a = `(${b}/${c})`;
       break;
     case 4: //alphabet
-      a = alphabet[Math.floor(Math.random() * alphabet.length)];
+      a = ALPHABET[Math.floor(Math.random() * ALPHABET.length)];
       break;
   }
   return a;

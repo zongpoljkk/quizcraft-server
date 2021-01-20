@@ -1,26 +1,11 @@
-const Problem = require("../../models/Problem");
-const Answer = require("../../models/Answer");
-const Hint = require("../../models/Hint");
+const Problem = require("../../../models/Problem");
+const Answer = require("../../../models/Answer");
+const Hint = require("../../../models/Hint");
 const math = require("mathjs");
-const { randInt, shuffle, baseSelector } = require("./globalFunction");
-const {
-  alphabet,
-} = require("./const");
-const { CHECK_ANSWER_TYPE, DIFFICULTY, ANSWER_TYPE } = require("../../utils/const");
+const { randInt, shuffle, baseSelector } = require("../globalFunction");
+const { CHECK_ANSWER_TYPE, DIFFICULTY, ANSWER_TYPE, ALPHABET } = require("../../../utils/const");
 const { bignumber } = require("mathjs");
-
-const multiplicationTerm = async (a, n) => {
-  let out = "";
-  n = Math.abs(n);
-  for (i=0; i<n; i++) {
-    if (i==0) {
-      out += a<0? `(${a})` : `${a}`;
-    } else {
-      out += a<0? `*(${a})` : `*${a}`;
-    }
-  }
-  return out;
-}
+const { multiplicationTerm } = require("./meaningOfExponentsFunction");
 
 const generateMeaningOfExponents = async (subtopicName, difficulty) => {
   var problemTitle,problemBody,answerBody,hintBody,solution,answerType,answerForDisplay, checkAnswerType ;
@@ -120,7 +105,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           if (rand) {
             a = randInt(1,7,true);
           } else {
-            a = randInt(0,1)? randInt(1,99,true) : alphabet[randInt(0,2)];
+            a = randInt(0,1)? randInt(1,99,true) : ALPHABET[randInt(0,2)];
           }
           n = randInt(2,7);
           problemBody = await multiplicationTerm(a,n);
@@ -155,7 +140,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
               if (!choices.includes(temp)) {
                 choices.push(temp);
               }
-              if (!alphabet.includes(a)) {
+              if (!ALPHABET.includes(a)) {
                 temp = n<0? `(${n})^[${randInt(a-1,a+2)}]` : `${n}^[${randInt(a-1,a+2)}]`;
                 if (!choices.includes(temp)) {
                   choices.push(temp);
@@ -265,6 +250,9 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
             n = randInt(2,3);
           } else {
             n = 2;
+          }
+          if (a < 0 && n % 2 == 0) {
+            a = -a;
           }
           expo = a<0? `(${a})^[${n}]` : `${a}^[${n}]`;
           num = math.pow(math.bignumber(a),math.bignumber(n));
