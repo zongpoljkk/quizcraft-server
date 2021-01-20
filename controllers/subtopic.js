@@ -2,6 +2,52 @@ const Subtopic = require("../models/Subtopic");
 const { DIFFICULTY } = require("../utils/const");
 
 exports.getAllSubtopics = async (req, res) => {
+  // try {
+  //   await Achievement.aggregate(
+  //     [
+  //       {
+  //         $lookup: {
+  //           from: "media.chunks",
+  //           localField: "image.id",
+  //           foreignField: "files_id",
+  //           as: "image_info",
+  //         },
+  //       },
+  //       { $unwind: "$image_info" },
+  //       {
+  //         $lookup: {
+  //           from: "media.chunks",
+  //           localField: "lottie.id",
+  //           foreignField: "files_id",
+  //           as: "lottie_info",
+  //         },
+  //       },
+  //       { $unwind: "$lottie_info" },
+  //       {
+  //         $project: {
+  //           _id: 1,
+  //           name: 1,
+  //           description: 1,
+  //           "image_info.data": 1,
+  //           "lottie_info.data": 1,
+  //         },
+  //       },
+  //     ],
+  //     (err, achievements) => {
+  //       if (err) {
+  //         return res.status(500).json({ success: false, error: err });
+  //       }
+  //       if (!achievements.length) {
+  //         return res
+  //           .status(400)
+  //           .json({ success: false, data: "no achievements" });
+  //       }
+  //       return res.status(200).json({ success: true, data: achievements });
+  //     }
+  //   );
+  // } catch (err) {
+  //   console.log(err);
+  // }
   await Subtopic.find()
     .exec((err, subtopics) => {
       if (err) {
@@ -15,6 +61,8 @@ exports.getAllSubtopics = async (req, res) => {
 };
 
 exports.getAllSubjects = async (req, res) => {
+  // TODO: Return subjects image
+
   await Subtopic.aggregate(
     [
       { $group: { _id: "$subject", subjectImg: { $first: "$subjectImg" } } },
