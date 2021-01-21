@@ -357,6 +357,8 @@ exports.changeProfilePicture = (req, res, next) => {
     });
 };
 
+
+
 exports.getAmountOfItems = (req, res) => {
   const userId = req.query.userId;
   User.findById(userId)
