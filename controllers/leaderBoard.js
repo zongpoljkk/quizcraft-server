@@ -4,17 +4,40 @@ exports.getLeaderBoard = async (req, res, next) => {
   const userId = req.query.userId;
 
   // ? Global ? //
-  User.find({})
-    .select("_id, username level class")
-    .exec((err, users) => {
-      if (err) {
-        res.status(500).send({ success: false, error: err });
-      } else if (!users) {
-        res
-          .status(400)
-          .send({ success: false, error: "Unable to get all users" });
-        return;
+  User.aggregate([
+    {
+      $lookup: {
+        from: "uploads.chunks",
+        localField: "photo.id",
+        foreignField: "files_id",
+        as: "profileImage",
+      },
+    },
+    { 
+      $unwind: {
+        path: "$profileImage",
+        "preserveNullAndEmptyArrays": true 
       }
+    },
+    {
+      $project: {
+        _id: 1,
+        username: 1,
+        profileImage: { $ifNull: [ "$profileImage", null ] },
+        level: 1,
+        class: 1
+      }
+    }
+  ])
+  .exec((err, users) => {
+    if (err) {
+      res.status(500).send({ success: false, error: err });
+    } else if (!users) {
+      res
+        .status(400)
+        .send({ success: false, error: "Unable to get all users" });
+      return;
+    }
 
       let copyUsers = users.slice(0);
       const byAll = copyUsers.sort((a, b) => {
@@ -40,8 +63,36 @@ exports.getLeaderBoard = async (req, res, next) => {
           const school = user.school;
 
           // * Same School * //
-          User.find({ school: school })
-            .select("_id username level class")
+          User.aggregate([
+            {
+              $match: {
+                school: school
+              }
+            },
+            {
+              $lookup: {
+                from: "uploads.chunks",
+                localField: "photo.id",
+                foreignField: "files_id",
+                as: "profileImage",
+              },
+            },
+            { 
+              $unwind: {
+                path: "$profileImage",
+                "preserveNullAndEmptyArrays": true 
+              }
+            },
+            {
+              $project: {
+                _id: 1,
+                username: 1,
+                profileImage: { $ifNull: [ "$profileImage", null ] },
+                level: 1,
+                class: 1
+              }
+            }
+          ])
             .exec((err, users) => {
               if (err) {
                 res.status(500).send({ success: false, error: err });
@@ -79,7 +130,6 @@ exports.getLeaderBoard = async (req, res, next) => {
               res.status(200).send({
                 success: true,
                 data: {
-                  profilePic: user.photo,
                   byAll: byAll,
                   bySchool: bySchool,
                   byClassroom: byClassroom,

@@ -23,10 +23,36 @@ exports.randomChallenge = async (req, res) => {
     problems = [];
   try {
     //step1: random user2 that user2 != user1
-    const user1 = await User.findOne(
-      { _id: user1Id },
-      { _id: 1, firstname: 1, lastname: 1, username: 1, photo: 1 }
-    );
+    const user1 = await User.aggregate([
+      {
+        $match: {
+         _id: ObjectId(user1Id)
+        },
+      },
+      {
+        $lookup: {
+          from: "uploads.chunks",
+          localField: "photo.id",
+          foreignField: "files_id",
+          as: "photo",
+        },
+      },
+      { 
+        $unwind: {
+          path: "$photo",
+          "preserveNullAndEmptyArrays": true 
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          firstname: 1,
+          lastname: 1,
+          username: 1,
+          "photo.data":1
+        }
+      }
+    ]);
     let count = await User.countDocuments({ _id: { $ne: user1Id } });
     let random = randInt(0, count - 1);
     const randomUser = await User.findOne(
@@ -34,6 +60,37 @@ exports.randomChallenge = async (req, res) => {
       { _id: 1, firstname: 1, lastname: 1, username: 1, photo: 1 }
     ).skip(random);
     const user2Id = randomUser._id;
+
+    const randomUserInfo = await User.aggregate([
+      {
+        $match: {
+          _id: ObjectId(user2Id)
+        },
+      },
+      {
+        $lookup: {
+          from: "uploads.chunks",
+          localField: "photo.id",
+          foreignField: "files_id",
+          as: "photo",
+        },
+      },
+      { 
+        $unwind: {
+          path: "$photo",
+          "preserveNullAndEmptyArrays": true 
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          firstname: 1,
+          lastname: 1,
+          username: 1,
+          "photo.data":1
+        }
+      }
+    ]);
 
     //step2: get <NUMBER_OF_PROBLEM> question for both user (both user should never seen all questions before)
     do {
@@ -82,7 +139,7 @@ exports.randomChallenge = async (req, res) => {
     await challenge.save();
     return res.status(200).json({
       success: true,
-      data: { challengeId: challenge._id, user1, user2: randomUser },
+      data: { challengeId: challenge._id, user1, user2: randomUserInfo },
     });
   } catch (err) {
     return res.status(400).json({ success: false, error: err.toString() });
@@ -303,6 +360,20 @@ exports.getChallengeInfo = async (req, res) => {
       { $unwind: "$fromUser1" },
       {
         $lookup: {
+          from: "uploads.chunks",
+          localField: "fromUser1.photo.id",
+          foreignField: "files_id",
+          as: "fromUser1Photo",
+        },
+      },
+      { 
+        $unwind: {
+          path: "$fromUser1Photo",
+          "preserveNullAndEmptyArrays": true 
+        }
+      },
+      {
+        $lookup: {
           from: "users",
           localField: "user2Id",
           foreignField: "_id",
@@ -311,9 +382,23 @@ exports.getChallengeInfo = async (req, res) => {
       },
       { $unwind: "$fromUser2" },
       {
+        $lookup: {
+          from: "uploads.chunks",
+          localField: "fromUser2.photo.id",
+          foreignField: "files_id",
+          as: "fromUser2Photo",
+        },
+      },
+      { 
+        $unwind: {
+          path: "$fromUser2Photo",
+          "preserveNullAndEmptyArrays": true 
+        }
+      },
+      {
         $addFields: {
-          user1Photo: "$fromUser1.photo",
-          user2Photo: "$fromUser2.photo",
+          user1Photo: "$fromUser1Photo",
+          user2Photo: "$fromUser2Photo",
           user1Username: "$fromUser1.username",
           user2Username: "$fromUser2.username",
           user1IsPlayed: false,
@@ -322,6 +407,16 @@ exports.getChallengeInfo = async (req, res) => {
       },
       { $set: { user1IsPlayed: { $gt: [{ $size: "$user1Result" }, 0] } } },
       { $set: { user2IsPlayed: { $gt: [{ $size: "$user2Result" }, 0] } } },
+      {
+        $project: {
+          "user1Photo.n": 0,
+          "user1Photo.files_id": 0,
+          "user1Photo._id": 0,
+          "user2Photo.n": 0,
+          "user2Photo.files_id": 0,
+          "user2Photo._id": 0,
+        }
+      }
     ]);
 
     challenge = challenge[0];
@@ -435,6 +530,20 @@ exports.getAllMyChallenges = async (req, res) => {
       { $unwind: "$user1" },
       {
         $lookup: {
+          from: "uploads.chunks",
+          localField: "user1.photo.id",
+          foreignField: "files_id",
+          as: "user1Photo",
+        },
+      },
+      { 
+        $unwind: {
+          path: "$user1Photo",
+          "preserveNullAndEmptyArrays": true 
+        }
+      },
+      {
+        $lookup: {
           from: "users",
           localField: "user2Id",
           foreignField: "_id",
@@ -442,6 +551,20 @@ exports.getAllMyChallenges = async (req, res) => {
         },
       },
       { $unwind: "$user2" },
+      {
+        $lookup: {
+          from: "uploads.chunks",
+          localField: "user2.photo.id",
+          foreignField: "files_id",
+          as: "user2Photo",
+        },
+      },
+      { 
+        $unwind: {
+          path: "$user2Photo" ,
+          "preserveNullAndEmptyArrays": true 
+        },
+      },
       {
         $project: {
           _id: 1,
@@ -455,13 +578,13 @@ exports.getAllMyChallenges = async (req, res) => {
           user1IsRead: 1,
           user2IsRead: 1,
           user1: {
-            photo: 1,
+            photo: "$user1Photo",
             firstname: 1,
             lastname: 1,
             username: 1,
           },
           user2: {
-            photo: 1,
+            photo: "$user2Photo",
             firstname: 1,
             lastname: 1,
             username: 1,
@@ -556,6 +679,20 @@ exports.getFinalChallengeResult = async (req, res) => {
       { $unwind: "$user1" },
       {
         $lookup: {
+          from: "uploads.chunks",
+          localField: "user1.photo.id",
+          foreignField: "files_id",
+          as: "user1Photo",
+        },
+      },
+      { 
+        $unwind: {
+          path: "$user1Photo",
+          "preserveNullAndEmptyArrays": true 
+        }
+      },
+      {
+        $lookup: {
           from: "users",
           localField: "user2Id",
           foreignField: "_id",
@@ -563,6 +700,30 @@ exports.getFinalChallengeResult = async (req, res) => {
         },
       },
       { $unwind: "$user2" },
+      {
+        $lookup: {
+          from: "uploads.chunks",
+          localField: "user2.photo.id",
+          foreignField: "files_id",
+          as: "user2Photo",
+        },
+      },
+      { 
+        $unwind: {
+          path: "$user2Photo",
+          "preserveNullAndEmptyArrays": true 
+        }
+      },
+      {
+        $project: {
+          "user1Photo._id": 0,
+          "user1Photo.files_id": 0,
+          "user1Photo.n": 0,
+          "user2Photo._id": 0,
+          "user2Photo.files_id": 0,
+          "user2Photo.n": 0,
+        }
+      }
     ]);
 
     challenge = challenge[0];
@@ -572,7 +733,7 @@ exports.getFinalChallengeResult = async (req, res) => {
         me: {
           result: challenge.user1Result,
           score: challenge.user1Score,
-          photo: challenge.user1.photo,
+          photo: challenge.user1Photo,
           username: challenge.user1.username,
           firstname: challenge.user1.firstname,
           lastname: challenge.user1.lastname,
@@ -583,7 +744,7 @@ exports.getFinalChallengeResult = async (req, res) => {
         opponent: {
           result: challenge.user2Result,
           score: challenge.user2Score,
-          photo: challenge.user2.photo,
+          photo: challenge.user2Photo,
           username: challenge.user2.username,
           firstname: challenge.user2.firstname,
           lastname: challenge.user2.lastname,
@@ -595,7 +756,7 @@ exports.getFinalChallengeResult = async (req, res) => {
         me: {
           result: challenge.user2Result,
           score: challenge.user2Score,
-          photo: challenge.user2.photo,
+          photo: challenge.user2Photo,
           username: challenge.user2.username,
           firstname: challenge.user2.firstname,
           lastname: challenge.user2.lastname,
@@ -606,7 +767,7 @@ exports.getFinalChallengeResult = async (req, res) => {
         opponent: {
           result: challenge.user1Result,
           score: challenge.user1Score,
-          photo: challenge.user1.photo,
+          photo: challenge.user1Photo,
           username: challenge.user1.username,
           firstname: challenge.user1.firstname,
           lastname: challenge.user1.lastname,

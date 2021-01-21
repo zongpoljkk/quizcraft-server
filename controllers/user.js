@@ -56,6 +56,20 @@ exports.getProfileByUID = async (req, res) => {
         },
       },
       {
+        $lookup: {
+          from: "uploads.chunks",
+          localField: "photo.id",
+          foreignField: "files_id",
+          as: "photo",
+        },
+      },
+      { 
+        $unwind: {
+          path: "$photo",
+          "preserveNullAndEmptyArrays": true 
+        }
+      },
+      {
         $addFields: {
           itemInfoWithoutImgs: {
             $map: {
@@ -88,6 +102,9 @@ exports.getProfileByUID = async (req, res) => {
           fromItems: 0,
           achievements: 0,
           __v: 0,
+          "photo._id": 0,
+          "photo.files_id": 0,
+          "photo.n": 0,
           "itemInfoWithoutImgs.name": 0,
           "itemInfoWithoutImgs.price": 0,
           "itemInfoWithoutImgs.description": 0,
