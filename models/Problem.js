@@ -37,7 +37,17 @@ const ProblemSchema = new Schema({
   title: {
     type:String,
     required: true
-  }
+  },
+  usedItems: [{
+    _id: false,
+    itemName: {
+      type: String,
+    },
+    amount: {
+      type: Number,
+      default: 0,
+    },
+  }],
 });
 
 module.exports = mongoose.model("Problem", ProblemSchema);
