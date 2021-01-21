@@ -96,8 +96,8 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
     case DIFFICULTY.MEDIUM:
       problemTitle = PROBLEM_TITLE.FIND_VALUE_STN;
       problemBody = "";
-      opt = randInt(1, 2);
-      opt = 3;
+      opt = randInt(1, 3);
+      opt = 2;
       switch (opt) {
         case 1:
           allInt = randInt(0, 1);
@@ -175,7 +175,9 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           solution = problemBody;
           solution += `\n${baseOut}*10^[${degreeOut}]`;
           answerBody = getStn(baseOut,degreeOut)
-          solution += "\n" + answerBody;
+          if (`${baseOut}*10^[${degreeOut}]` != answerBody ) {
+            solution += "\n" + answerBody;
+          }
           answerForDisplay = answerBody.replace("*","{*}");
           checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           answerType = ANSWER_TYPE.MATH_INPUT;
