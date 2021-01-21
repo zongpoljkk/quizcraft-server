@@ -17,13 +17,12 @@ const {
   genSolution,
   randFloat,
 } = require("./scientificNotationFunction");
-const { MATH_INPUT } = require("../const");
-const { all } = require("../../../routes/item");
+const { PROBLEM_TITLE, SUFFIX } = require("./const");
 
 const generateScientificNotation = async (subtopicName, difficulty) => {
   let problemTitle, problemBody, answerBody, hintBody, choices;
   let solution, answerType, answerForDisplay, checkAnswerType;
-  let a, n, stn, num, opt, nn, ff, allPos, allInt;
+  let a, n, stn, num, opt, nn, ff, allPos, allInt, rand;
   let i, m, min, baseOut, positiveBase, solutionList;
   let problem, problemId, answer, hint, newProblem, newAnswer, newHint;
   let termNum;
@@ -44,7 +43,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
       opt = randInt(1, 2);
       switch (opt) {
         case 1:
-          problemTitle = "จงเขียนจำนวนต่อไปนี้ให้อยู่ในรูปสัญกรณ์วิทยาศาสตร์";
+          problemTitle = PROBLEM_TITLE.FIND_STN;
           problemBody = num;
           answerBody = stn;
           answerForDisplay = stn.replace("*", "{*}");
@@ -94,19 +93,20 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
       }
       break;
     case DIFFICULTY.MEDIUM:
-      problemTitle = "จงหาผลลัพธ์ของเลขต่อไปนี้ แล้วตอบในรูปสัญกรณ์วิทยาศาสตร์";
+      problemTitle = PROBLEM_TITLE.FIND_VALUE_STN;
       problemBody = "";
       opt = randInt(1, 2);
-      opt = 1;
+      opt = 2;
       switch (opt) {
         case 1:
           allInt = randInt(0, 1);
           allInt = 0;
           termNum = randInt(2, 4);
-          (baseList = []), (nList = []);
+          baseList = [];
+          nList = [];
           baseOut = 0;
           randList = Array.from({ length: termNum }, () => randInt(0, 1));
-          n = randInt(3, 10);
+          n = randInt(3, 10, true);
           solution = "";
           for (i = 0; i < termNum; i++) {
             if (allInt) {
@@ -134,13 +134,55 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           }
           answerForDisplay = answerBody.replace("*", "{*}");
           checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
-          answerType = MATH_INPUT;
+          answerType = ANSWER_TYPE.MATH_INPUT;
           //create hint
           hintBody =
             "ถ้าเลขยกกำลังเท่ากัน เราสามารถนำเลขที่คูณอยู่ข้างหน้าเลขยกกำลังมาบวกลบกันได้เลย" +
             "\nเช่น 3*10^[3]+2*10^[3] = (3+2)*10^[3] = 5*10^[3]";
           break;
-        case 2:
+        case 2://1.5*2*10^[2] = 3*10^[2] → ตัวเลขคูณกับสัญกรณ์ → ตอบเป็นสัญกรณ์วิทยาศาสตร์ 
+          problemTitle = PROBLEM_TITLE.FIND_VALUE_STN;
+          termNum = randInt(2,3);
+          baseList = [];
+          nList = [];
+          baseOut = 1;
+          allInt = randInt(0,1);
+          for (i=0; i<termNum; i++) {
+            if (allInt) {
+              a = randInt(2,10);
+            } else {
+              a = randInt(0,1) ? randInt(2,10) : randFloat(10);
+            }
+            baseList.push(a);
+            baseOut = math.multiply(math.bignumber(baseOut),math.bignumber(a));
+          }
+          a = baseList.join("*");
+          problemBody = a ;
+          //`*10^[${degreeOut}]`;
+          termNum = randInt(1,2);
+          let degreeOut = 0;
+          for (i=0; i<termNum; i++) {
+            n = randInt(2, 10, true);
+            nList.push(n);
+            problemBody += `*10^[${n}]`
+            degreeOut += n;
+          }
+          a = `${nn}.${ff}`;
+          stn = `${a}*10^[${n}]`;
+          num = moveThePoint(a, n);
+          console.log(baseOut)
+
+          //create solution
+          solution = problemBody;
+          solution += `\n${baseOut}*10^[${degreeOut}]`;
+          answerBody = getStn(baseOut,degreeOut)
+          solution += "\n" + answerBody;
+
+          break;
+        case 3:
+          problemTitle = PROBLEM_TITLE.FIND_STN;
+          let suffixList = [SUFFIX.TEN_THOUSAND,SUFFIX.TEN_THOUSAND,SUFFIX.HUNDRED_THOUSAND,SUFFIX.MILLION]
+          let suffixIndex = randInt(0,suffixList.length-1);
           break;
       }
       break;
