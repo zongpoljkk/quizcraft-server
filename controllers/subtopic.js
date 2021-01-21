@@ -129,33 +129,30 @@ exports.getTopicBySubjectName = async (req, res) => {
         //   },
         // },
         // { $unwind: "$subject_image_info" },
-        // {
-        //   $lookup: {
-        //     from: "media.chunks",
-        //     localField: "topicImg.id",
-        //     foreignField: "files_id",
-        //     as: "topic_image_info",
-        //   },
-        // },
-        // { $unwind: "$lottie_info" },
-        // {
-        //   $project: {
-        //     _id: 1,
-        //     subtopicName: 1,
-        //     subject: 1,
-        //     topic: 1,
-        //     availableDifficulty: 1,
-        //     "subject_image_info.data": 1,
-        //     "topic_image_info.data": 1,
-        //   },
-        // },
+        {
+          $lookup: {
+            from: "media.chunks",
+            localField: "topicImg.id",
+            foreignField: "files_id",
+            as: "topic_image_info",
+          },
+        },
+        { $unwind: "$topic_image_info" },
+        {
+          $project: {
+            _id: 1,
+            "topic_image_info.data": 1,
+          },
+        },
       ],
       (err, subtopics) => {
         console.log(subtopics);
         if (err) {
+          console.log("ERROR")
           return res.status(500).json({ success: false, error: err });
         }
         if (!subtopics.length) {
+          console.log("MAI MEE")
           return res.status(400).json({ success: false, data: "no subtopics" });
         }
         return res.status(200).json({ success: true, data: subtopics });
