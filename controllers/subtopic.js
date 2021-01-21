@@ -41,67 +41,41 @@ exports.getAllSubtopics = async (req, res) => {
 
 exports.getAllSubjects = async (req, res) => {
   // TODO: Return subjects image
-  // try {
-  //   await Achievement.aggregate(
-  //     [
-  //       {
-  //         $lookup: {
-  //           from: "media.chunks",
-  //           localField: "image.id",
-  //           foreignField: "files_id",
-  //           as: "image_info",
-  //         },
-  //       },
-  //       { $unwind: "$image_info" },
-  //       {
-  //         $lookup: {
-  //           from: "media.chunks",
-  //           localField: "lottie.id",
-  //           foreignField: "files_id",
-  //           as: "lottie_info",
-  //         },
-  //       },
-  //       { $unwind: "$lottie_info" },
-  //       {
-  //         $project: {
-  //           _id: 1,
-  //           name: 1,
-  //           description: 1,
-  //           "image_info.data": 1,
-  //           "lottie_info.data": 1,
-  //         },
-  //       },
-  //     ],
-  //     (err, achievements) => {
-  //       if (err) {
-  //         return res.status(500).json({ success: false, error: err });
-  //       }
-  //       if (!achievements.length) {
-  //         return res
-  //           .status(400)
-  //           .json({ success: false, data: "no achievements" });
-  //       }
-  //       return res.status(200).json({ success: true, data: achievements });
-  //     }
-  //   );
-  // } catch (err) {
-  //   console.log(err);
-  // }
-  await Subtopic.aggregate(
-    [
-      { $group: { _id: "$subject", subjectImg: { $first: "$subjectImg" } } },
-      { $sort: { _id: 1 } },
-    ],
-    (err, subjects) => {
-      if (err) {
-        return res.status(500).json({ success: false, error: err });
+  try {
+    await Subtopic.aggregate(
+      [
+        { $group: { _id: "$subject", subjectImg: { $first: "$subjectImg" } } },
+        { $sort: { _id: 1 } },
+        {
+          $lookup: {
+            from: "media.chunks",
+            localField: "subjectImg.id",
+            foreignField: "files_id",
+            as: "subject_image_info",
+          },
+        },
+        { $unwind: "$subject_image_info" },
+        {
+          $project: {
+            _id: 1,
+            "subject_image_info.data": 1,
+          },
+        },
+      ],
+      (err, subjects) => {
+        console.log(subjects);
+        if (err) {
+          return res.status(500).json({ success: false, error: err });
+        }
+        if (!subjects.length) {
+          return res.status(400).json({ success: false, data: "no subjects" });
+        }
+        return res.status(200).json({ success: true, data: subjects });
       }
-      if (!subjects.length) {
-        return res.status(400).json({ success: false, data: "no subjects" });
-      }
-      return res.status(200).json({ success: true, data: subjects });
-    }
-  );
+    );
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 exports.getTopicBySubjectName = async (req, res) => {
@@ -120,15 +94,6 @@ exports.getTopicBySubjectName = async (req, res) => {
             topicImg: { $first: "$topicImg" },
           },
         },
-        // {
-        //   $lookup: {
-        //     from: "media.chunks",
-        //     localField: "subjectImg.id",
-        //     foreignField: "files_id",
-        //     as: "subject_image_info",
-        //   },
-        // },
-        // { $unwind: "$subject_image_info" },
         {
           $lookup: {
             from: "media.chunks",
@@ -145,43 +110,20 @@ exports.getTopicBySubjectName = async (req, res) => {
           },
         },
       ],
-      (err, subtopics) => {
-        console.log(subtopics);
+      (err, topics) => {
+        console.log(topics);
         if (err) {
-          console.log("ERROR")
           return res.status(500).json({ success: false, error: err });
         }
-        if (!subtopics.length) {
-          console.log("MAI MEE")
-          return res.status(400).json({ success: false, data: "no subtopics" });
+        if (!topics.length) {
+          return res.status(400).json({ success: false, data: "no topics" });
         }
-        return res.status(200).json({ success: true, data: subtopics });
+        return res.status(200).json({ success: true, data: topics });
       }
     );
   } catch (err) {
     console.log(err);
   }
-  console.log("FINALLY");
-  // await Subtopic.aggregate(
-  // [{
-  //   $match: {
-  //     subject: subject,
-  //   },
-  // },{
-  //   $group: {
-  //     _id: "$topic",
-  //     topicImg: { $first: "$topicImg" }
-  //   }
-  // }],
-  //   (err, topic) => {
-  //     if (err) {
-  //       return res.status(500).json({ success: false, error: err });
-  //     }
-  //     if (!topic.length) {
-  //       return res.status(400).json({ success: false, data: "no topics" });
-  //     }
-  //     return res.status(200).json({ success: true, data: topic });
-  //   })
 };
 
 exports.getSubtopicByTopicName = async (req, res) => {
