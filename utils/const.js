@@ -17,6 +17,19 @@ exports.SUBJECT = {
   ENG: "ภาษาอังกฤษ",
 };
 
+exports.GAME_MODE = {
+  PRACTICE: "PRACTICE",
+  QUIZ: "QUIZ",
+  CHALLENGE: "CHALLENGE"
+}
+
+exports.ITEM_NAME = {
+  SKIP: "Skip",
+  HINT: "Hint",
+  DOUBLE: "Double",
+  REFRESH: "Refresh"
+}
+
 exports.CHECK_ANSWER_TYPE = {
   MATH_EVALUATE: "MATH_EVALUATE",
   EQUAL_STRING: "EQUAL_STRING",

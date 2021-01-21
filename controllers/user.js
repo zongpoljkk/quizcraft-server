@@ -2,6 +2,9 @@ const User = require("../models/User");
 const Item = require("../models/Item");
 const jwt = require("jsonwebtoken");
 const config = require("../config/keys");
+const { GAME_MODE, DIFFICULTY } = require("../utils/const");
+const { DIFFICULTY_EXP, DIFFICULTY_COIN, MODE_SURPLUS } = require("../utils/gameConfig");
+const { levelSystem, rankSystem, MAX_LEVEL } = require("../utils/level");
 
 //Add user for testing
 exports.addUser = (req, res, next) => {
@@ -266,24 +269,7 @@ exports.editUsername = async (req, res) => {
   });
 };
 
-exports.usedItem = async (req, res) => {
-  let token = req.header("Authorization");
-  var userIdFromToken;
-  if (!token) {
-    return res
-      .status(403)
-      .json({ success: false, error: "No token provided!" });
-  }
-  if (token.startsWith("Bearer ")) {
-    token = token.slice(7, token.length).trimLeft();
-  } else {
-  }
-  jwt.verify(token, config.secret, (err, decoded) => {
-    if (err)
-      return res.status(401).json({ success: false, error: "Unauthorized!" });
-    userIdFromToken = decoded.userId;
-  });
-
+exports.usedItem = async (req, res) => {  
   const body = req.body;
   if (!body) {
     return res.status(400).json({
@@ -292,7 +278,7 @@ exports.usedItem = async (req, res) => {
     });
   }
 
-  if (userIdFromToken !== body.userId) {
+  if (req.userId !== body.userId) {
     return res.status(400).json({
       success: false,
       error: "userId not match userId that decoded from token!",
@@ -536,3 +522,58 @@ exports.buyItem = async (req, res) => {
     }
   );
 };
+
+exports.updateCoinAndExp = (user, gameMode, difficulty) => {  
+  const levelDictionary = levelSystem();
+  const rankDictionary = rankSystem();
+  let earnedCoins, earnedExp, modeSurplus;
+  switch (gameMode) {
+    case GAME_MODE.CHALLENGE:
+      modeSurplus = MODE_SURPLUS.CHALLENGE;
+      break;
+    case GAME_MODE.QUIZ:
+      modeSurplus = MODE_SURPLUS.QUIZ;
+      break;
+    default:
+      modeSurplus = 1;
+      break;
+  }
+
+  // * Handle Earned coins and exp * //
+  switch (difficulty) {
+    case DIFFICULTY.EASY:
+      earnedCoins = DIFFICULTY_COIN.EASY * modeSurplus;
+      earnedExp = DIFFICULTY_EXP.EASY * modeSurplus;
+      break;
+    case DIFFICULTY.MEDIUM:
+      earnedCoins = DIFFICULTY_COIN.MEDIUM * modeSurplus;
+      earnedExp = DIFFICULTY_EXP.MEDIUM * modeSurplus;
+      break;
+    case DIFFICULTY.HARD:
+      earnedCoins = DIFFICULTY_COIN.HARD * modeSurplus;
+      earnedExp = DIFFICULTY_EXP.HARD * modeSurplus;  
+      break;
+  }
+  user.exp += earnedExp;
+  user.coin += earnedCoins;
+
+  // * Handle Level up * //
+  // Compare user exp if it exceeds the limit of his/her level
+  let levelUp = false;
+  let rankUp = false;
+  if (user.exp >= levelDictionary[parseInt(user.level)]) {
+    if (user.level == MAX_LEVEL) {
+    } else {
+      levelUp = true;
+      user.exp -= levelDictionary[parseInt(user.level)];
+      user.maxExp = levelDictionary[parseInt(user.level + 1)];
+      user.level += 1;
+      // ? Handle Rank up ? //
+      if (user.level in rankDictionary) {
+        user.rank = rankDictionary[user.level];
+        rankUp = true;
+      }
+    }
+  }
+  return [{ user, levelUp, rankUp, earnedCoins, earnedExp }];
+}

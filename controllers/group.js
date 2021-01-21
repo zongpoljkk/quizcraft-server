@@ -306,6 +306,7 @@ exports.getGroupGame = async (req, res) => {
           currentIndex: 1,
           numberOfProblem: 1,
           timePerProblem: 1,
+          creatorId: 1,
           user: {
             $filter: {
               input: "$members",
@@ -320,9 +321,7 @@ exports.getGroupGame = async (req, res) => {
             answerType: 1,
             title: 1
           },
-          answer: {
-            body: 1
-          }
+          answer: 1
         }
       },
     ]);
@@ -333,6 +332,7 @@ exports.getGroupGame = async (req, res) => {
       currentIndex: group.currentIndex,
       numberOfProblem: group.numberOfProblem,
       timePerProblem: parseFloat(group.timePerProblem),
+      isCreator: userId == group.creatorId,
       user: group.user[0],
       problem: {
         _id: group.problem._id,
@@ -340,7 +340,7 @@ exports.getGroupGame = async (req, res) => {
         body: group.problem.body,
         answerType: group.problem.answerType,
         title: group.problem.title,
-        correctAnswer: group.answer.body
+        correctAnswer: group.answer.answerForDisplay
       }
     };
     return res.status(200).json({ success: true, data: groupGame });
