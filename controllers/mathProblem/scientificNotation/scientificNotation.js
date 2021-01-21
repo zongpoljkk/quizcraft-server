@@ -213,10 +213,9 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
             //create hint
             hintBody = `${suffix.STR} = ${suffix.NUM_STR} = ${suffix.EXPO_STR}`;
           }
-
-          // //create hint
-          // hintBody = ``;
-          
+          answerForDisplay = answerBody.replace("*","{*}");
+          checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
+          answerType = ANSWER_TYPE.MATH_INPUT;
           break;
       }
       break;
