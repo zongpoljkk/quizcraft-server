@@ -170,6 +170,26 @@ const randFloat = (precision) => {
   return Math.floor(Math.random() * (1000 - 100) + 100) / 100;
 };
 
+const multipleConcat = (base, degree, i) => {
+  if (i == 0) {
+    if (base < 0) {
+      if (degree == 1) return `(${base})`;
+      else return `(${base})^[${degree}]`;
+    } else {
+      if (degree == 1) return `${base}`;
+      else return `${base}^[${degree}]`;
+    }
+  } else {
+    if (base < 0) {
+      if (degree == 1) return `*(${base})`;
+      else return `*(${base})^[${degree}]`;
+    } else {
+      if (degree == 1) return `*${base}`;
+      return `*${base}^[${degree}]`;
+    }
+  }
+};
+
 module.exports = {
   moveThePoint,
   genAddSubStn,
@@ -177,4 +197,5 @@ module.exports = {
   stnString,
   genSolution,
   randFloat,
+  multipleConcat,
 };

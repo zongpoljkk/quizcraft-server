@@ -16,6 +16,7 @@ const {
   stnString,
   genSolution,
   randFloat,
+  multipleConcat,
 } = require("./scientificNotationFunction");
 const { PROBLEM_TITLE, SUFFIX } = require("./const");
 
@@ -23,7 +24,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
   let problemTitle, problemBody, answerBody, hintBody, choices;
   let solution, answerType, answerForDisplay, checkAnswerType;
   let a, n, stn, num, opt, nn, ff, allPos, allInt, rand;
-  let i, m, min, baseOut, positiveBase, solutionList;
+  let i, m, min, baseOut, positiveBase, solutionList, degreeOut;
   let problem, problemId, answer, hint, newProblem, newAnswer, newHint;
   let termNum;
   let baseList, nList, randList, temp;
@@ -96,7 +97,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
       problemTitle = PROBLEM_TITLE.FIND_VALUE_STN;
       problemBody = "";
       opt = randInt(1, 2);
-      opt = 2;
+      opt = 3;
       switch (opt) {
         case 1:
           allInt = randInt(0, 1);
@@ -110,7 +111,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           solution = "";
           for (i = 0; i < termNum; i++) {
             if (allInt) {
-              a = randInt(1, 10);
+              a = randInt(1, 50);
             } else {
               a = randFloat(10);
             }
@@ -158,7 +159,6 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           }
           a = baseList.join("*");
           problemBody = a ;
-          //`*10^[${degreeOut}]`;
           termNum = randInt(1,2);
           let degreeOut = 0;
           for (i=0; i<termNum; i++) {
@@ -170,19 +170,53 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           a = `${nn}.${ff}`;
           stn = `${a}*10^[${n}]`;
           num = moveThePoint(a, n);
-          console.log(baseOut)
 
-          //create solution
+          //create solution ans answer
           solution = problemBody;
           solution += `\n${baseOut}*10^[${degreeOut}]`;
           answerBody = getStn(baseOut,degreeOut)
           solution += "\n" + answerBody;
+          answerForDisplay = answerBody.replace("*","{*}");
+          checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
+          answerType = ANSWER_TYPE.MATH_INPUT;
+
+          //create hint TODO
+          hintBody = ``;
 
           break;
         case 3:
           problemTitle = PROBLEM_TITLE.FIND_STN;
-          let suffixList = [SUFFIX.TEN_THOUSAND,SUFFIX.TEN_THOUSAND,SUFFIX.HUNDRED_THOUSAND,SUFFIX.MILLION]
-          let suffixIndex = randInt(0,suffixList.length-1);
+          let suffixList = [SUFFIX.THOUSAND,SUFFIX.TEN_THOUSAND,SUFFIX.HUNDRED_THOUSAND,SUFFIX.MILLION]
+          let suffix = SUFFIX.MILLION;
+          a = randInt(2,1000);
+          rand = randInt(0,1);
+          if (rand) {
+            let suffixIndex = randInt(0,suffixList.length-1);
+            let preSuffix = suffixList[suffixIndex];
+            problemBody = `${a} ${preSuffix.STR}${suffix.STR}`;
+            solution = problemBody;
+            solution += "\n" + stnString(a,preSuffix.POWER);
+            solution += multipleConcat(10,suffix.POWER)
+            temp = preSuffix.POWER + suffix.POWER;
+            solution += "\n" + stnString(a,temp);
+            answerBody = getStn(a,temp);
+            solution += "\n" + answerBody;
+            //create hint
+            hintBody = `${preSuffix.STR} = ${preSuffix.NUM_STR} = ${preSuffix.EXPO_STR}`;
+            hintBody += `\n${suffix.STR} = ${suffix.NUM_STR} = ${suffix.EXPO_STR}`;
+          } else {
+            problemBody = `${a} ${suffix.STR}`;
+            solution = problemBody;
+            solution += "\n" + stnString(a,suffix.POWER);
+            answerBody = getStn(a,suffix.POWER);
+            solution += "\n" + answerBody;
+            //create hint
+            hintBody = `${suffix.STR} = ${suffix.NUM_STR} = ${suffix.EXPO_STR}`;
+          }
+
+          // //create hint
+          // hintBody = ``;
+          
           break;
       }
       break;
