@@ -1,5 +1,6 @@
 const { min } = require("mathjs");
 const math = require("mathjs");
+const { randInt } = require("../globalFunction");
 
 const moveThePoint = (a, n) => {
   let out;
@@ -58,26 +59,27 @@ const moveThePoint = (a, n) => {
   return out;
 };
 
-const genAddSubStn = (termNum, m) => {
-  let baseList = [],
-    nList = [];
+const genAddSubStn = (termNum, equalDegree) => {
+  let baseList = [];
+  let nList = [];
   let randList = Array.from({ length: termNum }, () =>
     Math.floor(Math.random() * 2)
   );
   let out = "";
-  if (m == null) {
-    m = randInt(4, 13, true);
-  }
+  let n;
+  let m = randInt(4, 13, true);
+  let  allInt = randInt(0, 1);
   for (i = 0; i < termNum; i++) {
-    let nn = randInt(1, 9);
-    let ff = String(randInt(1, 99));
-    if (ff[ff.length - 1] == 0) {
-      for (i in ff) {
-        if (ff[ff.length - 1] == 0) ff = ff.substring(0, ff.length - 1);
-      }
+    if (allInt) {
+      a = randInt(1, 50);
+    } else {
+      a = randFloat(10);
     }
-    let a = `${nn}.${ff}`;
-    let n = m + randInt(1, 3);
+    if (equalDegree) {
+      n = m;
+    } else {
+      n = m + randInt(1, 3);
+    }
     let stn = `${a}*10^[${n}]`;
     baseList.push(a);
     nList.push(n);
@@ -119,7 +121,7 @@ const stnString = (a, n) => {
   return `${a}*10^[${n}]`;
 };
 
-const genSolution = (baseList, nList, randList) => {
+const genSolutionAddSub = (baseList, nList, randList) => {
   let baseOut = 0;
   let i, stn, step1, step2, step3, answer;
   let solution = "";
@@ -195,7 +197,7 @@ module.exports = {
   genAddSubStn,
   getStn,
   stnString,
-  genSolution,
+  genSolutionAddSub,
   randFloat,
   multipleConcat,
 };

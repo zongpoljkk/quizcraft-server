@@ -31,5 +31,5 @@ exports.SUFFIX = {
     EXPO_STR: "10^[6]",
     NUM_STR: "1,000,000",
     POWER: 6,
-  }
+  },
 }
