@@ -10,13 +10,18 @@ const Challenge = require("../models/Challenge");
 const levelDictionary = levelSystem();
 const rankDictionary = rankSystem();
 
+const updateGroupScore = async (res, groupId, userId, correct, usedTime) => {
+  console.log(groupId, userId, correct, usedTime);
+  res.status(200).json({ success: true, data: groupId });
+};
+
 const updateChallengeScore = async (
   challengeId,
   correct,
   userTime,
   problemIndex,
   earnedExp,
-  earnedCoins,
+  earnedCoins
 ) => {
   await Challenge.findById(challengeId)
     .exec()
@@ -25,15 +30,11 @@ const updateChallengeScore = async (
         challenge.user1Time =
           +challenge.user1Time.toString() + parseFloat(userTime);
         if (correct) {
-          console.log("IF");
-          console.log(`problemIndex: ${problemIndex}`);
           challenge.user1Result.set(problemIndex, 1);
           challenge.user1Score++;
           challenge.user1GainExp += earnedExp;
           challenge.user1GainCoin += earnedCoins;
         } else {
-          console.log("ELSE");
-          console.log(`problemIndex: ${problemIndex}`);
           challenge.user1Result.set(problemIndex, 0);
         }
       } else {
@@ -51,7 +52,6 @@ const updateChallengeScore = async (
 
       // Update whoTurn when player finished NUMBER_OF_PROBLEM
       if (problemIndex === NUMBER_OF_PROBLEM - 1) {
-        console.log(`probleMIndex: ${problemIndex}`)
         switch (challenge.whoTurn) {
           case 1:
             challenge.whoTurn = 2;
@@ -64,7 +64,6 @@ const updateChallengeScore = async (
         challenge.user2IsRead = false;
       }
 
-      console.log(challenge);
       // No need to update current index because already did when getting problem by challenge id
       challenge.save();
     });
@@ -81,6 +80,10 @@ exports.checkAnswer = async (req, res, next) => {
   const challengeId = req.body.challengeId;
   const problemIndex = req.body.problemIndex;
   const userTime = req.body.userTime;
+
+  // * For Group Mode * //
+  const groupId = req.body.groupId;
+  const usedTime = req.body.usedTime; // Doesn't update difficulty index
 
   let earnedExp = 0;
   let earnedCoins = 0;
@@ -175,9 +178,27 @@ exports.checkAnswer = async (req, res, next) => {
               }
               user.save();
 
-              // * Update Challenge Field * //
+              // ? Update Challenge Field ? //
               if (mode === "challenge") {
-                updateChallengeScore(challengeId, true, userTime, problemIndex, earnedExp, earnedCoins);
+                updateChallengeScore(
+                  challengeId,
+                  true,
+                  userTime,
+                  problemIndex,
+                  earnedExp,
+                  earnedCoins
+                );
+              }
+
+              // * Update Group Field * //
+              if (mode === "group") {
+                updateGroupScore(
+                  res,
+                  groupId,
+                  userId,
+                  true,
+                  usedTime,
+                )
               }
 
               const returnedSolution = {
@@ -196,9 +217,27 @@ exports.checkAnswer = async (req, res, next) => {
               next();
             });
         } else {
-          // * Update Challenge Field * //
+          // ? Update Challenge Field ? //
           if (mode === "challenge") {
-            updateChallengeScore(challengeId, false, userTime, problemIndex, earnedExp, earnedCoins);
+            updateChallengeScore(
+              challengeId,
+              false,
+              userTime,
+              problemIndex,
+              earnedExp,
+              earnedCoins
+            );
+          }
+
+          // * Update Group Field * //
+          if (mode === "group") {
+            updateGroupScore(
+              res,
+              groupId,
+              userId,
+              false,
+              usedTime,
+            )
           }
 
           const user = User.findById(userId)
