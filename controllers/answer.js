@@ -2,6 +2,7 @@ const math = require("mathjs");
 const { levelSystem } = require("../utils/level");
 const { rankSystem } = require("../utils/level");
 const { NUMBER_OF_PROBLEM } = require("../utils/challenge");
+const { calculatePoints } = require("../utils/group");
 
 const Answer = require("../models/Answer");
 const User = require("../models/User");
@@ -11,8 +12,8 @@ const Group = require("../models/Group");
 const levelDictionary = levelSystem();
 const rankDictionary = rankSystem();
 
-const updateGroupScore = async (res, groupId, userId, correct, usedTime) => {
-  console.log(groupId, userId, correct, usedTime);
+const updateGroupScore = async (res, groupId, userId, correct, usedTime, correctAnswer) => {
+  console.log(groupId, userId, correct, usedTime, correctAnswer);
   await Group.findById(groupId).exec().then((group) => {
     console.log("CHECKTIME")
     console.log(usedTime)
@@ -25,9 +26,11 @@ const updateGroupScore = async (res, groupId, userId, correct, usedTime) => {
       console.log("UPDATE USER POINT AND SCORE")
       group.members.find(member => member.userId.toString() === userId).score++;
       console.log(`score: ${group.members.find(member => member.userId.toString() === userId).score}`)
+      group.members.find(member => member.userId.toString() === userId).point += calculatePoints(usedTime, group.timePerProblem);
+      console.log(`points: ${group.members.find(member => member.userId.toString() === userId).point}`)
     }
     console.log(group)
-    return res.status(200).json({ success: true, data: correct });
+    return res.status(200).json({ success: true, data: {correct: correct, correctAnswer: correctAnswer} });
   })
 };
 
@@ -86,6 +89,7 @@ const updateChallengeScore = async (
 };
 
 exports.checkAnswer = async (req, res, next) => {
+  console.log(req.body)
   let problemId = req.body.problemId;
   const userId = req.body.userId;
   const userAnswer = req.body.userAnswer;
@@ -214,6 +218,7 @@ exports.checkAnswer = async (req, res, next) => {
                   userId,
                   true,
                   usedTime,
+                  answer.body,
                 )
               }
 
@@ -253,6 +258,7 @@ exports.checkAnswer = async (req, res, next) => {
               userId,
               false,
               usedTime,
+              answer.body,
             )
           }
 
