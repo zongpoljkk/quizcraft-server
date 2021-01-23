@@ -1,21 +1,89 @@
 const math = require("mathjs");
 const { levelSystem } = require("../utils/level");
 const { rankSystem } = require("../utils/level");
+const { NUMBER_OF_PROBLEM } = require("../utils/challenge");
 
 const Answer = require("../models/Answer");
 const User = require("../models/User");
+const Challenge = require("../models/Challenge");
 
 const levelDictionary = levelSystem();
 const rankDictionary = rankSystem();
 
 const { CHECK_ANSWER_TYPE, DIFFICULTY } = require("../utils/const");
 
+const updateChallengeScore = async (
+  challengeId,
+  correct,
+  userTime,
+  problemIndex,
+  earnedExp,
+  earnedCoins,
+) => {
+  await Challenge.findById(challengeId)
+    .exec()
+    .then((challenge) => {
+      if (challenge.whoTurn === 1) {
+        challenge.user1Time =
+          +challenge.user1Time.toString() + parseFloat(userTime);
+        if (correct) {
+          console.log("IF");
+          console.log(`problemIndex: ${problemIndex}`);
+          challenge.user1Result.set(problemIndex, 1);
+          challenge.user1Score++;
+          challenge.user1GainExp += earnedExp;
+          challenge.user1GainCoin += earnedCoins;
+        } else {
+          console.log("ELSE");
+          console.log(`problemIndex: ${problemIndex}`);
+          challenge.user1Result.set(problemIndex, 0);
+        }
+      } else {
+        challenge.user2Time =
+          +challenge.user2Time.toString() + parseFloat(userTime);
+        if (correct) {
+          challenge.user2Result.set(problemIndex, 1);
+          challenge.user2Score++;
+          challenge.user2GainExp += earnedExp;
+          challenge.user2GainCoin += earnedCoins;
+        } else {
+          challenge.user2Result.set(problemIndex, 0);
+        }
+      }
+
+      // Update whoTurn when player finished NUMBER_OF_PROBLEM
+      if (problemIndex === NUMBER_OF_PROBLEM - 1) {
+        console.log(`probleMIndex: ${problemIndex}`)
+        switch (challenge.whoTurn) {
+          case 1:
+            challenge.whoTurn = 2;
+            break;
+          case 2:
+            challenge.whoTurn = 1;
+        }
+        challenge.currentProblem = 0;
+        challenge.user1IsRead = false;
+        challenge.user2IsRead = false;
+      }
+
+      console.log(challenge);
+      // No need to update current index because already did when getting problem by challenge id
+      challenge.save();
+    });
+};
+
 exports.checkAnswer = async (req, res, next) => {
-  const problemId = req.body.problemId;
+  let problemId = req.body.problemId;
   const userId = req.body.userId;
   const userAnswer = req.body.userAnswer;
   const subtopic = req.body.subtopic;
   const mode = req.body.mode;
+
+  // ? For Challenge Mode ? //
+  const challengeId = req.body.challengeId;
+  const problemIndex = req.body.problemIndex;
+  const userTime = req.body.userTime;
+
   let earnedExp = 0;
   let earnedCoins = 0;
 
@@ -37,7 +105,7 @@ exports.checkAnswer = async (req, res, next) => {
     .populate("problemId", "difficulty")
     .exec((err, answer) => {
       if (err) {
-        console.log(`errrrror`);
+        console.log(`error finding answer given problem id`);
         res.status(500).send({ error: err });
       } else if (!answer) {
         res
@@ -65,7 +133,7 @@ exports.checkAnswer = async (req, res, next) => {
           //   math.evaluate(userAnswer) === math.evaluate(answer.body))
           // math.compare(userAnswer, answer.body) === true)
         ) {
-        //  || subtopic === "การดำเนินการของเลขยกกำลัง") {
+          //  || subtopic === "การดำเนินการของเลขยกกำลัง") {
 
           // try {
           //    const eval = math.evaluate(userAnswer) === math.evaluate(answer.body)
@@ -73,7 +141,6 @@ exports.checkAnswer = async (req, res, next) => {
           // catch (err) {
           //   console.log(`Can't evaluate string: ${err}`)
           // }
-
 
           User.findById(userId)
             .exec()
@@ -122,6 +189,12 @@ exports.checkAnswer = async (req, res, next) => {
                 rank_up = false;
               }
               user.save();
+
+              // * Update Challenge Field * //
+              if (mode === "challenge") {
+                updateChallengeScore(challengeId, true, userTime, problemIndex, earnedExp, earnedCoins);
+              }
+
               const returnedSolution = {
                 correct: true,
                 solution: answer.solution,
@@ -138,6 +211,11 @@ exports.checkAnswer = async (req, res, next) => {
               next();
             });
         } else {
+          // * Update Challenge Field * //
+          if (mode === "challenge") {
+            updateChallengeScore(challengeId, false, userTime, problemIndex, earnedExp, earnedCoins);
+          }
+
           const user = User.findById(userId)
             .exec()
             .then((user) => {
