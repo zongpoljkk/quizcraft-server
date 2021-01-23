@@ -120,6 +120,8 @@ exports.checkAnswer = async (req, res, next) => {
     case "group":
       mode_surplus = 0;
       break;
+    default:
+      mode_surplus = 1;
   }
 
   Answer.findOne({ problemId: problemId })
@@ -227,6 +229,7 @@ exports.checkAnswer = async (req, res, next) => {
                 solution: answer.solution,
                 user: user,
               };
+
               req.correct = returnedSolution.correct;
               req.solution = returnedSolution.solution;
               req.user = returnedSolution.user._id;
