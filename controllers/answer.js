@@ -18,7 +18,7 @@ const updateChallengeScore = async (
   userTime,
   problemIndex,
   earnedExp,
-  earnedCoins,
+  earnedCoins
 ) => {
   await Challenge.findById(challengeId)
     .exec()
@@ -53,7 +53,7 @@ const updateChallengeScore = async (
 
       // Update whoTurn when player finished NUMBER_OF_PROBLEM
       if (problemIndex === NUMBER_OF_PROBLEM - 1) {
-        console.log(`probleMIndex: ${problemIndex}`)
+        console.log(`probleMIndex: ${problemIndex}`);
         switch (challenge.whoTurn) {
           case 1:
             challenge.whoTurn = 2;
@@ -99,6 +99,8 @@ exports.checkAnswer = async (req, res, next) => {
     case "group":
       mode_surplus = 0;
       break;
+    default:
+      mode_surplus = 1;
   }
 
   Answer.findOne({ problemId: problemId })
@@ -116,19 +118,25 @@ exports.checkAnswer = async (req, res, next) => {
         // TODO: Check answer by type
         let correctFlag = false;
         switch (answer.checkAnswerType) {
-          case CHECK_ANSWER_TYPE.EQUAL_STRING: 
+          case CHECK_ANSWER_TYPE.EQUAL_STRING:
             if (userAnswer === answer.body) {
               correctFlag = true;
             }
+            if (answer.body.includes("|")) {
+              const correctAnswers = answer.body.split("|");
+              if (correctAnswers.includes(userAnswer)) {
+                correctFlag = true;
+              }
+            }
             break;
-          case CHECK_ANSWER_TYPE.MATH_EVALUATE:
-            {}
-          case CHECK_ANSWER_TYPE.POWER_OVER_ONE:
-            {}
+          case CHECK_ANSWER_TYPE.MATH_EVALUATE: {
+          }
+          case CHECK_ANSWER_TYPE.POWER_OVER_ONE: {
+          }
         }
 
         if (
-          userAnswer === answer.body      
+          correctFlag
           // (subtopic === "การดำเนินการของเลขยกกำลัง" && // For this topic, there are many possible answers
           //   math.evaluate(userAnswer) === math.evaluate(answer.body))
           // math.compare(userAnswer, answer.body) === true)
@@ -192,7 +200,14 @@ exports.checkAnswer = async (req, res, next) => {
 
               // * Update Challenge Field * //
               if (mode === "challenge") {
-                updateChallengeScore(challengeId, true, userTime, problemIndex, earnedExp, earnedCoins);
+                updateChallengeScore(
+                  challengeId,
+                  true,
+                  userTime,
+                  problemIndex,
+                  earnedExp,
+                  earnedCoins
+                );
               }
 
               const returnedSolution = {
@@ -213,7 +228,14 @@ exports.checkAnswer = async (req, res, next) => {
         } else {
           // * Update Challenge Field * //
           if (mode === "challenge") {
-            updateChallengeScore(challengeId, false, userTime, problemIndex, earnedExp, earnedCoins);
+            updateChallengeScore(
+              challengeId,
+              false,
+              userTime,
+              problemIndex,
+              earnedExp,
+              earnedCoins
+            );
           }
 
           const user = User.findById(userId)
