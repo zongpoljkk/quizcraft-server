@@ -130,16 +130,31 @@ exports.checkAnswer = async (req, res, next) => {
             }
             break;
           case CHECK_ANSWER_TYPE.MATH_EVALUATE: {
-          }
-          case CHECK_ANSWER_TYPE.POWER_OVER_ONE: {
-            const tempUserAnswer = userAnswer.split('[').join('(')
-            const tempUserAnswer2 = tempUserAnswer.split(']').join(')')
-            const tempAnswerBody = answer.body.split('[').join('(')
-            const tempAnswerBody2 = tempAnswerBody.split(']').join(')')
+            const tempUserAnswer = userAnswer.split("[").join("(");
+            const tempUserAnswer2 = tempUserAnswer.split("]").join(")");
+            const tempAnswerBody = answer.body.split("[").join("(");
+            const tempAnswerBody2 = tempAnswerBody.split("]").join(")");
             if (
               math.evaluate(tempUserAnswer2) === math.evaluate(tempAnswerBody2)
             ) {
               correctFlag = true;
+            }
+          }
+          case CHECK_ANSWER_TYPE.POWER_OVER_ONE: {
+            // POWER equals 1
+            if (userAnswer.includes("[1]")) {
+              correctFlag = false;
+            } else {
+              const tempUserAnswer = userAnswer.split("[").join("(");
+              const tempUserAnswer2 = tempUserAnswer.split("]").join(")");
+              const tempAnswerBody = answer.body.split("[").join("(");
+              const tempAnswerBody2 = tempAnswerBody.split("]").join(")");
+              if (
+                math.evaluate(tempUserAnswer2) ===
+                math.evaluate(tempAnswerBody2)
+              ) {
+                correctFlag = true;
+              }
             }
           }
         }
