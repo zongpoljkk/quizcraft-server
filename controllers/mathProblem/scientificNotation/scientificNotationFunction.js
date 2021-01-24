@@ -1,4 +1,3 @@
-const { min } = require("mathjs");
 const math = require("mathjs");
 const { randInt } = require("../globalFunction");
 
@@ -121,6 +120,108 @@ const stnString = (a, n) => {
   return `${a}*10^[${n}]`;
 };
 
+const genSolutionAddSubDiv = (baseList1, nList1, randList1, baseList2, nList2, randList2) => {
+  let baseOutTop = 0;
+  let baseOutButtom = 0;
+  let top = "";
+  let buttom = "";
+  let i, stn, step1, step2, step3, step4;
+  let answer, minTop, minButton, baseOut, min
+  let solution = "";
+  let solutionList = [];
+  let temp = "";
+  //step1 make n to equal (top)
+  minTop = Math.min(...nList1);
+  step1 = "";
+  for (i in baseList1) {
+    if (nList1[i] != minTop) {
+      temp = moveThePoint(baseList1[i], nList1[i] - minTop);
+      baseList1[i] = temp;
+      nList1[i] = minTop;
+    } else {
+      temp = baseList1[i];
+    }
+    stn = `${temp}*10^[${minTop}]`;
+    if (i == 0) {
+      top += randList1[i] ? `${stn}` : `-${stn}`;
+    } else {
+      top += randList1[i] ? `+${stn}` : `-${stn}`;
+    }
+    baseOutTop = math.add(
+      baseOutTop,
+      randList1[i] ? math.bignumber(temp) : math.bignumber(-temp)
+    );
+  }
+  baseOut = baseOutTop;
+  min = minTop;
+  step1 = top;
+  if (baseList2) {
+    minButton = Math.min(...nList2);
+    for (i in baseList2) {
+      if (nList2[i] != minButton) {
+        temp = moveThePoint(baseList2[i], nList2[i] - minButton);
+        baseList2[i] = temp;
+        nList2[i] = minButton;
+      } else {
+        temp = baseList2[i];
+      }
+      stn = `${temp}*10^[${minButton}]`;
+      if (i == 0) {
+        buttom += randList2[i] ? `${stn}` : `-${stn}`;
+      } else {
+        buttom += randList2[i] ? `+${stn}` : `-${stn}`;
+      }
+      baseOutButtom = math.add(
+        baseOutButtom,
+        randList2[i] ? math.bignumber(temp) : math.bignumber(-temp)
+      );
+    }
+    step1 = `(${top})/(${buttom})`;
+    baseOut = math.divide(math.bignumber(baseOutTop),math.bignumber(baseOutButtom));
+    min = minTop - minButton;
+  }
+  solutionList.push(step1);
+  step2= "";
+  top = "";
+  for (i in baseList1) {
+    temp = baseList1[i];
+    if (i == 0) {
+      top += randList1[i] ? `${temp}` : `-${temp}`;
+    } else {
+      top += randList1[i] ? `+${temp}` : `-${temp}`;
+    }
+  }
+  top = stnString(`(${top})`,minTop);
+  step2 = top;
+  buttom = "";
+  step3 = stnString(baseOutTop, minTop);
+  if (baseList2) {
+    for (i in baseList2) {
+      temp = baseList2[i];
+      if (i == 0) {
+        buttom += randList2[i] ? `${temp}` : `-${temp}`;
+      } else {
+        buttom += randList2[i] ? `+${temp}` : `-${temp}`;
+      }
+    }
+    buttom = stnString(`(${buttom})`,minButton);
+    step2 = `(${top})/(${buttom})`;
+    step3 = `(${stnString(baseOutTop, minTop)})/(${stnString(baseOutButtom, minButton)})`;
+  }
+  solutionList.push(step2);
+  solutionList.push(step3);
+  if (baseList2) {
+    step4 = stnString(baseOut, min);
+    solutionList.push(step4);
+  }
+  answer = getStn(baseOut, min);
+  if (solutionList[solutionList.length - 1] != answer) {
+    solutionList.push(answer);
+  }
+  solution = solutionList.join("\n");
+  return [{ solution, solutionList }];
+}
+
 const genSolutionAddSub = (baseList, nList, randList) => {
   let baseOut = 0;
   let i, stn, step1, step2, step3, answer;
@@ -134,8 +235,6 @@ const genSolutionAddSub = (baseList, nList, randList) => {
   for (i in baseList) {
     if (nList[i] != min) {
       temp = moveThePoint(baseList[i], nList[i] - min);
-      baseList[i] = temp;
-      nList[i] = min;
     } else {
       temp = baseList[i];
     }
@@ -200,4 +299,5 @@ module.exports = {
   genSolutionAddSub,
   randFloat,
   multipleConcat,
+  genSolutionAddSubDiv, 
 };

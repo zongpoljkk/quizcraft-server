@@ -47,6 +47,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           //create answer
           answerBody = `${num}`;
           answerForDisplay = answerBody;
+          checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           answerType = randInt(0,1)? ANSWER_TYPE.MATH_INPUT : ANSWER_TYPE.RADIO_CHOICE;
           if(answerType == ANSWER_TYPE.RADIO_CHOICE) {
              //gen list of choices
@@ -103,9 +104,9 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           rand = randInt(0,1);
           problemTitle = rand? "จงเขียนเลขยกกำลังต่อไปนี้ในรูปผลคูณ โดยใช้เครื่องหมาย * แทนเครื่องหมายการคูณ" : "จงเขียนผลคูณต่อไปนี้ในรูปเลขยกกำลัง";
           if (rand) {
-            a = randInt(1,7,true);
+            a = randInt(2,99,true);
           } else {
-            a = randInt(0,1)? randInt(1,99,true) : ALPHABET[randInt(0,2)];
+            a = randInt(0,1)? randInt(2,99,true) : ALPHABET[randInt(0,ALPHABET.length)];
           }
           n = randInt(2,7);
           problemBody = await multiplicationTerm(a,n);
@@ -116,18 +117,21 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
             [answerBody,problemBody] = [problemBody,answerBody];
           }
           answerForDisplay = answerBody;
+          checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           answerType = randInt(0,1)? ANSWER_TYPE.MATH_INPUT : ANSWER_TYPE.RADIO_CHOICE;
           if(answerType == ANSWER_TYPE.RADIO_CHOICE) {
             //gen list of choices
             choices = [answerBody];
             if (rand) {
-              temp = await multiplicationTerm(n,Math.abs(a));
-              if (!choices.includes(temp)) {
-                choices.push(temp);
-              }
-              temp = await multiplicationTerm(n, randInt(1,Math.abs(a)+2));
-              if (!choices.includes(temp)) {
-                choices.push(temp);
+              if (Math.abs(a) <= 7) {
+                temp = await multiplicationTerm(n,Math.abs(a));
+                if (!choices.includes(temp)) {
+                  choices.push(temp);
+                }
+                temp = await multiplicationTerm(n, randInt(1,Math.abs(a)+2));
+                if (!choices.includes(temp)) {
+                  choices.push(temp);
+                }
               }
               do {
                 temp = await multiplicationTerm(a, randInt(n-1,n+2));
@@ -162,7 +166,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           break;
         case 3: 
           a = baseSelector();
-          n = randInt(0,15,true);
+          n = randInt(0,99,true);
           rand = randInt(0,1);
           problemTitle = rand? `จงบอก "ฐาน" ของเลขยกกำลังต่อไปนี้` : `จงบอก "เลขชี้กำลัง" ของเลขยกกำลังต่อไปนี้`;
           problemBody = a<0? `(${a})^[${n}]` : `${a}^[${n}]`;
@@ -170,6 +174,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           //create answer
           answerBody = rand? `${a}` : `${n}`;
           answerForDisplay = answerBody;
+          checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           answerType = randInt(0,1)? ANSWER_TYPE.MATH_INPUT : ANSWER_TYPE.RADIO_CHOICE;
           if (answerType =  ANSWER_TYPE.RADIO_CHOICE) {
             choices = [a,n];
@@ -191,13 +196,13 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           if (1 <= positiveBase && positiveBase <= 2) {
             n = randInt(3,10);
           } else if (2 < positiveBase && positiveBase <= 5) {
-            n = randInt(0,5);
+            n = randInt(1,6);
           } else if (5 < positiveBase && positiveBase <= 10) {
-            n = randInt(0,4);
+            n = randInt(0,5);
           } else if (10 < positiveBase && positiveBase <= 15) {
-            n = randInt(0,3);
+            n = randInt(0,4);
           } else {
-            n = randInt(0,2);
+            n = randInt(0,3);
           }
           expo = a<0? `(${a})^[x]`: `${a}^[x]`;
           num = math.pow(math.bignumber(a),math.bignumber(n));
@@ -207,6 +212,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           answerBody = n;
           answerForDisplay = n;
           answerType = ANSWER_TYPE.MATH_INPUT;
+          checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
           break;
         case 2:
           problemTitle = "จงเขียนจำนวนต่อไปนี้ ให้อยู่ในรูปเลขยกกำลังที่มีฐานเป็นจำนวนเฉพาะ"
@@ -216,15 +222,15 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           if (2 <= positiveBase && positiveBase <= 3) { // 2 3
             n = randInt(2,10);
           } else if (3 < positiveBase && positiveBase <= 6) { // 5 
-            n = randInt(2,5);
+            n = randInt(2,6);
           } else if (6 < positiveBase && positiveBase <= 10) { // 7 
-            n = randInt(2,4);
+            n = randInt(2,5);
           } else if (10 < positiveBase && positiveBase <= 15) { // 11 13
-            n = randInt(2,3);
+            n = randInt(2,4);
           } else {
-            n = 2;
+            n = randInt(2,3);
           }
-          expo = a<0? `(${a})^[${n}]` : `${a}^[${n}]`;
+          expo = `(${a})^[${n}]`;
           num = math.pow(math.bignumber(a),math.bignumber(n));
           problemBody = num;
           
@@ -232,9 +238,10 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           answerBody = `${expo}`;
           answerForDisplay = `${expo}`;
           if (n%2 == 0) {
-            answerBody += a<0? `|${-a}^[${n}]` : `|(${-a})^[${n}]`;
+            answerBody += `|(${-a})^[${n}]`;
           }
           answerType = ANSWER_TYPE.MATH_INPUT;
+          checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           break;
         case 3:
           problemTitle = "จงเขียนจำนวนต่อไปนี้ให้อยู่ในรูปเลขยกกำลังที่มีเลขชี้กำลังมากกว่า 1";
@@ -243,13 +250,13 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           if (positiveBase == 2) {
             n = randInt(2,10);
           } else if (2 < positiveBase && positiveBase <= 5) {
-            n = randInt(2,5);
+            n = randInt(2,6);
           } else if (5 < positiveBase && positiveBase <= 8) {
-            n = randInt(2,4);
+            n = randInt(2,5);
           } else if (8 < positiveBase && positiveBase <= 11) {
-            n = randInt(2,3);
+            n = randInt(2,4);
           } else {
-            n = 2;
+            n = randInt(2,3);;
           }
           if (a < 0 && n % 2 == 0) {
             a = -a;
@@ -267,8 +274,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
       }
       break;
     case DIFFICULTY.HARD:
-      // opt = randInt(1,3);
-      opt = 3;
+      opt = randInt(1,3);
       switch (opt) {
         case 1:
           problemTitle = "จงหาว่าเลขยกกำลังต่อไปนี้มีค่าเท่ากันหรือไม่"
@@ -302,6 +308,8 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           //create answer
           answerBody = numList[indexList[0]] == numList[indexList[1]] ? "เท่ากัน" : "ไม่เท่า";
           answerType = ANSWER_TYPE.RADIO_CHOICE;
+          answerForDisplay = answerBody;
+          checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           choices = ["เท่ากัน","ไม่เท่า"]
           solution = `${selectedExpo[0]} มีค่าเป็น${numList[indexList[0]]==1? `บวก`:`ลบ`} `
                     + `${answerBody==`เท่ากัน`? `และ`:`ในขณะที่`} `
@@ -334,6 +342,8 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           //create answer
           answerBody = expoList[rand] == 1? "จำนวนเต็มบวก" : "จำนวนเต็มลบ";
           answerType = ANSWER_TYPE.RADIO_CHOICE;
+          answerForDisplay = answerBody;
+          checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           choices = ["จำนวนเต็มบวก","จำนวนเต็มลบ"];
           //create hint
           hintBody = `ถ้าเลขติดลบยกกำลังด้วยเลขคู่จะได้ค่าบวก`
@@ -342,7 +352,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           break;
         case 3:
           problemTitle = "จงหาค่าของ x เมื่อ";
-          a = randInt(2,25,true);
+          a = randInt(2,50,true);
           positiveBase = Math.abs(a);
           if (1 <= positiveBase && positiveBase <= 2) {
             n = randInt(4,10);
@@ -364,10 +374,12 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
             answerBody += `|${-a}`;
           }
           answerType = ANSWER_TYPE.MATH_INPUT;
+          checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
           break;
       }
       break;
   }
+
   // create model
   problem = new Problem({
     body: problemBody,

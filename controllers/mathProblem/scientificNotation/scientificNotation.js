@@ -17,6 +17,7 @@ const {
   genSolutionAddSub,
   randFloat,
   multipleConcat,
+  genSolutionAddSubDiv, 
 } = require("./scientificNotationFunction");
 const { genSolution } = require("../operationsOfExponents/operationsOfExponentsFunction");
 const { PROBLEM_TITLE, SUFFIX } = require("./const");
@@ -265,22 +266,36 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           //create hint
           hintBody = `ทำให้เลขยกกำลังเท่ากันก่อน แล้วจึงนำเลขข้างหน้ามาบวกลบกัน\nเช่น 3*10^[4] + 5.6*10^[6]\n= 3*10^[4] + 560*10[4]\n= 563*10[4]\n= 5.63*10^[6]`;
           break;
-        case 2: //mul div equalDegree top buttom
-          answer = randInt(1,25,true);
+        case 2: //add sub div equalDegree top buttom
+          answer = randInt(1,50,true);
           buttom =  randInt(2,10);
           top = math.multiply(bignumber(answer),math.bignumber(buttom));
           termNum = randInt(2,4);
           //gen top
-          // baseList = [];
+          baseList = [];
+          nList = [];
+          randList = [];
+          baseList2 = [];
+          nList2 = [];
+          randList2 = [];
           baseOut = 0;
           n = randInt(3, 10, true);
           for (i = 0; i<termNum; i++) {
             if (i == termNum-1) {
               a = top - baseOut;
             } else {
-              a = randInt(1,top);
+              do {
+                a = randInt(1,Math.abs(top),true);
+              } while (baseOut + a == top);
             }
-            // baseList.push(a);
+            if (a < 0) {
+              baseList.push(-a);
+              randList.push(0);
+            } else {
+              baseList.push(a);
+              randList.push(1);
+            }
+            nList.push(n);
             baseOut += a;
             if (i==0) {
               problemBody += `${stnString(a,n)}`;
@@ -297,9 +312,18 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
             if (i == termNum-1) {
               a = buttom - baseOut;
             } else {
-              a = randInt(1,buttom);
+              do {
+                a = randInt(1,Math.abs(buttom),true);
+              } while (baseOut + a == buttom);
             }
-            // baseList.push(a);
+            if (a < 0) {
+              baseList2.push(-a);
+              randList2.push(0);
+            } else {
+              baseList2.push(a);
+              randList2.push(1);
+            }
+            nList2.push(n2);
             baseOut += a;
             if (i==0) {
               temp += `${stnString(a,n2)}`;
@@ -308,40 +332,107 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
             }
           }
           problemBody = `(${problemBody})/(${temp})`;
-          solution = problemBody;
-          solution += `\n(${stnString(top,n)})/(${stnString(buttom,n2)})`;
-          solution += "\n" + stnString(answer,n-n2);
-          answerBody = getStn(answer,n-n2);
-          if (stnString(answer,n-n2) != answerBody) {
-            solution += "\n" + answerBody;
+          [{ solution, solutionList }] = genSolutionAddSubDiv(baseList,nList,randList,baseList2,nList2,randList2);
+          answerBody = solutionList[solutionList.length-1];
+          answerForDisplay = answerBody.replace("*10","{*10}");
+          checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
+          answerType = ANSWER_TYPE.MATH_INPUT;
+          hintBody = `ถ้าเลขยกกำลังของ 10 เท่ากันแล้ว สามารถนำเลขข้างหน้า 10 มาบวกลบกันได้ จากนั้นค่อยนำเลขมาหารกัน แล้วจัดให้อยู่ในรูปสัญกรณ์วิทยาศาสตร์`;
+          break;
+        case 3: //add sub div non-equalDegree top buttom
+          answer = randInt(1,50,true);
+          buttom =  randInt(2,10);
+          top = math.multiply(bignumber(answer),math.bignumber(buttom));
+          termNum = randInt(2,4);
+          //gen top
+          baseList = [];
+          nList = [];
+          randList = [];
+          baseList2 = [];
+          nList2 = [];
+          randList2 = [];
+          baseOut = 0;
+          n = randInt(3, 10, true);
+          for (i = 0; i<termNum; i++) {
+            if (i == termNum-1) {
+              a = top - baseOut;
+            } else {
+              do {
+                a = randInt(1,Math.abs(top),true);
+              } while (baseOut + a == top);
+            }
+            positiveBase = Math.abs(a);
+            rand = randInt(1,3,true);
+            positiveBase = moveThePoint(positiveBase,rand);
+            baseList.push(positiveBase);
+            randList.push(a<0? 0 : 1 );
+            nList.push(n-rand);
+            baseOut += a;
+            if (i==0) {
+              problemBody += a<0? `${stnString(-positiveBase,n-rand)}`:`${stnString(positiveBase,n-rand)}`;
+            } else {
+              problemBody += a<0 ? `-${stnString(positiveBase,n-rand)}`: `+${stnString(positiveBase,n-rand)}`;
+            }
           }
+
+          //gen buttom
+          temp = "";
+          baseOut = 0;
+          n2 = randInt(3, 10, true);
+          for (i = 0; i<termNum; i++) {
+            if (i == termNum-1) {
+              a = buttom - baseOut;
+            } else {
+              do {
+                a = randInt(1,Math.abs(buttom),true);
+              } while (baseOut + a == buttom);
+            }
+            positiveBase = Math.abs(a);
+            rand = randInt(1,3,true);
+            positiveBase = moveThePoint(positiveBase,rand);
+            baseList2.push(positiveBase);
+            randList2.push(a<0? 0 : 1 );
+            nList2.push(n2-rand);
+            baseOut += a;
+            if (i==0) {
+              temp += a<0? `${stnString(-positiveBase,n2-rand)}`:`${stnString(positiveBase,n2-rand)}`;
+            } else {
+              temp += a<0 ? `-${stnString(positiveBase,n2-rand)}`: `+${stnString(positiveBase,n2-rand)}`;
+            }
+          }
+          problemBody = `(${problemBody})/(${temp})`;
+          [{ solution, solutionList }] = genSolutionAddSubDiv(baseList,nList,randList,baseList2,nList2,randList2);
+          answerBody = solutionList[solutionList.length-1];
           answerForDisplay = answerBody.replace("*10","{*10}");
           checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           answerType = ANSWER_TYPE.MATH_INPUT;
           hintBody = `ทำให้เลขยกกำลังของ 10 เท่ากันก่อน แล้วจึงนำเลขข้างหน้า 10 มาบวกลบกัน จากนั้นค่อยนำเลขมาหารกัน แล้วจัดให้อยู่ในรูปสัญกรณ์วิทยาศาสตร์`;
-          // [{out: temp, baseList:baseList2, nList:nList2, randList:randList2}] = genAddSubStn(termNum, true);
-          // termNum = randInt(2,4);
-          // [{out: problemBody, baseList, nList, randList}] = genAddSubStn(termNum, true);
-          // problemBody = `(${problemBody})/(${temp})`;
           break;
       }
       break;
   }
-  console.log("---------------------------------------------");
-  console.log("problemTitle", problemTitle);
-  console.log("problemBody", problemBody);
-  console.log("answerBody", answerBody);
-  console.log("solution", `\n${solution}`);
-  console.log("hintBody", hintBody);
-  console.log("answerForDisplay", answerForDisplay);
-  console.log("checkAnswerType", checkAnswerType);
-  console.log("answerType", answerType);
-  console.log("choices", choices);
+  // console.log("---------------------------------------------");
+  // console.log("problemTitle", problemTitle);
+  // console.log("problemBody", problemBody);
+  // console.log("answerBody", answerBody);
+  // console.log("solution", `\n${solution}`);
+  // console.log("hintBody", hintBody);
+  // console.log("answerForDisplay", answerForDisplay);
+  // console.log("checkAnswerType", checkAnswerType);
+  // console.log("answerType", answerType);
+  // console.log("choices", choices);
   // console.log("allPos", allPos);
-  console.log("---------------------------------------------");
+  // console.log("---------------------------------------------");
 };
 
 generateScientificNotation("สัญกรณ์วิทยาศาสตร์", DIFFICULTY.HARD);
 // console.log(getStn(290,3))
 // console.log(genSolution([3, 1, 23], [4, 5, 4], [0, 0, 1]));
+// [{solution}]=genSolutionAddSubDiv([2,3],[3,3],[1,1],[400,100],[6,6],[1,1]);
+// [{solution}]=genSolutionAddSubDiv([20,30],[3,3],[1,1]);
+// console.log(solution);
+// console.log(moveThePoint(9,-2))
+// p = "0"
+// console.log(randInt(1,-5))
+// console.log(moveThePoint(0,5))
 return 0;
