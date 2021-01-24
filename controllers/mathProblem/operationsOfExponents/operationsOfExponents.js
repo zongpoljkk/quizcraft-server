@@ -623,9 +623,6 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
   });
   hint = new Hint({ problemId: problemId, body: hintBody });
   
-  console.log(problem)
-  console.log(answer)
-  console.log(hint)
   // save to database
   try {
     newProblem = await problem.save();

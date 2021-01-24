@@ -411,28 +411,35 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
       }
       break;
   }
-  // console.log("---------------------------------------------");
-  // console.log("problemTitle", problemTitle);
-  // console.log("problemBody", problemBody);
-  // console.log("answerBody", answerBody);
-  // console.log("solution", `\n${solution}`);
-  // console.log("hintBody", hintBody);
-  // console.log("answerForDisplay", answerForDisplay);
-  // console.log("checkAnswerType", checkAnswerType);
-  // console.log("answerType", answerType);
-  // console.log("choices", choices);
-  // console.log("allPos", allPos);
-  // console.log("---------------------------------------------");
+  // create model
+  problem = new Problem({
+    body: problemBody,
+    subtopicName: subtopicName,
+    difficulty: difficulty,
+    answerType: answerType,
+    title: problemTitle,
+    choices: answerType == ANSWER_TYPE.RADIO_CHOICE? choices : [],
+  });
+  problemId = problem._id;
+  answer = new Answer({
+    problemId: problemId,
+    body: answerBody,
+    solution: solution,
+    answerForDisplay: answerForDisplay,
+    checkAnswerType: checkAnswerType
+  });
+  hint = new Hint({ problemId: problemId, body: hintBody });
+  
+  // save to database
+  try {
+    newProblem = await problem.save();
+    newAnswer = await answer.save();
+    newHint = await hint.save();
+    return [{ problem:newProblem, answer:newAnswer, hint:newHint }];
+  } catch (err) {
+    console.log(err)
+    return err;
+  }
 };
 
-generateScientificNotation("สัญกรณ์วิทยาศาสตร์", DIFFICULTY.HARD);
-// console.log(getStn(290,3))
-// console.log(genSolution([3, 1, 23], [4, 5, 4], [0, 0, 1]));
-// [{solution}]=genSolutionAddSubDiv([2,3],[3,3],[1,1],[400,100],[6,6],[1,1]);
-// [{solution}]=genSolutionAddSubDiv([20,30],[3,3],[1,1]);
-// console.log(solution);
-// console.log(moveThePoint(9,-2))
-// p = "0"
-// console.log(randInt(1,-5))
-// console.log(moveThePoint(0,5))
-return 0;
+module.exports = { generateScientificNotation };
