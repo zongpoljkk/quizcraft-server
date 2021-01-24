@@ -159,21 +159,7 @@ exports.checkAnswer = async (req, res, next) => {
           }
         }
 
-        if (
-          correctFlag
-          // (subtopic === "การดำเนินการของเลขยกกำลัง" && // For this topic, there are many possible answers
-          //   math.evaluate(userAnswer) === math.evaluate(answer.body))
-          // math.compare(userAnswer, answer.body) === true)
-        ) {
-          //  || subtopic === "การดำเนินการของเลขยกกำลัง") {
-
-          // try {
-          //    const eval = math.evaluate(userAnswer) === math.evaluate(answer.body)
-          // }
-          // catch (err) {
-          //   console.log(`Can't evaluate string: ${err}`)
-          // }
-
+        if (correctFlag) {
           User.findById(userId)
             .exec()
             .then((user) => {
