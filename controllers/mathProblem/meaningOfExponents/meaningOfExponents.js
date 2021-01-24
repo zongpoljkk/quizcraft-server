@@ -275,6 +275,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
       break;
     case DIFFICULTY.HARD:
       opt = randInt(1,3);
+      opt = 3;
       switch (opt) {
         case 1:
           problemTitle = "จงหาว่าเลขยกกำลังต่อไปนี้มีค่าเท่ากันหรือไม่"
@@ -368,13 +369,25 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           problemBody = `${expo} = ${num}`;
 
           //create answer
-          answerBody = a;
-          answerForDisplay = a;
           if (n%2 == 0) {
-            answerBody += `|${-a}`;
+            answerBody = Math.abs(a);
+            answerForDisplay = answerBody;
+            answerBody += `|${-Math.abs(a)}`;
+          } else {
+            answerBody = a;
+            answerForDisplay = answerBody;
           }
           answerType = ANSWER_TYPE.MATH_INPUT;
-          checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
+          checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
+
+          //crete solution
+          solution = problemBody;
+          if (n%2 == 0) {
+            solution += `\n${expo} = ${Math.abs(a)}^[${n}]`;
+          } else {
+            solution += a<0? `\n${expo} = (${a})^[${n}]` : `\n${expo} = ${a}^[${n}]`;
+          }
+          solution += `\nx = ${answerForDisplay}`;
           break;
       }
       break;
