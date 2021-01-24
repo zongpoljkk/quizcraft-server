@@ -1,10 +1,9 @@
 const Problem = require("../models/Problem");
-const Subtopic = require("../models/Subtopic");
 const Answer = require("../models/Answer");
 const Hint = require("../models/Hint");
 const { mathGenerate } = require("./mathProblem/mathProblemGenerator");
 const { englishGenerate } = require("./englishProblem/englishProblemGenerator");
-const { MATH_INPUT } = require("./mathProblem/const");
+const { ANSWER_TYPE } = require("../utils/const");
 const MATH = "คณิตศาสตร์";
 const ENG = "ภาษาอังกฤษ";
 
@@ -228,7 +227,7 @@ exports.getProblemForUser = async (req, res, next) => {
               },
             }
           );
-          if (problem.answerType == MATH_INPUT) {
+          if (problem.answerType == ANSWER_TYPE.MATH_INPUT) {
             answer = await Answer.findOne({ problemId: problem._id });
             return res.status(200).json({
               success: true,
@@ -278,7 +277,7 @@ exports.getProblemForUser = async (req, res, next) => {
           .json({ success: false, error: "Problem out of stock" });
     }
   } else {
-    if (problem.answerType == MATH_INPUT) {
+    if (problem.answerType == ANSWER_TYPE.MATH_INPUT) {
       answer = await Answer.findOne({ problemId: problem._id });
       return res
         .status(200)
