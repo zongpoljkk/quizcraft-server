@@ -251,7 +251,8 @@ exports.joinGroup = async (req, res) => {
 
   Group.findOneAndUpdate(
     {
-      pin: body.pin
+      pin: body.pin,
+      problems: []
     },
     { $addToSet: { members: { userId: body.userId, username: user.username } } },
     { new: true },
