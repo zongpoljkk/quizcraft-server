@@ -5,6 +5,8 @@ const config = require("../config/keys");
 const { GAME_MODE, DIFFICULTY } = require("../utils/const");
 const { DIFFICULTY_EXP, DIFFICULTY_COIN, MODE_SURPLUS } = require("../utils/gameConfig");
 const { levelSystem, rankSystem, MAX_LEVEL } = require("../utils/level");
+const { findActiveItem } = require("./item");
+const { ITEM_NAME } = require("../utils/const"); 
 
 //Add user for testing
 exports.addUser = (req, res, next) => {
@@ -396,6 +398,30 @@ exports.updateStreak = async (userId) => {
   const lastLoginDate = new Date(user.lastLogin);
   const nextDate = new Date(user.lastLogin);
   nextDate.setDate(nextDate.getDate() + 1);
+  const activeItem = findActiveItem(user, ITEM_NAME.FREEZE);
+  if (activeItem) {
+    //Freeze if not expired
+    let nextDateOfExpiredDate = activeItem.expiredDate;
+    nextDateOfExpiredDate.setDate(nextDateOfExpiredDate.getDate() + 1);
+    if (now <= activeItem.expiredDate || now.toDateString() == activeItem.expiredDate.toDateString()) {
+      console.log("Freeze");
+      return;
+    } else if (now.toDateString() == nextDateOfExpiredDate.toDateString()) {
+      //inc streak by 1
+      await User.findOneAndUpdate(
+        {
+          _id: userId,
+        },
+        {
+          $inc: {
+            streak: 1,
+          },
+        }
+      );
+      console.log("inc streak by freeze");
+      return;
+    }
+  }
   if (now.toDateString() == lastLoginDate.toDateString()) {
     //same day, do nothing
     console.log("sameday");
@@ -554,6 +580,12 @@ exports.updateCoinAndExp = (user, gameMode, difficulty) => {
       earnedExp = DIFFICULTY_EXP.HARD * modeSurplus;  
       break;
   }
+
+  let activeItem = findActiveItem(user, ITEM_NAME.DOUBLE);
+  if (activeItem && Date.now() <= activeItem.expiredDate) {
+    earnedCoins *= 2;
+  }
+
   user.exp += earnedExp;
   user.coin += earnedCoins;
 

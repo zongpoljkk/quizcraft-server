@@ -87,10 +87,7 @@ exports.useSkipItemForQuiz = async (req,res) => {
   try {
     const userId = req.userId;
     const problemId = req.body.problemId;
-    var user = await User.findOne(
-      { _id: userId }, 
-      { level:1, rank:1, exp:1, maxExp:1, coin:1, items:1, usedItems:1}
-    );
+    var user = await User.findById(userId);
     let skipItem, indexOfSkipItem, i;
     for (i in user.items) {
       if (user.items[i].itemName == ITEM_NAME.SKIP) {
@@ -103,7 +100,7 @@ exports.useSkipItemForQuiz = async (req,res) => {
       return res.status(400).json({ success: false, error: "User does not has skip item" });
     }
     
-    var problem = await Problem.findOne({ _id: problemId });
+    var problem = await Problem.findById(problemId);
     if (!problem) {
       return res.status(400).json({ success: false, error: "problem not founded" });
     }
@@ -119,7 +116,7 @@ exports.useSkipItemForQuiz = async (req,res) => {
       problem.usedItems.push({
         itemName: ITEM_NAME.SKIP,
         amount: 1
-      })
+      });
     }
 
     // * Handle used item * //
@@ -138,7 +135,7 @@ exports.useSkipItemForQuiz = async (req,res) => {
         itemName: ITEM_NAME.SKIP,
         amount: 1,
         problems: problemId
-      })
+      });
     }
 
     let levelUp, rankUp, earnedCoins, earnedExp;
@@ -149,6 +146,7 @@ exports.useSkipItemForQuiz = async (req,res) => {
     await problem.save();
     return res.status(200).json({ success: true, data: { levelUp, rankUp, earnedCoins, earnedExp } }); 
   } catch (err) {
+    console.log(err)
     return res.status(500).json({ success: false, error: err.toString() });
   }
 }
@@ -265,11 +263,11 @@ exports.useFreezeItem = async (req, res) => {
     let user = await User.findById( req.userId );
     let indexOfFreezeItem;
     [user, indexOfFreezeItem] = checkAndUseItemOfUser(user, ITEM_NAME.FREEZE, res);
-    let nextDate = new Date();
-    nextDate.setDate(nextDate.getDate() + 1);
+    let expiredDate = new Date();
+    expiredDate.setDate(expiredDate.getDate() + 1);
     let indexOfActiveItem;
-    [user, indexOfActiveItem] = setActiveItemForUser(user, ITEM_NAME.FREEZE, nextDate);
-    // await user.save();
+    [user, indexOfActiveItem] = setActiveItemForUser(user, ITEM_NAME.FREEZE, expiredDate);
+    await user.save();
     return res.status(200).json({ 
       success: true, 
       data: { 
@@ -285,7 +283,30 @@ exports.useFreezeItem = async (req, res) => {
 }
 
 exports.useDoubleItem = async (req, res) => {
-  //coin 2x in 4 hr
+  //coin x2 in 1 hr
+  try {
+    let user = await User.findById( req.userId );
+    let indexOfDoubleItem;
+    [user, indexOfDoubleItem] = checkAndUseItemOfUser(user, ITEM_NAME.DOUBLE, res);
+    let expiredDate = new Date();
+    // 1 hr
+    expiredDate.setHours(expiredDate.getHours() + 1);
+    let indexOfActiveItem;
+    [user, indexOfActiveItem] = setActiveItemForUser(user, ITEM_NAME.DOUBLE, expiredDate);
+    await user.save();
+    return res.status(200).json({ 
+      success: true, 
+      data: { 
+        user: { 
+          item: user.items[indexOfDoubleItem], 
+          activeItem: user.activeItems[indexOfActiveItem]
+        }
+      } 
+    }); 
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.toString() });
+  }
+
 }
 
 exports.findActiveItem = (user, itemName) => {
