@@ -1,10 +1,8 @@
 const Item = require("../models/Item");
 const User = require("../models/User");
-const Challenge = require("../models/Challenge");
 const Problem = require("../models/Problem");
 const { GAME_MODE, ITEM_NAME } = require("../utils/const");
 const { updateCoinAndExp } = require("./user");
-const { NUMBER_OF_PROBLEM } = require("../utils/challenge");
 
 //Add item for testing
 exports.addItem = (req, res, next) => {
@@ -85,7 +83,6 @@ exports.getAllItems = async (req, res) => {
   );
 };
 
-
 exports.useSkipItemForQuiz = async (req,res) => {
   try {
     const userId = req.userId;
@@ -156,7 +153,7 @@ exports.useSkipItemForQuiz = async (req,res) => {
   }
 }
 
-exports.useRefreshItem = async (req,res) => {
+exports.useRefreshItem = async (req, res) => {
   try {
     const userId = req.userId;
     const problemId = req.body.problemId;
@@ -222,3 +219,85 @@ exports.useRefreshItem = async (req,res) => {
     return res.status(500).json({ success: false, error: err.toString() });
   }
 }
+
+const checkAndUseItemOfUser = (user, itemName, res) => {
+  let item, indexOfItem, i;
+  //check
+  for (i in user.items) {
+    if (user.items[i].itemName == itemName) {
+      item = user.items[i];
+      indexOfItem = i;
+      break;
+    }
+  }
+  if (!item || item.amount <= 0) {
+    return res.status(400).json({ success: false, error: `User does not has ${itemName} item` });
+  }
+  //use item
+  user.items[indexOfItem].amount -= 1;
+  return [user, indexOfItem];
+}
+
+const setActiveItemForUser = (user, itemName, expiredDate) => {
+  let activeItem, indexOfActiveItem;
+  for (i in user.activeItems) {
+    let item = user.activeItems[i];
+    if (item.itemName == itemName) {
+      item.expiredDate = expiredDate;
+      activeItem = item;
+      indexOfActiveItem = i;
+      break;
+    }
+  }
+  if (!activeItem) {
+    user.activeItems.push({
+      itemName: itemName,
+      expiredDate: expiredDate
+    })
+    indexOfActiveItem = user.activeItems.length-1;
+  }
+  return [user, indexOfActiveItem];
+}
+
+exports.useFreezeItem = async (req, res) => {
+  //1 day
+  try {
+    let user = await User.findById( req.userId );
+    let indexOfFreezeItem;
+    [user, indexOfFreezeItem] = checkAndUseItemOfUser(user, ITEM_NAME.FREEZE, res);
+    let nextDate = new Date();
+    nextDate.setDate(nextDate.getDate() + 1);
+    let indexOfActiveItem;
+    [user, indexOfActiveItem] = setActiveItemForUser(user, ITEM_NAME.FREEZE, nextDate);
+    // await user.save();
+    return res.status(200).json({ 
+      success: true, 
+      data: { 
+        user: { 
+          item: user.items[indexOfFreezeItem], 
+          activeItem: user.activeItems[indexOfActiveItem]
+        }
+      } 
+    }); 
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.toString() });
+  }
+}
+
+exports.useDoubleItem = async (req, res) => {
+  //coin 2x in 4 hr
+}
+
+exports.findActiveItem = (user, itemName) => {
+  let activeItem, indexOfActiveItem;
+  for (i in user.activeItems) {
+    let item = user.activeItems[i];
+    if (item.itemName == itemName) {
+      activeItem = item;
+      indexOfActiveItem = i;
+      break;
+    }
+  }
+  return activeItem;
+}
+

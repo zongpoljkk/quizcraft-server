@@ -45,5 +45,7 @@ router.get("/", [authJwt], itemController.getAllItems);
 router.post("/add-item", [authJwt, adminOnly], itemController.addItem);
 router.post("/use-skip-item-for-quiz", [authJwt], itemController.useSkipItemForQuiz);
 router.post("/use-refresh-item", [authJwt], itemController.useRefreshItem);
+router.post("/use-freeze-item", [authJwt], itemController.useFreezeItem);
+router.post("/use-double-item", [authJwt], itemController.useDoubleItem);
 
 module.exports = router;
