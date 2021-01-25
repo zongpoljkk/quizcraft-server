@@ -178,11 +178,11 @@ exports.useRefreshItem = async (req,res) => {
     
     var problem = await Problem.findOne({ _id: problemId });
     if (!problem) {
-      return res.status(400).json({ success: false, error: "problem not founded" });
+      return res.status(400).json({ success: false, error: "problem not found" });
     }
     let foundUsedItem = false;
     for (i in problem.usedItems) {
-      if (problem.usedItems[i].itemName = ITEM_NAME.SKIP) {
+      if (problem.usedItems[i].itemName = ITEM_NAME.REFRESH) {
         problem.usedItems[i].amount++;
         foundUsedItem = true;
         break;
@@ -190,7 +190,7 @@ exports.useRefreshItem = async (req,res) => {
     }
     if (!foundUsedItem) {
       problem.usedItems.push({
-        itemName: ITEM_NAME.SKIP,
+        itemName: ITEM_NAME.REFRESH,
         amount: 1
       })
     }
