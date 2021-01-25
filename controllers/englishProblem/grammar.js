@@ -147,6 +147,11 @@ const generateGrammar = async (subtopicName, difficulty) => {
     answerType: answerType,
     title: problemTitle,
     choices: answerType == ANSWER_TYPE.RADIO_CHOICE? choices : [],
+    answerBody: answerBody,
+    solution: solution,
+    checkAnswerType: checkAnswerType,
+    answerForDisplay: answerForDisplay,
+    hintBody: hintBody,
   });
   problemId = problem._id;
   answer = new Answer({

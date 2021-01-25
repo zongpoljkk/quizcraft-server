@@ -3,7 +3,7 @@ const Answer = require("../models/Answer");
 const Hint = require("../models/Hint");
 const { mathGenerate } = require("./mathProblem/mathProblemGenerator");
 const { englishGenerate } = require("./englishProblem/englishProblemGenerator");
-const { ANSWER_TYPE } = require("../utils/const");
+const { ANSWER_TYPE, SUBJECT } = require("../utils/const");
 const MATH = "คณิตศาสตร์";
 const ENG = "ภาษาอังกฤษ";
 
@@ -195,96 +195,64 @@ exports.getProblemForUser = async (req, res, next) => {
   const subject = req.body.subject;
   const subtopicName = req.body.subtopicName;
   const difficulty = req.body.difficulty;
-  var answer;
-  var problem = await Problem.findOneAndUpdate(
-    {
-      subtopicName: subtopicName,
-      difficulty: difficulty,
-      users: { $ne: userId },
-    },
-    { $push: { users: userId } },
-    { projection: { users: 0, times: 0, subtopicName: 0, difficulty: 0 } }
-  );
-  if (problem == null) {
-    //generate problem
-    switch (subject) {
-      case MATH:
-        try {
+  var problemOut;
+  try {
+    var problem = await Problem.findOneAndUpdate(
+      {
+        subtopicName: subtopicName,
+        difficulty: difficulty,
+        users: { $ne: userId },
+      },
+      { $push: { users: userId } },
+    );
+    if (problem == null) {
+      //generate problem
+      switch (subject) {
+        case SUBJECT.MATH:
           await mathGenerate({ subtopicName, difficulty });
-          problem = await Problem.findOneAndUpdate(
-            {
-              subtopicName: subtopicName,
-              difficulty: difficulty,
-              users: { $ne: userId },
-            },
-            { $push: { users: userId } },
-            {
-              projection: {
-                users: 0,
-                times: 0,
-                subtopicName: 0,
-                difficulty: 0,
-              },
-            }
-          );
-          if (problem.answerType == ANSWER_TYPE.MATH_INPUT) {
-            answer = await Answer.findOne({ problemId: problem._id });
-            return res.status(200).json({
-              success: true,
-              data: { problem, correctAnswer: answer.answerForDisplay },
-            });
-          } else {
-            return res.status(200).json({ success: true, data: { problem } });
-          }
-        } catch (err) {
-          if (!problem) return res.status(404).json({ success: false, error: "Problem out of stock and cannot generate problem" });
-          else if (err) return res.status(500).json({ success: false, error: err.toString() });
-          else return res.status(400).json({ success: false, error: "Something went wrong" });
-        }
-
-      case ENG:
-        try {
+          break;
+        case SUBJECT.ENG:
           await englishGenerate({ subtopicName, difficulty });
-          problem = await Problem.findOneAndUpdate(
-            {
-              subtopicName: subtopicName,
-              difficulty: difficulty,
-              users: { $ne: userId },
-            },
-            { $push: { users: userId } },
-            {
-              projection: {
-                users: 0,
-                times: 0,
-                subtopicName: 0,
-                difficulty: 0,
-              },
-            }
-          );
-          return res.status(200).json({
-            success: true,
-            data: { problem },
-          });
-        } catch (err) {
-          if (!problem) return res.status(404).json({ success: false, error: "Problem out of stock and cannot generate problem" });
-          else if (err) return res.status(500).json({ success: false, error: err.toString() });
-          else return res.status(400).json({ success: false, error: "Something went wrong" });
-        }
-
-      default:
-        return res
-          .status(404)
-          .json({ success: false, error: "Problem out of stock" });
+          break;
+        default:
+          return res.status(404).json({ success: false, error: "Problem out of stock" });
+      }
+      //find problem again
+      problem = await Problem.findOneAndUpdate(
+        {
+          subtopicName: subtopicName,
+          difficulty: difficulty,
+          users: { $ne: userId },
+        },
+        { $push: { users: userId } },
+      );
     }
-  } else {
+  
+    problemOut = {
+      _id: problem._id,
+      choices: problem.choices,
+      body: problem.body,
+      answerType: problem.answerType,
+      title: problem.title,
+    } 
     if (problem.answerType == ANSWER_TYPE.MATH_INPUT) {
-      answer = await Answer.findOne({ problemId: problem._id });
-      return res
-        .status(200)
-        .json({ success: true, data: { problem, correctAnswer: answer.answerForDisplay } });
+      return res.status(200).json({ 
+        success: true, 
+        data: { 
+          problem: problemOut, 
+          correctAnswer: problem.answerForDisplay 
+        } 
+      });
     } else {
-      return res.status(200).json({ success: true, data: { problem } });
+      return res.status(200).json({ 
+        success: true, 
+        data: { problem: problemOut } 
+      });
     }
+  } catch (err) {
+    if (!problem) return res.status(404).json({ success: false, error: "Problem out of stock and cannot generate problem" });
+    else if (err) return res.status(500).json({ success: false, error: err.toString() });
+    else return res.status(400).json({ success: false, error: "Something went wrong" });
   }
 };
 

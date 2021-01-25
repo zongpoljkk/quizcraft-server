@@ -48,6 +48,24 @@ const ProblemSchema = new Schema({
       default: 0,
     },
   }],
+  answerBody: {
+    type: String,
+    required: true,
+  },
+  solution: {
+    type: String,
+  },
+  checkAnswerType: {
+    type: String,
+    enum: ["MATH_EVALUATE","EQUAL_STRING","RULE_BASE","POWER_OVER_ONE"],
+    default: "EQUAL_STRING",
+  },
+  answerForDisplay: {
+    type: String,
+  },
+  hintBody: {
+    type: String,
+  }
 });
 
 module.exports = mongoose.model("Problem", ProblemSchema);
