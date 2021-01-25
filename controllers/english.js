@@ -12,6 +12,6 @@ exports.addEnglishData = async (req, res) => {
 
 //for test only
 exports.test = async (req, res) => {
-  const [{ problem, answer, hint }] = await generateGrammar('Grammar','EASY');
+  const problem = await generateGrammar('Grammar','EASY');
   return res.status(200).json({problem,answer,hint});
 }
