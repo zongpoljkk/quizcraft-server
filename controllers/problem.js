@@ -173,16 +173,16 @@ exports.generateProblem = async (req, res, next) => {
   switch (subject) {
     case MATH: 
       try {
-        [{ problem, answer, hint }] = await mathGenerate(req.body);
-        return res.send({ problem, answer, hint });
+        problem = await mathGenerate(req.body);
+        return res.send({ problem });
       } catch (err) {
         return res.status(500).json({ success: false, error: err });
       }
     
     case ENG:
       try {
-        [{ problem, answer, hint }] = await englishGenerate(req.body);
-        return res.send({ problem, answer, hint });
+        problem = await englishGenerate(req.body);
+        return res.send({ problem });
       } catch (err) {
         return res.status(500).json({ success: false, error: err });
       }

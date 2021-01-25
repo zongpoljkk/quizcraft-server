@@ -422,7 +422,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
     newProblem = await problem.save();
     newAnswer = await answer.save();
     newHint = await hint.save();
-    return [{ problem:newProblem, answer:newAnswer, hint:newHint }];
+    return newProblem;
   } catch (err) {
     console.log(err)
     return err;
