@@ -353,3 +353,33 @@ exports.getGroupGame = async (req, res) => {
       return res.status(400).json({ succes: false, error: "Something went wrong" });
   };
 };
+
+exports.resetAfterGameEnd = async (req, res) => {
+  const body = req.body;
+  if (!body) {
+    return res.status(400).json({
+      success: false,
+      error: "You must provide a body to update",
+    });
+  }
+
+  Group.findOneAndUpdate(
+    {
+      _id: body.groupId,
+    },
+    {
+      $set: { "members.$[].score": 0, "members.$[].point": 0, problems: [] },
+    },
+    { multi: true },
+    (err, user) => {
+      if (err) {
+        return res.status(500).json({ success: false, error: err });
+      }
+      if (!user) {
+        return res.status(400).json({ success: false, error: "no data" });
+      }
+      return res
+        .status(200).json({ success: true, data: "reset group success!" });
+    }
+  );
+};

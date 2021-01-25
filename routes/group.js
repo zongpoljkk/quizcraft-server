@@ -14,5 +14,6 @@ router.post("/gen-problems-when-group-start", [authJwt], groupController.genProb
 router.get("/group-scoreboard/", [authJwt], groupController.getGroupScoreboard);
 router.put("/join-group", [authJwt], groupController.joinGroup);
 router.get("/get-group-game", [authJwt], groupController.getGroupGame);
+router.put("/reset-group-game", [authJwt], groupController.resetAfterGameEnd);
 
 module.exports = router;
