@@ -3,9 +3,7 @@ const Answer = require("../models/Answer");
 const Hint = require("../models/Hint");
 const { mathGenerate } = require("./mathProblem/mathProblemGenerator");
 const { englishGenerate } = require("./englishProblem/englishProblemGenerator");
-const { ANSWER_TYPE, SUBJECT } = require("../utils/const");
-const MATH = "คณิตศาสตร์";
-const ENG = "ภาษาอังกฤษ";
+const { ANSWER_TYPE, SUBJECT, DIFFICULTY } = require("../utils/const");
 
 exports.getAllProblems = (req, res, next) => {
   Problem.find().exec((err, problems) => {
@@ -122,28 +120,28 @@ exports.checkAnswerAndUpdateDifficulty = async (req, res, next) => {
     const old_difficulty = problem.difficulty;
 
     switch (problem.difficulty) {
-      case "EASY":
+      case DIFFICULTY.EASY:
         if (avgProblemTime >= EASY_CEIL) {
           if (avgProblemTime >= MEDIUM_CEIL) {
-            problem.difficulty = "HARD";
+            problem.difficulty = DIFFICULTY.HARD;
           } else {
-            problem.difficulty = "MEDIUM";
+            problem.difficulty = DIFFICULTY.MEDIUM;
           }
         }
         break;
-      case "MEDIUM":
+      case DIFFICULTY.MEDIUM:
         if (avgProblemTime >= MEDIUM_CEIL) {
-          problem.difficulty = "HARD";
+          problem.difficulty = DIFFICULTY.HARD;
         } else if (avgProblemTime < EASY_CEIL) {
-          problem.difficulty = "EASY";
+          problem.difficulty = DIFFICULTY.EASY;
         }
         break;
-      case "HARD":
+      case DIFFICULTY.HARD:
         if (avgProblemTime < MEDIUM_CEIL) {
           if (avgProblemTime < EASY_CEIL) {
-            problem.difficulty = "EASY";
+            problem.difficulty = DIFFICULTY.EASY;
           } else {
-            problem.difficulty = "MEDIUM";
+            problem.difficulty = DIFFICULTY.MEDIUM;
           }
         }
     }
@@ -169,9 +167,9 @@ exports.checkAnswerAndUpdateDifficulty = async (req, res, next) => {
 // for testing
 exports.generateProblem = async (req, res, next) => {
   let subject = req.body.subject;
-  let problem, answer, hint;
+  let problem;
   switch (subject) {
-    case MATH: 
+    case SUBJECT.MATH: 
       try {
         problem = await mathGenerate(req.body);
         return res.send({ problem });
@@ -179,7 +177,7 @@ exports.generateProblem = async (req, res, next) => {
         return res.status(500).json({ success: false, error: err });
       }
     
-    case ENG:
+    case SUBJECT.ENG:
       try {
         problem = await englishGenerate(req.body);
         return res.send({ problem });
