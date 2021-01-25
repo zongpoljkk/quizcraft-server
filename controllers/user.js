@@ -549,7 +549,7 @@ exports.buyItem = async (req, res) => {
   );
 };
 
-exports.updateCoinAndExp = (user, gameMode, difficulty) => {  
+exports.updateCoinAndExp = async (user, gameMode, difficulty) => {  
   const levelDictionary = levelSystem();
   const rankDictionary = rankSystem();
   let earnedCoins, earnedExp, modeSurplus;
@@ -608,4 +608,4 @@ exports.updateCoinAndExp = (user, gameMode, difficulty) => {
     }
   }
   return [{ user, levelUp, rankUp, earnedCoins, earnedExp }];
-}
+};

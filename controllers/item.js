@@ -2,7 +2,7 @@ const Item = require("../models/Item");
 const User = require("../models/User");
 const Problem = require("../models/Problem");
 const { GAME_MODE, ITEM_NAME } = require("../utils/const");
-const { updateCoinAndExp } = require("./user");
+const userController = require("./user");
 
 //Add item for testing
 exports.addItem = (req, res, next) => {
@@ -139,7 +139,7 @@ exports.useSkipItemForQuiz = async (req,res) => {
     }
 
     let levelUp, rankUp, earnedCoins, earnedExp;
-    [{ user, levelUp, rankUp, earnedCoins, earnedExp }] = await updateCoinAndExp(user, GAME_MODE.QUIZ, problem.difficulty);
+    [{ user, levelUp, rankUp, earnedCoins, earnedExp }] = await userController.updateCoinAndExp(user, GAME_MODE.QUIZ, problem.difficulty);
 
     //save to database
     await user.save();
