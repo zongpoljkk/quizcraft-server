@@ -3,9 +3,9 @@ const { levelSystem } = require("../utils/level");
 const { rankSystem } = require("../utils/level");
 const { NUMBER_OF_PROBLEM } = require("../utils/challenge");
 
-const Answer = require("../models/Answer");
 const User = require("../models/User");
 const Challenge = require("../models/Challenge");
+const Problem = require("../models/Problem");
 
 const levelDictionary = levelSystem();
 const rankDictionary = rankSystem();
@@ -103,7 +103,7 @@ exports.checkAnswer = async (req, res, next) => {
       mode_surplus = 1;
   }
 
-  Answer.findOne({ problemId: problemId })
+  Problem.findById(problemId)
     .populate("problemId", "difficulty")
     .exec((err, answer) => {
       if (err) {
@@ -115,15 +115,14 @@ exports.checkAnswer = async (req, res, next) => {
           .send("The answer with the given problem id was not found");
         return;
       } else {
-        // TODO: Check answer by type
         let correctFlag = false;
         switch (answer.checkAnswerType) {
           case CHECK_ANSWER_TYPE.EQUAL_STRING:
-            if (userAnswer === answer.body) {
+            if (userAnswer === answer.answerBody) {
               correctFlag = true;
             }
-            if (answer.body.includes("|")) {
-              const correctAnswers = answer.body.split("|");
+            if (answer.answerBody.includes("|")) {
+              const correctAnswers = answer.answerBody.split("|");
               if (correctAnswers.includes(userAnswer)) {
                 correctFlag = true;
               }
@@ -132,7 +131,7 @@ exports.checkAnswer = async (req, res, next) => {
           case CHECK_ANSWER_TYPE.MATH_EVALUATE: {
             const tempUserAnswer = userAnswer.split("[").join("(");
             const tempUserAnswer2 = tempUserAnswer.split("]").join(")");
-            const tempAnswerBody = answer.body.split("[").join("(");
+            const tempAnswerBody = answer.answerBody.split("[").join("(");
             const tempAnswerBody2 = tempAnswerBody.split("]").join(")");
             if (
               math.evaluate(tempUserAnswer2) === math.evaluate(tempAnswerBody2)
@@ -147,7 +146,7 @@ exports.checkAnswer = async (req, res, next) => {
             } else {
               const tempUserAnswer = userAnswer.split("[").join("(");
               const tempUserAnswer2 = tempUserAnswer.split("]").join(")");
-              const tempAnswerBody = answer.body.split("[").join("(");
+              const tempAnswerBody = answer.answerBody.split("[").join("(");
               const tempAnswerBody2 = tempAnswerBody.split("]").join(")");
               if (
                 math.evaluate(tempUserAnswer2) ===
@@ -230,7 +229,7 @@ exports.checkAnswer = async (req, res, next) => {
               req.user = returnedSolution.user._id;
               req.level_up = level_up;
               req.rank_up = rank_up;
-              req.answer = answer.body;
+              req.answer = answer.answerBody;
               req.earned_exp = earnedExp;
               req.earned_coins = earnedCoins;
               next();
@@ -261,7 +260,7 @@ exports.checkAnswer = async (req, res, next) => {
               req.user = returnedSolution.user._id;
               req.level_up = false;
               req.rank_up = false;
-              req.answer = answer.body;
+              req.answer = answer.answerBody;
               req.earned_exp = earnedExp;
               req.earned_coins = earnedCoins;
               next();
