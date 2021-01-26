@@ -366,9 +366,15 @@ exports.resetAfterGameEnd = async (req, res) => {
   Group.findOneAndUpdate(
     {
       _id: body.groupId,
+      creatorId: body.userId,
     },
     {
-      $set: { "members.$[].score": 0, "members.$[].point": 0, problems: [] },
+      $set: {
+        "members.$[].score": 0,
+        "members.$[].point": 0,
+        problems: [],
+        currentIndex: 0,
+      },
     },
     { multi: true },
     (err, user) => {
@@ -379,7 +385,8 @@ exports.resetAfterGameEnd = async (req, res) => {
         return res.status(400).json({ success: false, error: "no data" });
       }
       return res
-        .status(200).json({ success: true, data: "reset group success!" });
+        .status(200)
+        .json({ success: true, data: "reset group success!" });
     }
   );
 };
