@@ -18,6 +18,7 @@ exports.getHintByProblemId = async (req, res) => {
   for (i in problem.usedItems) {
     if (problem.usedItems[i].itemName = ITEM_NAME.HINT) {
       problem.usedItems[i].amount++;
+      problem.usedItems[i].userId.push(userId);
       foundUsedItem = true;
       break;
     }
@@ -25,7 +26,8 @@ exports.getHintByProblemId = async (req, res) => {
   if (!foundUsedItem) {
     problem.usedItems.push({
       itemName: ITEM_NAME.HINT,
-      amount: 1
+      amount: 1,
+      userId: userId,
     })
   }
 

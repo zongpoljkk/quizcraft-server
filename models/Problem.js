@@ -45,8 +45,11 @@ const ProblemSchema = new Schema({
     },
     amount: {
       type: Number,
-      default: 0,
+      default: 1,
     },
+    userId: [{
+      type: Schema.Types.ObjectId,
+    }]
   }],
   answerBody: {
     type: String,
