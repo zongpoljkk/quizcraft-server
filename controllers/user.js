@@ -399,57 +399,32 @@ exports.updateStreak = async (userId) => {
   const nextDate = new Date(user.lastLogin);
   nextDate.setDate(nextDate.getDate() + 1);
   const activeItem = findActiveItem(user, ITEM_NAME.FREEZE);
-  if (activeItem) {
-    //Freeze if not expired
-    let nextDateOfExpiredDate = activeItem.expiredDate;
-    nextDateOfExpiredDate.setDate(nextDateOfExpiredDate.getDate() + 1);
-    if (now <= activeItem.expiredDate || now.toDateString() == activeItem.expiredDate.toDateString()) {
-      console.log("Freeze");
-      return;
-    } else if (now.toDateString() == nextDateOfExpiredDate.toDateString()) {
-      //inc streak by 1
-      await User.findOneAndUpdate(
-        {
-          _id: userId,
-        },
-        {
-          $inc: {
-            streak: 1,
-          },
-        }
-      );
-      console.log("inc streak by freeze");
-      return;
-    }
-  }
   if (now.toDateString() == lastLoginDate.toDateString()) {
     //same day, do nothing
     console.log("sameday");
     return;
   } else if (now.toDateString() == nextDate.toDateString()) {
     //inc streak by 1
-    await User.findOneAndUpdate(
-      {
-        _id: userId,
-      },
-      {
-        $inc: {
-          streak: 1,
-        },
-      }
-    );
+    await User.findOneAndUpdate({ _id: userId }, { $inc: { streak: 1 } });
     console.log("inc streak");
     return;
+  } else if (activeItem) {
+    let nextDateOfExpiredDate = activeItem.expiredDate;
+    nextDateOfExpiredDate.setDate(nextDateOfExpiredDate.getDate() + 1);
+    if (now.toDateString() == nextDateOfExpiredDate.toDateString()) {
+      //inc streak by 1
+      await User.findOneAndUpdate({ _id: userId }, { $inc: { streak: 1 } });
+      console.log("inc streak by freeze");
+      return;
+    } else {
+      //set streak to 1
+      await User.findOneAndUpdate({ _id: userId }, { streak: 1 });
+      console.log("set 1");
+      return;
+    }
   } else {
     //set streak to 1
-    await User.findOneAndUpdate(
-      {
-        _id: userId,
-      },
-      {
-        streak: 1,
-      }
-    );
+    await User.findOneAndUpdate({ _id: userId }, { streak: 1 });
     console.log("set 1");
     return;
   }
