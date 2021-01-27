@@ -535,6 +535,9 @@ exports.updateCoinAndExp = async (user, gameMode, difficulty) => {
     case GAME_MODE.QUIZ:
       modeSurplus = MODE_SURPLUS.QUIZ;
       break;
+    case GAME_MODE.GROUP:
+      modeSurplus = MODE_SURPLUS.GROUP;
+      break;
     default:
       modeSurplus = 1;
       break;
@@ -558,7 +561,7 @@ exports.updateCoinAndExp = async (user, gameMode, difficulty) => {
 
   let activeItem = findActiveItem(user, ITEM_NAME.DOUBLE);
   if (activeItem && Date.now() <= activeItem.expiredDate) {
-    earnedCoins *= 2;
+    earnedExp *= 2;
   }
 
   user.exp += earnedExp;
