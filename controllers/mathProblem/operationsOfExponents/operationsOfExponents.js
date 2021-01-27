@@ -202,7 +202,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
           if (ALPHABET.includes(base)) {
             problemTitle += ` เมื่อ ${base} ไม่เท่ากับ 0`;
-            checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING
+            checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           }
           for (i = 0; i < termNum; i++) {
             degree = randInt(1, 10, true);
@@ -220,6 +220,11 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           break;
         case 4: //similar to easy but harder and base is not int -> divided
           base = baseSelectorNoInt();
+          checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
+          if (ALPHABET.includes(base)) {
+            problemTitle += ` เมื่อ ${base} ไม่เท่ากับ 0`;
+            checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
+          }
           degreeList = Array.from({ length: 2 }, () => randInt(1, 5, true));
           problemBody =
             base < 0
@@ -234,7 +239,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           answerBody = solutionList[solutionList.length - 1];
           answerForDisplay = answerBody;
           answerType = ANSWER_TYPE.MATH_INPUT;
-          checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
+
           //create hint
           hintBody = PROPERTY_EXPO.DIVIDE;
           break;
