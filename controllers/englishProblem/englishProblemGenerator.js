@@ -1,11 +1,4 @@
-const Problem = require("../../models/Problem");
-const Answer = require("../../models/Answer");
-const Hint = require("../../models/Hint");
-const {generateGrammar} = require("./grammar");
-const EASY = "EASY";
-const MEDIUM = "MEDIUM";
-const HARD = "HARD";
-const alphabet = "abcdefghijklmnopqrstuvwxyz";
+const { generateGrammar } = require("./grammar");
 
 const englishGenerate = ({ subtopicName, difficulty }) => {
   switch (subtopicName) {

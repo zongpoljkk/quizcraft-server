@@ -85,7 +85,6 @@ exports.getAllItems = async (req, res) => {
   );
 };
 
-
 exports.useSkipItemForQuiz = async (req,res) => {
   try {
     const userId = req.userId;
@@ -114,6 +113,7 @@ exports.useSkipItemForQuiz = async (req,res) => {
     for (i in problem.usedItems) {
       if (problem.usedItems[i].itemName = ITEM_NAME.SKIP) {
         problem.usedItems[i].amount++;
+        problem.usedItems[i].userId.push(userId);
         foundUsedItem = true;
         break;
       }
@@ -121,7 +121,8 @@ exports.useSkipItemForQuiz = async (req,res) => {
     if (!foundUsedItem) {
       problem.usedItems.push({
         itemName: ITEM_NAME.SKIP,
-        amount: 1
+        amount: 1,
+        userId: userId,
       })
     }
 
@@ -178,20 +179,22 @@ exports.useRefreshItem = async (req,res) => {
     
     var problem = await Problem.findOne({ _id: problemId });
     if (!problem) {
-      return res.status(400).json({ success: false, error: "problem not founded" });
+      return res.status(400).json({ success: false, error: "problem not found" });
     }
     let foundUsedItem = false;
     for (i in problem.usedItems) {
-      if (problem.usedItems[i].itemName = ITEM_NAME.SKIP) {
+      if (problem.usedItems[i].itemName = ITEM_NAME.REFRESH) {
         problem.usedItems[i].amount++;
+        problem.usedItems[i].userId.push(userId);
         foundUsedItem = true;
         break;
       }
     }
     if (!foundUsedItem) {
       problem.usedItems.push({
-        itemName: ITEM_NAME.SKIP,
-        amount: 1
+        itemName: ITEM_NAME.REFRESH,
+        amount: 1,
+        userId: userId,
       })
     }
 

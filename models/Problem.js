@@ -45,9 +45,30 @@ const ProblemSchema = new Schema({
     },
     amount: {
       type: Number,
-      default: 0,
+      default: 1,
     },
+    userId: [{
+      type: Schema.Types.ObjectId,
+    }]
   }],
+  answerBody: {
+    type: String,
+    required: true,
+  },
+  solution: {
+    type: String,
+  },
+  checkAnswerType: {
+    type: String,
+    enum: ["MATH_EVALUATE","EQUAL_STRING","RULE_BASE","POWER_OVER_ONE"],
+    default: "EQUAL_STRING",
+  },
+  answerForDisplay: {
+    type: String,
+  },
+  hintBody: {
+    type: String,
+  }
 });
 
 module.exports = mongoose.model("Problem", ProblemSchema);

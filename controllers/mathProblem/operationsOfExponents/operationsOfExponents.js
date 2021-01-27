@@ -612,6 +612,11 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
     answerType: answerType,
     title: problemTitle,
     choices: answerType == ANSWER_TYPE.RADIO_CHOICE? choices : [],
+    answerBody: answerBody,
+    solution: solution,
+    checkAnswerType: checkAnswerType,
+    answerForDisplay: answerForDisplay,
+    hintBody: hintBody,
   });
   problemId = problem._id;
   answer = new Answer({
@@ -628,7 +633,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
     newProblem = await problem.save();
     newAnswer = await answer.save();
     newHint = await hint.save();
-    return [{ problem:newProblem, answer:newAnswer, hint:newHint }];
+    return newProblem;
   } catch (err) {
     console.log(err)
     return err;

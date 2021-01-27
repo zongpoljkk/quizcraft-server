@@ -296,15 +296,6 @@ exports.getGroupGame = async (req, res) => {
       },
       { $unwind: "$problem" },
       {
-        $lookup: {
-          from: "answers",
-          localField: "problemId",
-          foreignField: "problemId",
-          as: "answer",
-        },
-      },
-      { $unwind: "$answer" },
-      {
         $project: {
           _id: 1,
           currentIndex: 1,
@@ -323,9 +314,9 @@ exports.getGroupGame = async (req, res) => {
             choices: 1,
             body: 1,
             answerType: 1,
-            title: 1
+            title: 1,
+            answerForDisplay: 1,
           },
-          answer: 1
         }
       },
     ]);
@@ -344,7 +335,7 @@ exports.getGroupGame = async (req, res) => {
         body: group.problem.body,
         answerType: group.problem.answerType,
         title: group.problem.title,
-        correctAnswer: group.answer.answerForDisplay
+        correctAnswer: group.problem.answerForDisplay
       }
     };
     return res.status(200).json({ success: true, data: groupGame });
