@@ -100,7 +100,6 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
       problemTitle = PROBLEM_TITLE.FIND_VALUE_STN;
       problemBody = "";
       opt = randInt(1, 4);
-      opt=4
       switch (opt) {
         case 1:
           allInt = randInt(0, 1);
