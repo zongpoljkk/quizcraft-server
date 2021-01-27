@@ -524,10 +524,10 @@ exports.buyItem = async (req, res) => {
   );
 };
 
-exports.updateCoinAndExp = async (user, gameMode, difficulty) => {  
+exports.updateCoinAndExp = (user, gameMode, difficulty) => {  
   const levelDictionary = levelSystem();
   const rankDictionary = rankSystem();
-  let earnedCoins, earnedExp, modeSurplus;
+  let earnedCoins = 0, earnedExp = 0, modeSurplus = 1;
   switch (gameMode) {
     case GAME_MODE.CHALLENGE:
       modeSurplus = MODE_SURPLUS.CHALLENGE;
@@ -585,5 +585,5 @@ exports.updateCoinAndExp = async (user, gameMode, difficulty) => {
       }
     }
   }
-  return [{ user, levelUp, rankUp, earnedCoins, earnedExp }];
+  return { user: user, levelUp: levelUp, rankUp: rankUp, earnedCoins: earnedCoins, earnedExp: earnedExp };
 };
