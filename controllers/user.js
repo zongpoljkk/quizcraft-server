@@ -5,6 +5,8 @@ const config = require("../config/keys");
 const { GAME_MODE, DIFFICULTY } = require("../utils/const");
 const { DIFFICULTY_EXP, DIFFICULTY_COIN, MODE_SURPLUS } = require("../utils/gameConfig");
 const { levelSystem, rankSystem, MAX_LEVEL } = require("../utils/level");
+const { findActiveItem } = require("./item");
+const { ITEM_NAME } = require("../utils/const"); 
 
 //Add user for testing
 exports.addUser = (req, res, next) => {
@@ -357,8 +359,6 @@ exports.changeProfilePicture = (req, res, next) => {
     });
 };
 
-
-
 exports.getAmountOfItems = (req, res) => {
   const userId = req.query.userId;
   User.findById(userId)
@@ -398,34 +398,33 @@ exports.updateStreak = async (userId) => {
   const lastLoginDate = new Date(user.lastLogin);
   const nextDate = new Date(user.lastLogin);
   nextDate.setDate(nextDate.getDate() + 1);
+  const activeItem = findActiveItem(user, ITEM_NAME.FREEZE);
   if (now.toDateString() == lastLoginDate.toDateString()) {
     //same day, do nothing
     console.log("sameday");
     return;
   } else if (now.toDateString() == nextDate.toDateString()) {
     //inc streak by 1
-    await User.findOneAndUpdate(
-      {
-        _id: userId,
-      },
-      {
-        $inc: {
-          streak: 1,
-        },
-      }
-    );
+    await User.findOneAndUpdate({ _id: userId }, { $inc: { streak: 1 } });
     console.log("inc streak");
     return;
+  } else if (activeItem) {
+    let nextDateOfExpiredDate = activeItem.expiredDate;
+    nextDateOfExpiredDate.setDate(nextDateOfExpiredDate.getDate() + 1);
+    if (now.toDateString() == nextDateOfExpiredDate.toDateString()) {
+      //inc streak by 1
+      await User.findOneAndUpdate({ _id: userId }, { $inc: { streak: 1 } });
+      console.log("inc streak by freeze");
+      return;
+    } else {
+      //set streak to 1
+      await User.findOneAndUpdate({ _id: userId }, { streak: 1 });
+      console.log("set 1");
+      return;
+    }
   } else {
     //set streak to 1
-    await User.findOneAndUpdate(
-      {
-        _id: userId,
-      },
-      {
-        streak: 1,
-      }
-    );
+    await User.findOneAndUpdate({ _id: userId }, { streak: 1 });
     console.log("set 1");
     return;
   }
@@ -525,7 +524,7 @@ exports.buyItem = async (req, res) => {
   );
 };
 
-exports.updateCoinAndExp = (user, gameMode, difficulty) => {  
+exports.updateCoinAndExp = async (user, gameMode, difficulty) => {  
   const levelDictionary = levelSystem();
   const rankDictionary = rankSystem();
   let earnedCoins, earnedExp, modeSurplus;
@@ -556,6 +555,12 @@ exports.updateCoinAndExp = (user, gameMode, difficulty) => {
       earnedExp = DIFFICULTY_EXP.HARD * modeSurplus;  
       break;
   }
+
+  let activeItem = findActiveItem(user, ITEM_NAME.DOUBLE);
+  if (activeItem && Date.now() <= activeItem.expiredDate) {
+    earnedCoins *= 2;
+  }
+
   user.exp += earnedExp;
   user.coin += earnedCoins;
 
@@ -578,4 +583,4 @@ exports.updateCoinAndExp = (user, gameMode, difficulty) => {
     }
   }
   return [{ user, levelUp, rankUp, earnedCoins, earnedExp }];
-}
+};

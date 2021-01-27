@@ -110,7 +110,6 @@ exports.getTopicBySubjectName = async (req, res) => {
         },
       ],
       (err, topics) => {
-        console.log(topics);
         if (err) {
           return res.status(500).json({ success: false, error: err });
         }
