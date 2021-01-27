@@ -27,7 +27,8 @@ exports.ITEM_NAME = {
   SKIP: "Skip",
   HINT: "Hint",
   DOUBLE: "Double",
-  REFRESH: "Refresh"
+  REFRESH: "Refresh",
+  FREEZE: "Freeze"
 }
 
 exports.CHECK_ANSWER_TYPE = {
