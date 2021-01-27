@@ -12,6 +12,9 @@ const Group = require("../models/Group");
 const levelDictionary = levelSystem();
 const rankDictionary = rankSystem();
 
+const { SUBJECT, SSE_TOPIC } = require("../utils/const");
+const { sendEventToGroupMember, sendEventToUser } = require("../middlewares");
+
 const updateGroupScore = async (res, groupId, userId, correct, usedTime, correctAnswer) => {
   console.log(groupId, userId, correct, usedTime, correctAnswer);
   await Group.findById(groupId).exec().then((group) => {
@@ -31,7 +34,9 @@ const updateGroupScore = async (res, groupId, userId, correct, usedTime, correct
     }
     console.log(group)
     group.save();
-    return res.status(200).json({ success: true, data: {correct: correct, correctAnswer: correctAnswer} });
+    res.status(200).json({ success: true, data: {correct: correct, correctAnswer: correctAnswer} });
+    sendEventToUser(group.creatorId, SSE_TOPIC.SEND_ANSWER);
+    return;
   })
 };
 
