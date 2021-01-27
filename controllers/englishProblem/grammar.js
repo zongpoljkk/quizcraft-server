@@ -1,6 +1,4 @@
 const Problem = require("../../models/Problem");
-const Answer = require("../../models/Answer");
-const Hint = require("../../models/Hint");
 const English = require("../../models/English");
 const WordPOS = require("wordpos");
 const pos = require('pos');
@@ -60,7 +58,7 @@ const generateGrammar = async (subtopicName, difficulty) => {
   let problemBody = "", problemTitle = "";
   let answerBody = "",answerChoices;
   let hintBody = "",solution = "";
-  let newProblem, newAnswer, newHint;
+  let newProblem;
   let answerType = randInt(0,1)? ANSWER_TYPE.SELECT_ONE : ANSWER_TYPE.RADIO_CHOICE;
   switch (difficulty) {
     case DIFFICULTY.EASY:
@@ -153,21 +151,10 @@ const generateGrammar = async (subtopicName, difficulty) => {
     answerForDisplay: answerForDisplay,
     hintBody: hintBody,
   });
-  problemId = problem._id;
-  answer = new Answer({
-    problemId: problemId,
-    body: answerBody,
-    solution: solution,
-    answerForDisplay: answerForDisplay,
-    checkAnswerType: checkAnswerType
-  });
-  hint = new Hint({ problemId: problemId, body: hintBody });
   
   // save to database
   try {
     newProblem = await problem.save();
-    newAnswer = await answer.save();
-    newHint = await hint.save();
     return newProblem;
   } catch (err) {
     console.log(err)
