@@ -30,6 +30,7 @@ const updateGroupScore = async (res, groupId, userId, correct, usedTime, correct
       console.log(`points: ${group.members.find(member => member.userId.toString() === userId).point}`)
     }
     console.log(group)
+    group.save();
     return res.status(200).json({ success: true, data: {correct: correct, correctAnswer: correctAnswer} });
   })
 };
