@@ -12,6 +12,8 @@ const rankDictionary = rankSystem();
 
 const { CHECK_ANSWER_TYPE, DIFFICULTY } = require("../utils/const");
 const { updateCoinAndExp } = require("./user");
+const { SUBJECT, SSE_TOPIC } = require("../utils/const");
+const { sendEventToGroupMember, sendEventToUser } = require("../middlewares");
 
 const updateChallengeScore = async (
   challengeId,
