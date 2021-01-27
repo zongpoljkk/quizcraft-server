@@ -415,13 +415,13 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
     checkAnswerType: checkAnswerType
   });
   hint = new Hint({ problemId: problemId, body: hintBody });
-  console.log(problem)
+
   // save to database
   try {
-    // newProblem = await problem.save();
-    // newAnswer = await answer.save();
-    // newHint = await hint.save();
-    // return newProblem;
+    newProblem = await problem.save();
+    newAnswer = await answer.save();
+    newHint = await hint.save();
+    return newProblem;
   } catch (err) {
     console.log(err)
     return err;
