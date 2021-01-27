@@ -428,7 +428,5 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
   }
 };
 
-generateMeaningOfExponents("ความหมายของเลขยกกำลัง",DIFFICULTY.HARD);
-
 module.exports = {generateMeaningOfExponents};
 
