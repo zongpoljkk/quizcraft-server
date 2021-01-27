@@ -1,7 +1,18 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const AchievementSchema = new Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+  },
+  rewardEXP: {
+    type: Number,
+    required: true,
+  },
   rewardCoin: {
     type: Number,
     required: true,
@@ -9,20 +20,16 @@ const AchievementSchema = new Schema({
   type: {
     type: String,
     required: true,
-    enum: ['STREAKS','QUESTIONS','OTHER'],
-  },
-  name: {
-    type: String,
-    required: true,
-  },
-  goal: {
-    type: Number,
-    required: true,
+    enum: ["STREAKS", "QUESTIONS", "OTHER"],
   },
   image: {
-    type: String,
-    default: null
+    type: Object,
+    default: null,
   },
-})
+  lottie: {
+    type: Object,
+    default: null,
+  },
+});
 
-module.exports = mongoose.model('Achievement', AchievementSchema);
+module.exports = mongoose.model("Achievement", AchievementSchema);
