@@ -4,11 +4,12 @@ const User = require("../models/User");
 const Problem = require("../models/Problem");
 const moment = require("moment");
 const { MIN_PROBLEM, MAX_PROBLEM } = require("../utils/group");
-const { SUBJECT } = require("../utils/const");
+const { SUBJECT, SSE_TOPIC } = require("../utils/const");
 const { mathGenerate } = require("./mathProblem/mathProblemGenerator");
 const { englishGenerate } = require("./englishProblem/englishProblemGenerator");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
+const { sendEventToGroupMember, sendEventToUser } = require("../middlewares");
 
 const getPin = async (date) => {
   let prefix = moment(date).format('DDMMYY');
@@ -125,7 +126,8 @@ exports.leaveGroup = async (req, res) => {
       if (!user) {
         return res.status(400).json({ success: false, error: "no data" });
       }
-      return res.status(200).json({ success: true, data: "leave group success!" });
+      res.status(200).json({ success: true, data: "leave group success!" });
+      sendEventToGroupMember(body.groupId, SSE_TOPIC.UPDATE_MEMBER);
     }
   );
 };
@@ -183,7 +185,8 @@ exports.genProblemsWhenGroupStart = async (req, res) => {
       } else if (!newGroup) {
         return res.status(400).json({ success: false, error: "Cannot generate problem and add into Group" });
       } else {
-        return res.status(200).json({ success: true, data: { problems: newGroup.problems, numberOfProblem: newGroup.numberOfProblem } });
+        res.status(200).json({ success: true, data: { problems: newGroup.problems, numberOfProblem: newGroup.numberOfProblem } });
+        sendEventToGroupMember(groupId, SSE_TOPIC.START_GAME);
       }
     });
   } catch (err) {
@@ -259,10 +262,11 @@ exports.joinGroup = async (req, res) => {
       if (err) {
         return res.status(500).json({ success: false, error: err });
       }
-      if (!group) {
+      else if (!group) {
         return res.status(400).json({ success: false, error: "no data" });
       }
-      return res.status(200).json({ success: true, data: { groupId: group._id } });
+      res.status(200).json({ success: true, data: { groupId: group._id } });
+      sendEventToGroupMember(group._id, SSE_TOPIC.UPDATE_MEMBER);
     }
   );
 };
@@ -292,15 +296,6 @@ exports.getGroupGame = async (req, res) => {
       },
       { $unwind: "$problem" },
       {
-        $lookup: {
-          from: "answers",
-          localField: "problemId",
-          foreignField: "problemId",
-          as: "answer",
-        },
-      },
-      { $unwind: "$answer" },
-      {
         $project: {
           _id: 1,
           currentIndex: 1,
@@ -319,9 +314,9 @@ exports.getGroupGame = async (req, res) => {
             choices: 1,
             body: 1,
             answerType: 1,
-            title: 1
+            title: 1,
+            answerForDisplay: 1,
           },
-          answer: 1
         }
       },
     ]);
@@ -340,7 +335,7 @@ exports.getGroupGame = async (req, res) => {
         body: group.problem.body,
         answerType: group.problem.answerType,
         title: group.problem.title,
-        correctAnswer: group.answer.answerForDisplay
+        correctAnswer: group.problem.answerForDisplay
       }
     };
     return res.status(200).json({ success: true, data: groupGame });
@@ -390,3 +385,21 @@ exports.resetAfterGameEnd = async (req, res) => {
     }
   );
 };
+
+exports.nextProblem = async (req, res) => {
+  const groupId = req.body.groupId;
+  const userId = req.userId;
+  Group.findOneAndUpdate(
+    { _id: groupId, creatorId: userId },
+    { $inc: { currentIndex: 1 } },
+    { new: true},
+    (err, group) => {
+      if (err) return res.status(500).json({ success: false, error: err.toString() });
+      else if (!group) return res.status(400).json({ success: false, error: "Cannot do next problem" });
+      res.status(200).json({ success: true, data: {currentIndex: group.currentIndex}});
+      // Server-sent-event
+      sendEventToGroupMember(groupId, SSE_TOPIC.NEXT_PROBLEM);
+    }
+  );
+};
+

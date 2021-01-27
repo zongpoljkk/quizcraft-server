@@ -1,8 +1,15 @@
 const express = require("express");
+const { re } = require("mathjs");
 
 const groupController = require("../controllers/group");
 
-const { authJwt, adminOnly } = require("../middlewares");
+const { 
+  authJwt, 
+  adminOnly, 
+  groupEventsHandler,
+  subscribers,
+  closeConnection 
+} = require("../middlewares");
 
 const router = express.Router();
 
@@ -15,5 +22,10 @@ router.get("/group-scoreboard/", [authJwt], groupController.getGroupScoreboard);
 router.put("/join-group", [authJwt], groupController.joinGroup);
 router.get("/get-group-game", [authJwt], groupController.getGroupGame);
 router.put("/reset-group-game", [authJwt], groupController.resetAfterGameEnd);
+router.post("/next-problem", [authJwt], groupController.nextProblem);
+router.get("/event/", [authJwt], groupEventsHandler);
+router.delete("/close/", [authJwt], closeConnection);
+//for test
+router.get("/status", (req, res) => res.json({ clients: subscribers.length }));
 
 module.exports = router;

@@ -125,3 +125,9 @@ exports.register = async (req,res) => {
   });
 }
 
+exports.refreshToken = async (req, res) => {
+  const token = jwt.sign({userId: req.userId, role: req.role}, config.secret, {
+    expiresIn: 14400 // 4 hours
+  });
+  return res.header("auth-token",token).status(200).json({ success: true, token: token});
+}
