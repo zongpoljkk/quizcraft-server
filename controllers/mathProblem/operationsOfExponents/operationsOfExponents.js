@@ -199,6 +199,11 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           degreeList = [];
           problemBody = "";
           base = baseSelectorNoInt();
+          checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
+          if (ALPHABET.includes(base)) {
+            problemTitle += ` เมื่อ ${base} ไม่เท่ากับ 0`;
+            checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING
+          }
           for (i = 0; i < termNum; i++) {
             degree = randInt(1, 10, true);
             degreeList.push(degree);
@@ -210,7 +215,6 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           answerBody = solutionList[solutionList.length - 1];
           answerForDisplay = answerBody;
           answerType = ANSWER_TYPE.MATH_INPUT;
-          checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           //create hint
           hintBody = PROPERTY_EXPO.MULTIPLY;
           break;
@@ -615,7 +619,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
     answerForDisplay: answerForDisplay,
     hintBody: hintBody,
   });
-  
+
   // save to database
   try {
     newProblem = await problem.save();

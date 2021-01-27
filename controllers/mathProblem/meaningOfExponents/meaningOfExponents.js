@@ -211,6 +211,10 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           answerForDisplay = n;
           answerType = ANSWER_TYPE.MATH_INPUT;
           checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
+          
+          //create hint 
+          hintBody = `ถ้า a^[n] = a^[m] โดยที่ a ไม่เท่ากับ 0 จะได้ว่า n = m`;
+          hintBody += `\nเช่น ถ้า 3^[x] = 81 = 3^[4] จะได้ว่า x = 4`;
           break;
         case 2:
           problemTitle = "จงเขียนจำนวนต่อไปนี้ ให้อยู่ในรูปเลขยกกำลังที่มีฐานเป็นจำนวนเฉพาะ"
