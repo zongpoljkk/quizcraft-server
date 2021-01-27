@@ -19,15 +19,14 @@ const {
   multipleConcat,
   genSolutionAddSubDiv, 
 } = require("./scientificNotationFunction");
-const { genSolution } = require("../operationsOfExponents/operationsOfExponentsFunction");
 const { PROBLEM_TITLE, SUFFIX } = require("./const");
 const { bignumber } = require("mathjs");
 
 const generateScientificNotation = async (subtopicName, difficulty) => {
   let problemTitle, problemBody, answerBody, hintBody, choices;
   let solution, answerType, answerForDisplay, checkAnswerType;
-  let a, n, stn, num, opt, nn, ff, allPos, allInt, rand, n2;
-  let i, m, min, baseOut, positiveBase, solutionList, degreeOut;
+  let a, n, stn, num, opt, nn, ff, allInt, rand, n2;
+  let i, baseOut, positiveBase, solutionList;
   let problem, problemId, answer, hint, newProblem, newAnswer, newHint;
   let termNum, baseList, nList, randList;
   let baseList2, nList2, randList2, temp, top, buttom;
@@ -100,7 +99,6 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
       problemTitle = PROBLEM_TITLE.FIND_VALUE_STN;
       problemBody = "";
       opt = randInt(1, 4);
-      opt=4
       switch (opt) {
         case 1:
           allInt = randInt(0, 1);
@@ -249,7 +247,6 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
       problemTitle = PROBLEM_TITLE.FIND_VALUE_STN;
       problemBody = "";
       opt = randInt(1,3);
-      opt = 2;
       switch (opt) {
         case 1:
           termNum = randInt(2,4);

@@ -283,8 +283,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
     case DIFFICULTY.HARD:
       problemTitle = PROBLEM_TITLE.SIMPLE_EXPO;
       problemBody = "";
-      // opt = randInt(1,3);
-      opt = 3;
+      opt = randInt(1,3);
       switch (opt) {
         case 1: // (a^[-3]*a^[2]) / (a^[-1]*a^[5]) = a^[-5]
           base = baseSelector();

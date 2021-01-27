@@ -275,7 +275,6 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
       break;
     case DIFFICULTY.HARD:
       opt = randInt(1,3);
-      opt = 3;
       switch (opt) {
         case 1:
           problemTitle = "จงหาว่าเลขยกกำลังต่อไปนี้มีค่าเท่ากันหรือไม่"
