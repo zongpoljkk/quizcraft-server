@@ -351,7 +351,6 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
                   +`\nเช่น (-${a})^[2] = (-${a})*(-${a}) แต่ -${a}^[2] = -(${a}*${a})`;
           break;
         case 3:
-          problemTitle = "จงหาค่าของ x เมื่อ";
           a = randInt(2,50,true);
           positiveBase = Math.abs(a);
           if (1 <= positiveBase && positiveBase <= 2) {
@@ -369,15 +368,16 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
 
           //create answer
           if (n%2 == 0) {
+            problemTitle = `จงหาค่าของ x ที่เป็นจำนวนเต็มบวกเมื่อ`;
             answerBody = Math.abs(a);
             answerForDisplay = answerBody;
-            answerBody += `|${-Math.abs(a)}`;
           } else {
+            problemTitle = `จงหาค่าของ x เมื่อ`;
             answerBody = a;
             answerForDisplay = answerBody;
           }
           answerType = ANSWER_TYPE.MATH_INPUT;
-          checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
+          checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
 
           //crete solution
           solution = problemBody;
@@ -415,18 +415,20 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
     checkAnswerType: checkAnswerType
   });
   hint = new Hint({ problemId: problemId, body: hintBody });
-  
+  console.log(problem)
   // save to database
   try {
-    newProblem = await problem.save();
-    newAnswer = await answer.save();
-    newHint = await hint.save();
-    return newProblem;
+    // newProblem = await problem.save();
+    // newAnswer = await answer.save();
+    // newHint = await hint.save();
+    // return newProblem;
   } catch (err) {
     console.log(err)
     return err;
   }
 };
+
+generateMeaningOfExponents("ความหมายของเลขยกกำลัง",DIFFICULTY.HARD);
 
 module.exports = {generateMeaningOfExponents};
 
