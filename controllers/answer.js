@@ -163,7 +163,7 @@ exports.checkAnswer = async (req, res, next) => {
           User.findById(userId)
             .exec()
             .then((user) => {
-              updateCoinAndExp(user, mode, answer._id.difficulty)
+              const updated = updateCoinAndExp(user, mode, answer.difficulty)
               // // * Handle Earned coins * //
               // switch (answer.problemId.difficulty) {
               //   case DIFFICULTY.EASY:
@@ -216,24 +216,24 @@ exports.checkAnswer = async (req, res, next) => {
                   true,
                   userTime,
                   problemIndex,
-                  earnedExp,
-                  earnedCoins
+                  updated.earnedExp,
+                  updated.earnedCoins
                 );
               }
 
               const returnedSolution = {
                 correct: true,
                 solution: answer.solution,
-                user: user,
+                user: updated.user,
               };
               req.correct = returnedSolution.correct;
               req.solution = returnedSolution.solution;
               req.user = returnedSolution.user._id;
-              req.level_up = level_up;
-              req.rank_up = rank_up;
+              req.level_up = updated.levelUp;
+              req.rank_up = updated.rankUp;
               req.answer = answer.answerBody;
-              req.earned_exp = earnedExp;
-              req.earned_coins = earnedCoins;
+              req.earned_exp = updated.earnedExp;
+              req.earned_coins = updated.earnedCoins;
               next();
             });
         } else {
