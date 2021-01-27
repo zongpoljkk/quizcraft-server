@@ -5,6 +5,7 @@ const cookieSession = require("cookie-session");
 const keys = require("./config/keys");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const helmet = require("helmet")
 
 const problemRouter = require("./routes/problem");
 const subtopicRouter = require("./routes/subtopic");
@@ -32,6 +33,7 @@ mongoose.connect(keys.mongoURI, () => {
 // Listen to node and route http request to the route handler
 const app = express();
 
+app.use(helmet())
 app.use(bodyParser.json());
 app.use(
   cookieSession({

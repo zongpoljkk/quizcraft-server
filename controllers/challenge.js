@@ -1,14 +1,12 @@
 const User = require("../models/User");
 const Challenge = require("../models/Challenge");
 const Problem = require("../models/Problem");
-const Answer = require("../models/Answer");
 const { NUMBER_OF_PROBLEM } = require("../utils/challenge");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 const { mathGenerate } = require("./mathProblem/mathProblemGenerator");
 const { englishGenerate } = require("./englishProblem/englishProblemGenerator");
-const MATH = "คณิตศาสตร์";
-const ENG = "ภาษาอังกฤษ";
+const { ANSWER_TYPE, SUBJECT } = require("../utils/const");
 
 const randInt = (start, end) => {
   return Math.floor(Math.random() * (end - start + 1)) + start;
@@ -106,10 +104,10 @@ exports.randomChallenge = async (req, res) => {
       if (problem == null) {
         //generate problem
         switch (subject) {
-          case MATH:
+          case SUBJECT.MATH:
             await mathGenerate({ subtopicName, difficulty });
             break;
-          case ENG:
+          case SUBJECT.ENG:
             await englishGenerate({ subtopicName, difficulty });
             break;
         }
@@ -188,10 +186,10 @@ exports.specificChallenge = async (req, res) => {
       if (problem == null) {
         //generate problem
         switch (subject) {
-          case MATH:
+          case SUBJECT.MATH:
             await mathGenerate({ subtopicName, difficulty });
             break;
-          case ENG:
+          case SUBJECT.ENG:
             await englishGenerate({ subtopicName, difficulty });
             break;
         }
@@ -266,7 +264,7 @@ exports.getProblemByChallengeId = (req, res) => {
         challenge.save();
 
         Problem.findById(challenge.problems[problemIndex])
-          .select("choices _id body answerType title")
+          .select("choices _id body answerType title answerForDisplay")
           .exec()
           .then(async (problem) => {
             if (!problem) {
@@ -275,14 +273,20 @@ exports.getProblemByChallengeId = (req, res) => {
                 error: `Unable to find problem given index ${problemIndex}`,
               });
             }
-            if (problem.answerType === "MATH_INPUT") {
-              const answer = await Answer.findOne({ problemId: problem._id });
-              return res.status(200).json({
-                success: true,
-                data: { problem: problem, correct_answer: answer.answerForDisplay },
+            let problemOut = {
+              _id: problem._id,
+              choices: problem.choices,
+              body: problem.body,
+              answerType: problem.answerType,
+              title: problem.title,
+            } 
+            if (problem.answerType === ANSWER_TYPE.MATH_INPUT) {
+              return res.status(200).json({ 
+                success: true, 
+                data: { problem: problemOut, correct_answer: problem.answerForDisplay } 
               });
             }
-            return res.status(200).json({ success: true, data: problem });
+            return res.status(200).json({ success: true, data: { problem: problemOut } });
           });
       });
   } catch (err) {
