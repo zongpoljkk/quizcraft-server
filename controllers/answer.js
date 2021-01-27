@@ -88,22 +88,6 @@ exports.checkAnswer = async (req, res, next) => {
   let earnedExp = 0;
   let earnedCoins = 0;
 
-  // ------ Handle mode surplus ------ //
-  let mode_surplus = 1;
-  switch (mode) {
-    case "challenge":
-      mode_surplus = 1.2;
-      break;
-    case "quiz":
-      mode_surplus = 1.4;
-      break;
-    case "group":
-      mode_surplus = 0;
-      break;
-    default:
-      mode_surplus = 1;
-  }
-
   Problem.findById(problemId)
     .populate("problemId", "difficulty")
     .exec((err, answer) => {
@@ -164,49 +148,6 @@ exports.checkAnswer = async (req, res, next) => {
             .exec()
             .then((user) => {
               const updated = updateCoinAndExp(user, mode, answer.difficulty)
-              // // * Handle Earned coins * //
-              // switch (answer.problemId.difficulty) {
-              //   case DIFFICULTY.EASY:
-              //     earnedExp = 10 * mode_surplus;
-              //     earnedCoins = 10 * mode_surplus;
-              //     user.exp += earnedExp;
-              //     user.coin += earnedCoins;
-              //     break;
-              //   case DIFFICULTY.MEDIUM:
-              //     earnedExp = 20 * mode_surplus;
-              //     earnedCoins = 20 * mode_surplus;
-              //     user.exp += earnedExp;
-              //     user.coin += earnedCoins;
-              //     break;
-              //   case DIFFICULTY.HARD:
-              //     earnedExp = 30 * mode_surplus;
-              //     earnedCoins = 30 * mode_surplus;
-              //     user.exp += earnedExp;
-              //     user.coin += earnedCoins;
-              //     break;
-              // }
-
-              // // * Handle Level up * //
-              // // Compare user exp if it exceeds the limit of his/her level
-              // let level_up;
-              // let rank_up;
-              // if (user.exp >= levelDictionary[parseInt(user.level)]) {
-              //   if (user.level == 40) {
-              //   } else {
-              //     level_up = true;
-              //     user.exp -= levelDictionary[parseInt(user.level)];
-              //     user.maxExp = levelDictionary[parseInt(user.level + 1)];
-              //     user.level += 1;
-              //     // ? Handle Rank up ? //
-              //     if (user.level in rankDictionary) {
-              //       user.rank = rankDictionary[user.level];
-              //       rank_up = true;
-              //     }
-              //   }
-              // } else {
-              //   level_up = false;
-              //   rank_up = false;
-              // }
               user.save();
 
               // * Update Challenge Field * //

@@ -528,6 +528,8 @@ exports.updateCoinAndExp = (user, gameMode, difficulty) => {
   const levelDictionary = levelSystem();
   const rankDictionary = rankSystem();
   let earnedCoins = 0, earnedExp = 0, modeSurplus = 1;
+
+  // ------ Handle mode surplus ------ //
   switch (gameMode) {
     case GAME_MODE.CHALLENGE:
       modeSurplus = MODE_SURPLUS.CHALLENGE;
@@ -539,7 +541,7 @@ exports.updateCoinAndExp = (user, gameMode, difficulty) => {
       modeSurplus = MODE_SURPLUS.GROUP;
       break;
     default:
-      modeSurplus = 1;
+      modeSurplus = MODE_SURPLUS.PRACTICE;
       break;
   }
 
