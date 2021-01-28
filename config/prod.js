@@ -6,6 +6,7 @@ module.exports = {
   cookieKey: process.env.COOKIE_KEY,
   secret: process.env.SECRET,
   mcvClientId: process.env.MCV_CLIENT_ID,
-  mcvClientSecret: process.env.MCV_CLIENT_SECRET
+  mcvClientSecret: process.env.MCV_CLIENT_SECRET,
+  redirect_uri: process.env.REDIRECT_URI,
 };
 
