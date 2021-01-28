@@ -1,12 +1,9 @@
 const Problem = require("../models/Problem");
-const Subtopic = require("../models/Subtopic");
 const Answer = require("../models/Answer");
 const Hint = require("../models/Hint");
 const { mathGenerate } = require("./mathProblem/mathProblemGenerator");
 const { englishGenerate } = require("./englishProblem/englishProblemGenerator");
-const { MATH_INPUT } = require("./mathProblem/const");
-const MATH = "คณิตศาสตร์";
-const ENG = "ภาษาอังกฤษ";
+const { ANSWER_TYPE, SUBJECT, DIFFICULTY } = require("../utils/const");
 
 exports.getAllProblems = (req, res, next) => {
   Problem.find().exec((err, problems) => {
@@ -123,28 +120,28 @@ exports.checkAnswerAndUpdateDifficulty = async (req, res, next) => {
     const old_difficulty = problem.difficulty;
 
     switch (problem.difficulty) {
-      case "EASY":
+      case DIFFICULTY.EASY:
         if (avgProblemTime >= EASY_CEIL) {
           if (avgProblemTime >= MEDIUM_CEIL) {
-            problem.difficulty = "HARD";
+            problem.difficulty = DIFFICULTY.HARD;
           } else {
-            problem.difficulty = "MEDIUM";
+            problem.difficulty = DIFFICULTY.MEDIUM;
           }
         }
         break;
-      case "MEDIUM":
+      case DIFFICULTY.MEDIUM:
         if (avgProblemTime >= MEDIUM_CEIL) {
-          problem.difficulty = "HARD";
+          problem.difficulty = DIFFICULTY.HARD;
         } else if (avgProblemTime < EASY_CEIL) {
-          problem.difficulty = "EASY";
+          problem.difficulty = DIFFICULTY.EASY;
         }
         break;
-      case "HARD":
+      case DIFFICULTY.HARD:
         if (avgProblemTime < MEDIUM_CEIL) {
           if (avgProblemTime < EASY_CEIL) {
-            problem.difficulty = "EASY";
+            problem.difficulty = DIFFICULTY.EASY;
           } else {
-            problem.difficulty = "MEDIUM";
+            problem.difficulty = DIFFICULTY.MEDIUM;
           }
         }
     }
@@ -170,20 +167,20 @@ exports.checkAnswerAndUpdateDifficulty = async (req, res, next) => {
 // for testing
 exports.generateProblem = async (req, res, next) => {
   let subject = req.body.subject;
-  let problem, answer, hint;
+  let problem;
   switch (subject) {
-    case MATH: 
+    case SUBJECT.MATH: 
       try {
-        [{ problem, answer, hint }] = await mathGenerate(req.body);
-        return res.send({ problem, answer, hint });
+        problem = await mathGenerate(req.body);
+        return res.send({ problem });
       } catch (err) {
         return res.status(500).json({ success: false, error: err });
       }
     
-    case ENG:
+    case SUBJECT.ENG:
       try {
-        [{ problem, answer, hint }] = await englishGenerate(req.body);
-        return res.send({ problem, answer, hint });
+        problem = await englishGenerate(req.body);
+        return res.send({ problem });
       } catch (err) {
         return res.status(500).json({ success: false, error: err });
       }
@@ -196,96 +193,64 @@ exports.getProblemForUser = async (req, res, next) => {
   const subject = req.body.subject;
   const subtopicName = req.body.subtopicName;
   const difficulty = req.body.difficulty;
-  var answer;
-  var problem = await Problem.findOneAndUpdate(
-    {
-      subtopicName: subtopicName,
-      difficulty: difficulty,
-      users: { $ne: userId },
-    },
-    { $push: { users: userId } },
-    { projection: { users: 0, times: 0, subtopicName: 0, difficulty: 0 } }
-  );
-  if (problem == null) {
-    //generate problem
-    switch (subject) {
-      case MATH:
-        try {
+  var problemOut;
+  try {
+    var problem = await Problem.findOneAndUpdate(
+      {
+        subtopicName: subtopicName,
+        difficulty: difficulty,
+        users: { $ne: userId },
+      },
+      { $push: { users: userId } },
+    );
+    if (problem == null) {
+      //generate problem
+      switch (subject) {
+        case SUBJECT.MATH:
           await mathGenerate({ subtopicName, difficulty });
-          problem = await Problem.findOneAndUpdate(
-            {
-              subtopicName: subtopicName,
-              difficulty: difficulty,
-              users: { $ne: userId },
-            },
-            { $push: { users: userId } },
-            {
-              projection: {
-                users: 0,
-                times: 0,
-                subtopicName: 0,
-                difficulty: 0,
-              },
-            }
-          );
-          if (problem.answerType == MATH_INPUT) {
-            answer = await Answer.findOne({ problemId: problem._id });
-            return res.status(200).json({
-              success: true,
-              data: { problem, correctAnswer: answer.answerForDisplay },
-            });
-          } else {
-            return res.status(200).json({ success: true, data: { problem } });
-          }
-        } catch (err) {
-          if (!problem) return res.status(404).json({ success: false, error: "Problem out of stock and cannot generate problem" });
-          else if (err) return res.status(500).json({ success: false, error: err.toString() });
-          else return res.status(400).json({ success: false, error: "Something went wrong" });
-        }
-
-      case ENG:
-        try {
+          break;
+        case SUBJECT.ENG:
           await englishGenerate({ subtopicName, difficulty });
-          problem = await Problem.findOneAndUpdate(
-            {
-              subtopicName: subtopicName,
-              difficulty: difficulty,
-              users: { $ne: userId },
-            },
-            { $push: { users: userId } },
-            {
-              projection: {
-                users: 0,
-                times: 0,
-                subtopicName: 0,
-                difficulty: 0,
-              },
-            }
-          );
-          return res.status(200).json({
-            success: true,
-            data: { problem },
-          });
-        } catch (err) {
-          if (!problem) return res.status(404).json({ success: false, error: "Problem out of stock and cannot generate problem" });
-          else if (err) return res.status(500).json({ success: false, error: err.toString() });
-          else return res.status(400).json({ success: false, error: "Something went wrong" });
-        }
-
-      default:
-        return res
-          .status(404)
-          .json({ success: false, error: "Problem out of stock" });
+          break;
+        default:
+          return res.status(404).json({ success: false, error: "Problem out of stock" });
+      }
+      //find problem again
+      problem = await Problem.findOneAndUpdate(
+        {
+          subtopicName: subtopicName,
+          difficulty: difficulty,
+          users: { $ne: userId },
+        },
+        { $push: { users: userId } },
+      );
     }
-  } else {
-    if (problem.answerType == MATH_INPUT) {
-      answer = await Answer.findOne({ problemId: problem._id });
-      return res
-        .status(200)
-        .json({ success: true, data: { problem, correctAnswer: answer.answerForDisplay } });
+  
+    problemOut = {
+      _id: problem._id,
+      choices: problem.choices,
+      body: problem.body,
+      answerType: problem.answerType,
+      title: problem.title,
+    } 
+    if (problem.answerType == ANSWER_TYPE.MATH_INPUT) {
+      return res.status(200).json({ 
+        success: true, 
+        data: { 
+          problem: problemOut, 
+          correctAnswer: problem.answerForDisplay 
+        } 
+      });
     } else {
-      return res.status(200).json({ success: true, data: { problem } });
+      return res.status(200).json({ 
+        success: true, 
+        data: { problem: problemOut } 
+      });
     }
+  } catch (err) {
+    if (!problem) return res.status(404).json({ success: false, error: "Problem out of stock and cannot generate problem" });
+    else if (err) return res.status(500).json({ success: false, error: err.toString() });
+    else return res.status(400).json({ success: false, error: "Something went wrong" });
   }
 };
 
