@@ -30,7 +30,7 @@ exports.loginViaMCV = async (req, res) => {
     grant_type: "authorization_code",
     client_id: config.mcvClientId,
     client_secret: config.mcvClientSecret,
-    redirect_uri: "http://localhost:3000/oauth/mcv-callback",
+    redirect_uri: config.redirect_uri,
     code: code
   }
   await axios.post(tokenURL, data
