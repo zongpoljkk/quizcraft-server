@@ -371,7 +371,7 @@ exports.getNumberOfAnswer = (req, res) => {
   Group.findById(groupId).exec((err, group) => {
     if (err) return res.status(500).json({ success: false, error: err.toString() });
     else if (!group) return res.status(400).json({ success: false, error: "Group not found" });
-    return res.status(200).json({ success: true, data: { answersNumber: group.answersNumber } })
+    return res.status(200).json({ success: true, data: { numberOfAnswer: group.answersNumber, numberOfMembers: group.members.length } })
   })
 }
 
