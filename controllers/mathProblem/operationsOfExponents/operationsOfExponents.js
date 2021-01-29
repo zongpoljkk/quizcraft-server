@@ -1,6 +1,4 @@
 const Problem = require("../../../models/Problem");
-const Answer = require("../../../models/Answer");
-const Hint = require("../../../models/Hint");
 const math = require("mathjs");
 const { randInt, shuffle, baseSelector } = require("../globalFunction");
 const {
@@ -22,7 +20,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
   let problemTitle, problemBody, answerBody, hintBody;
   let solution, answerType, answerForDisplay, checkAnswerType;
   let expo, positiveBase, opt, buttom;
-  let problem, problemId, answer, hint, newProblem, newAnswer, newHint;
+  let problem, newProblem;
   let i, temp, temp2, allPos, degreeSum, degreeSum2;
   let choices, solutionList;
   let base, degree, randList, baseList, degreeList, termNum;
@@ -201,6 +199,11 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           degreeList = [];
           problemBody = "";
           base = baseSelectorNoInt();
+          checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
+          if (ALPHABET.includes(base)) {
+            problemTitle += ` เมื่อ ${base} ไม่เท่ากับ 0`;
+            checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
+          }
           for (i = 0; i < termNum; i++) {
             degree = randInt(1, 10, true);
             degreeList.push(degree);
@@ -212,12 +215,16 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           answerBody = solutionList[solutionList.length - 1];
           answerForDisplay = answerBody;
           answerType = ANSWER_TYPE.MATH_INPUT;
-          checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           //create hint
           hintBody = PROPERTY_EXPO.MULTIPLY;
           break;
         case 4: //similar to easy but harder and base is not int -> divided
           base = baseSelectorNoInt();
+          checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
+          if (ALPHABET.includes(base)) {
+            problemTitle += ` เมื่อ ${base} ไม่เท่ากับ 0`;
+            checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
+          }
           degreeList = Array.from({ length: 2 }, () => randInt(1, 5, true));
           problemBody =
             base < 0
@@ -232,7 +239,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           answerBody = solutionList[solutionList.length - 1];
           answerForDisplay = answerBody;
           answerType = ANSWER_TYPE.MATH_INPUT;
-          checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
+
           //create hint
           hintBody = PROPERTY_EXPO.DIVIDE;
           break;
@@ -283,8 +290,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
     case DIFFICULTY.HARD:
       problemTitle = PROBLEM_TITLE.SIMPLE_EXPO;
       problemBody = "";
-      // opt = randInt(1,3);
-      opt = 3;
+      opt = randInt(1,3);
       switch (opt) {
         case 1: // (a^[-3]*a^[2]) / (a^[-1]*a^[5]) = a^[-5]
           base = baseSelector();
@@ -618,21 +624,10 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
     answerForDisplay: answerForDisplay,
     hintBody: hintBody,
   });
-  problemId = problem._id;
-  answer = new Answer({
-    problemId: problemId,
-    body: answerBody,
-    solution: solution,
-    answerForDisplay: answerForDisplay,
-    checkAnswerType: checkAnswerType
-  });
-  hint = new Hint({ problemId: problemId, body: hintBody });
-  
+
   // save to database
   try {
     newProblem = await problem.save();
-    newAnswer = await answer.save();
-    newHint = await hint.save();
     return newProblem;
   } catch (err) {
     console.log(err)
