@@ -264,6 +264,9 @@ const setActiveItemForUser = (user, itemName, expiredDate) => {
 exports.useFreezeItem = async (req, res) => {
   //1 day
   try {
+    if (req.body.userId != req.userId) {
+      return res.status(400).json({ success: false, error: "Unauthorized!" });
+    }
     let user = await User.findById( req.userId );
     let indexOfFreezeItem;
     [user, indexOfFreezeItem] = checkAndUseItemOfUser(user, ITEM_NAME.FREEZE, res);
@@ -289,6 +292,9 @@ exports.useFreezeItem = async (req, res) => {
 exports.useDoubleItem = async (req, res) => {
   //coin x2 in 1 hr
   try {
+    if (req.body.userId != req.userId) {
+      return res.status(400).json({ success: false, error: "Unauthorized!" });
+    }
     let user = await User.findById( req.userId );
     let indexOfDoubleItem;
     [user, indexOfDoubleItem] = checkAndUseItemOfUser(user, ITEM_NAME.DOUBLE, res);
