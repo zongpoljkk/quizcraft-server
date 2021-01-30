@@ -109,7 +109,6 @@ exports.getAllAchievements = async (req, res) => {
 };
 
 exports.getMyAchievements = async (req, res) => {
-  console.log("getMyAchievements");
   const userId = req.query.userId;
 
   await User.findById(userId)
@@ -185,7 +184,6 @@ function add(arr, name) {
 }
 
 exports.checkAchievement = async (req, res) => {
-  // console.log(req.body);
   let user_achievement_names = [];
   const type = req.body.type;
   const userId = req.body.userId;
@@ -205,14 +203,10 @@ exports.checkAchievement = async (req, res) => {
     })
       .exec()
       .then((problems) => {
-        console.log("GOT IN QUESTION TYPE");
-        console.log(problems.length);
         const filtered = problems.filter(
           (problem) => problem.subtopicName === subtopic
         );
-        console.log(filtered.length);
         if (filtered.length >= 10) {
-          console.log("DID MORE THAN 10 PROBLEMS");
           user_achievement_names = [
             ...user_achievement_names,
             `นักแก้โจทย์${subtopic}มือสมัครเล่น`,
@@ -241,7 +235,6 @@ exports.checkAchievement = async (req, res) => {
     const streaks = +req.body.streaks;
 
     if (streaks >= 7) {
-      // console.log("SHOULD KAOO");
       user_achievement_names = [...user_achievement_names, "จับฉันให้ได้สิ"];
     }
     if (streaks >= 14) {
@@ -276,11 +269,9 @@ exports.checkAchievement = async (req, res) => {
   // Handle Item related, Do when useEffect Shop page {
   // Check if user has more than 10 basic items and more than 3 advance items
   if (type === "item") {
-    console.log("KAO TYPE ITEM");
     const items = req.body.items;
     let check = 0;
     for (const [key, value] of Object.entries(items)) {
-      console.log(`${key}: ${value}`);
       if (["hint", "skip", "refresh"].includes(key)) {
         if (value >= 10) {
           check++;
@@ -291,7 +282,6 @@ exports.checkAchievement = async (req, res) => {
         }
       }
     }
-    console.log(check);
     if (check === NUMBER_OF_ITEMS) {
       user_achievement_names = [...user_achievement_names, "นักสะสมไอเทม"];
     }
@@ -338,9 +328,6 @@ exports.checkAchievement = async (req, res) => {
     .catch((error) => {
       console.log(error);
     });
-
-  console.log("PRINTING NAMES");
-  console.log(user_achievement_names);
 
   await Achievement.aggregate(
     [
