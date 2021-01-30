@@ -16,23 +16,14 @@ const { SUBJECT, SSE_TOPIC } = require("../utils/const");
 const { sendEventToGroupMember, sendEventToUser } = require("../middlewares");
 
 const updateGroupScore = async (res, groupId, userId, correct, usedTime, correctAnswer) => {
-  console.log(groupId, userId, correct, usedTime, correctAnswer);
   await Group.findById(groupId).exec().then((group) => {
-    console.log("CHECKTIME")
-    console.log(usedTime)
-    console.log(+group.timePerProblem.toString())
     // User either took too long or answer incorrectly or hit skip
     if (usedTime >= +group.timePerProblem.toString() || !correct) {
-      console.log("NO UPDATE")
     }
     else {
-      console.log("UPDATE USER POINT AND SCORE")
       group.members.find(member => member.userId.toString() === userId).score++;
-      console.log(`score: ${group.members.find(member => member.userId.toString() === userId).score}`)
       group.members.find(member => member.userId.toString() === userId).point += calculatePoints(usedTime, group.timePerProblem);
-      console.log(`points: ${group.members.find(member => member.userId.toString() === userId).point}`)
     }
-    console.log(group)
     group.save();
     res.status(200).json({ success: true, data: {correct: correct, correctAnswer: correctAnswer} });
     sendEventToUser(group.creatorId, SSE_TOPIC.SEND_ANSWER);
@@ -95,7 +86,6 @@ const updateChallengeScore = async (
 };
 
 exports.checkAnswer = async (req, res, next) => {
-  console.log(req.body)
   let problemId = req.body.problemId;
   const userId = req.body.userId;
   const userAnswer = req.body.userAnswer;
