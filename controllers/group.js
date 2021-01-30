@@ -252,23 +252,39 @@ exports.joinGroup = async (req, res) => {
 
   var user = await User.findById(body.userId);
 
-  Group.findOneAndUpdate(
-    {
-      pin: body.pin
-    },
-    { $addToSet: { members: { userId: body.userId, username: user.username } } },
-    { new: true },
-    (err, group) => {
-      if (err) {
-        return res.status(500).json({ success: false, error: err });
-      }
-      else if (!group) {
-        return res.status(400).json({ success: false, error: "no data" });
-      }
-      res.status(200).json({ success: true, data: { groupId: group._id } });
-      sendEventToGroupMember(group._id, SSE_TOPIC.UPDATE_MEMBER);
+  Group.findOne({ pin: body.pin }, (err, group) => {
+    if (err) {
+      return res.status(500).json({ success: false, error: err });
+    } else if (!group) {
+      return res
+        .status(400)
+        .json({ success: false, error: "The group does not exist" });
+    } else {
+      Group.findOneAndUpdate(
+        {
+          pin: body.pin,
+          problems: [],
+        },
+        {
+          $addToSet: {
+            members: { userId: body.userId, username: user.username },
+          },
+        },
+        { new: true },
+        (err, group) => {
+          if (err) {
+            return res.status(500).json({ success: false, error: err });
+          } else if (!group) {
+            return res
+              .status(400)
+              .json({ success: false, error: "The game has already started" });
+          }
+          res.status(200).json({ success: true, data: { groupId: group._id } });
+          sendEventToGroupMember(group._id, SSE_TOPIC.UPDATE_MEMBER);
+        }
+      );
     }
-  );
+  });
 };
 
 exports.getGroupGame = async (req, res) => {
