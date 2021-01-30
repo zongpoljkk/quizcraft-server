@@ -79,7 +79,8 @@ const genAddSubStn = (termNum, equalDegree) => {
     } else {
       n = m + randInt(1, 3);
     }
-    let stn = `${a}*10^[${n}]`;
+
+    let stn = stnString2(a,n);
     baseList.push(a);
     nList.push(n);
     if (i == 0) {
@@ -120,6 +121,10 @@ const stnString = (a, n) => {
   return `${a}*10^[${n}]`;
 };
 
+const stnString2 = (a, n) => {
+  return `(${a}*10^[${n}])`;
+};
+
 const genSolutionAddSubDiv = (baseList1, nList1, randList1, baseList2, nList2, randList2) => {
   let baseOutTop = 0;
   let baseOutButtom = 0;
@@ -141,7 +146,7 @@ const genSolutionAddSubDiv = (baseList1, nList1, randList1, baseList2, nList2, r
     } else {
       temp = baseList1[i];
     }
-    stn = `${temp}*10^[${minTop}]`;
+    stn = stnString2(temp,minTop);
     if (i == 0) {
       top += randList1[i] ? `${stn}` : `-${stn}`;
     } else {
@@ -165,7 +170,7 @@ const genSolutionAddSubDiv = (baseList1, nList1, randList1, baseList2, nList2, r
       } else {
         temp = baseList2[i];
       }
-      stn = `${temp}*10^[${minButton}]`;
+      stn = stnString2(temp,minButton);
       if (i == 0) {
         buttom += randList2[i] ? `${stn}` : `-${stn}`;
       } else {
@@ -238,7 +243,7 @@ const genSolutionAddSub = (baseList, nList, randList) => {
     } else {
       temp = baseList[i];
     }
-    stn = `${temp}*10^[${min}]`;
+    stn = stnString2(temp,min);
     if (i == 0) {
       step1 += randList[i] ? `${stn}` : `-${stn}`;
       step2 += randList[i] ? `${temp}` : `-${temp}`;
@@ -296,6 +301,7 @@ module.exports = {
   genAddSubStn,
   getStn,
   stnString,
+  stnString2,
   genSolutionAddSub,
   randFloat,
   multipleConcat,
