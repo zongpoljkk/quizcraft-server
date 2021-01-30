@@ -16,8 +16,11 @@ const AnswerSchema = new Schema({
   },
   checkAnswerType: {
     type: String,
-    enum: ["MATH_EVALUATE","EQUAL_STRING","RULE_BASE"],
+    enum: ["MATH_EVALUATE","EQUAL_STRING","RULE_BASE","POWER_OVER_ONE"],
     default: "EQUAL_STRING",
+  },
+  answerForDisplay: {
+    type: String,
   }
 });
 

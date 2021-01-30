@@ -12,7 +12,7 @@ const SubtopicSchema = new Schema({
     required: true,
   },
   subjectImg: {
-    type: String,
+    type: Object,
     default: null,
   },
   topic: {
@@ -20,7 +20,7 @@ const SubtopicSchema = new Schema({
     required: true,
   },
   topicImg: {
-    type: String,
+    type: Object,
     default: null,
   },
   availableDifficulty: [{

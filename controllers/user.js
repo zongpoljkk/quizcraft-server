@@ -2,6 +2,11 @@ const User = require("../models/User");
 const Item = require("../models/Item");
 const jwt = require("jsonwebtoken");
 const config = require("../config/keys");
+const { GAME_MODE, DIFFICULTY } = require("../utils/const");
+const { DIFFICULTY_EXP, DIFFICULTY_COIN, MODE_SURPLUS } = require("../utils/gameConfig");
+const { levelSystem, rankSystem, MAX_LEVEL } = require("../utils/level");
+const { findActiveItem } = require("./item");
+const { ITEM_NAME } = require("../utils/const"); 
 
 //Add user for testing
 exports.addUser = (req, res, next) => {
@@ -45,8 +50,30 @@ exports.getProfileByUID = async (req, res) => {
         },
       },
       {
+        $lookup: {
+          from: "media.chunks",
+          localField: "fromItems.image.id",
+          foreignField: "files_id",
+          as: "itemImages",
+        },
+      },
+      {
+        $lookup: {
+          from: "uploads.chunks",
+          localField: "photo.id",
+          foreignField: "files_id",
+          as: "photo",
+        },
+      },
+      { 
+        $unwind: {
+          path: "$photo",
+          "preserveNullAndEmptyArrays": true 
+        }
+      },
+      {
         $addFields: {
-          itemInfos: {
+          itemInfoWithoutImgs: {
             $map: {
               input: "$items",
               as: "item",
@@ -77,11 +104,76 @@ exports.getProfileByUID = async (req, res) => {
           fromItems: 0,
           achievements: 0,
           __v: 0,
-          "itemInfos.name": 0,
-          "itemInfos.price": 0,
-          "itemInfos.description": 0,
-          "itemInfos.__v": 0,
+          "photo._id": 0,
+          "photo.files_id": 0,
+          "photo.n": 0,
+          "itemInfoWithoutImgs.name": 0,
+          "itemInfoWithoutImgs.price": 0,
+          "itemInfoWithoutImgs.description": 0,
+          "itemInfoWithoutImgs.__v": 0,
+          "itemInfoWithoutImgs._id": 0,
+          "itemInfoWithoutImgs.lottie": 0,
+        },
+      },
+      {$unwind: "$itemInfoWithoutImgs"},
+      {$unwind: "$itemInfoWithoutImgs.image"},
+      {
+        $group: {
+          _id: "$_id",
+          school: { $first: "$school" },
+          class: { $first: "$class" },
+          rank: { $first: "$rank" },
+          coin: { $first: "$coin" },
+          photo: { $first: "$photo" },
+          streak: { $first: "$streak" },
+          role: { $first: "$role" },
+          firstname: { $first: "$firstname" },
+          lastname: { $first: "$lastname" },
+          smartSchoolAccount: { $first: "$smartSchoolAccount" },
+          username: { $first: "$username" },
+          lastLogin: { $first: "$lastLogin" },
+          exp: { $first: "$exp" },
+          level: { $first: "$level" },
+          maxExp: { $first: "$maxExp" },
+          itemInfoWithoutImgs: { $push: "$itemInfoWithoutImgs" },
+          itemImages: { $first: "$itemImages"}
+        },
+      },
+      {
+        $addFields: {
+          itemInfos: {
+            $map: {
+              input: "$itemInfoWithoutImgs",
+              as: "item",
+              in: {
+                $mergeObjects: [
+                  "$$item",
+                  {
+                    $arrayElemAt: [
+                      {
+                        $filter: {
+                          input: "$itemImages",
+                          as: "image",
+                          cond: { $eq: ["$$image.files_id", "$$item.image.id"] },
+                        },
+                      },
+                      0,
+                    ],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          itemInfoWithoutImgs: 0,
+          itemImages: 0,
+          "itemInfos.image": 0,
           "itemInfos._id": 0,
+          "itemInfos.files_id": 0,
+          "itemInfos.n": 0
         },
       },
     ],
@@ -179,24 +271,7 @@ exports.editUsername = async (req, res) => {
   });
 };
 
-exports.usedItem = async (req, res) => {
-  let token = req.header("Authorization");
-  var userIdFromToken;
-  if (!token) {
-    return res
-      .status(403)
-      .json({ success: false, error: "No token provided!" });
-  }
-  if (token.startsWith("Bearer ")) {
-    token = token.slice(7, token.length).trimLeft();
-  } else {
-  }
-  jwt.verify(token, config.secret, (err, decoded) => {
-    if (err)
-      return res.status(401).json({ success: false, error: "Unauthorized!" });
-    userIdFromToken = decoded.userId;
-  });
-
+exports.usedItem = async (req, res) => {  
   const body = req.body;
   if (!body) {
     return res.status(400).json({
@@ -205,7 +280,7 @@ exports.usedItem = async (req, res) => {
     });
   }
 
-  if (userIdFromToken !== body.userId) {
+  if (req.userId !== body.userId) {
     return res.status(400).json({
       success: false,
       error: "userId not match userId that decoded from token!",
@@ -323,34 +398,33 @@ exports.updateStreak = async (userId) => {
   const lastLoginDate = new Date(user.lastLogin);
   const nextDate = new Date(user.lastLogin);
   nextDate.setDate(nextDate.getDate() + 1);
+  const activeItem = findActiveItem(user, ITEM_NAME.FREEZE);
   if (now.toDateString() == lastLoginDate.toDateString()) {
     //same day, do nothing
     console.log("sameday");
     return;
   } else if (now.toDateString() == nextDate.toDateString()) {
     //inc streak by 1
-    await User.findOneAndUpdate(
-      {
-        _id: userId,
-      },
-      {
-        $inc: {
-          streak: 1,
-        },
-      }
-    );
+    await User.findOneAndUpdate({ _id: userId }, { $inc: { streak: 1 } });
     console.log("inc streak");
     return;
+  } else if (activeItem) {
+    let nextDateOfExpiredDate = activeItem.expiredDate;
+    nextDateOfExpiredDate.setDate(nextDateOfExpiredDate.getDate() + 1);
+    if (now.toDateString() == nextDateOfExpiredDate.toDateString()) {
+      //inc streak by 1
+      await User.findOneAndUpdate({ _id: userId }, { $inc: { streak: 1 } });
+      console.log("inc streak by freeze");
+      return;
+    } else {
+      //set streak to 1
+      await User.findOneAndUpdate({ _id: userId }, { streak: 1 });
+      console.log("set 1");
+      return;
+    }
   } else {
     //set streak to 1
-    await User.findOneAndUpdate(
-      {
-        _id: userId,
-      },
-      {
-        streak: 1,
-      }
-    );
+    await User.findOneAndUpdate({ _id: userId }, { streak: 1 });
     console.log("set 1");
     return;
   }
@@ -448,4 +522,65 @@ exports.buyItem = async (req, res) => {
       }
     }
   );
+};
+
+exports.updateCoinAndExp = async (user, gameMode, difficulty) => {  
+  const levelDictionary = levelSystem();
+  const rankDictionary = rankSystem();
+  let earnedCoins, earnedExp, modeSurplus;
+  switch (gameMode) {
+    case GAME_MODE.CHALLENGE:
+      modeSurplus = MODE_SURPLUS.CHALLENGE;
+      break;
+    case GAME_MODE.QUIZ:
+      modeSurplus = MODE_SURPLUS.QUIZ;
+      break;
+    default:
+      modeSurplus = 1;
+      break;
+  }
+
+  // * Handle Earned coins and exp * //
+  switch (difficulty) {
+    case DIFFICULTY.EASY:
+      earnedCoins = DIFFICULTY_COIN.EASY * modeSurplus;
+      earnedExp = DIFFICULTY_EXP.EASY * modeSurplus;
+      break;
+    case DIFFICULTY.MEDIUM:
+      earnedCoins = DIFFICULTY_COIN.MEDIUM * modeSurplus;
+      earnedExp = DIFFICULTY_EXP.MEDIUM * modeSurplus;
+      break;
+    case DIFFICULTY.HARD:
+      earnedCoins = DIFFICULTY_COIN.HARD * modeSurplus;
+      earnedExp = DIFFICULTY_EXP.HARD * modeSurplus;  
+      break;
+  }
+
+  let activeItem = findActiveItem(user, ITEM_NAME.DOUBLE);
+  if (activeItem && Date.now() <= activeItem.expiredDate) {
+    earnedCoins *= 2;
+  }
+
+  user.exp += earnedExp;
+  user.coin += earnedCoins;
+
+  // * Handle Level up * //
+  // Compare user exp if it exceeds the limit of his/her level
+  let levelUp = false;
+  let rankUp = false;
+  if (user.exp >= levelDictionary[parseInt(user.level)]) {
+    if (user.level == MAX_LEVEL) {
+    } else {
+      levelUp = true;
+      user.exp -= levelDictionary[parseInt(user.level)];
+      user.maxExp = levelDictionary[parseInt(user.level + 1)];
+      user.level += 1;
+      // ? Handle Rank up ? //
+      if (user.level in rankDictionary) {
+        user.rank = rankDictionary[user.level];
+        rankUp = true;
+      }
+    }
+  }
+  return [{ user, levelUp, rankUp, earnedCoins, earnedExp }];
 };

@@ -89,6 +89,37 @@ const UserSchema = new Schema({
     type: Date,
     default: Date.now,
   },
+  usedItems: [
+    {
+      _id: false,
+      itemName: {
+        type: String,
+      },
+      amount: {
+        type: Number,
+        default: 0,
+      },
+      problems: [
+        {
+          type: Schema.Types.ObjectId,
+          ref: "Problem",
+        },
+      ],
+    },
+  ],
+  activeItems: [
+    {
+      _id: false,
+      itemName: {
+        type: String,
+        require: true,
+      },
+      expiredDate: {
+        type: Date,
+        require: true,
+      }
+    }
+  ]
 });
 
 module.exports = mongoose.model("User", UserSchema);

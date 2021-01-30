@@ -1,28 +1,30 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const ChallengeSchema = new Schema({
   user1Id: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
+    ref: "User",
     required: true,
   },
   user2Id: {
     type: Schema.Types.ObjectId,
-    ref: 'User',
+    ref: "User",
     required: true,
   },
   whoTurn: {
     type: Number,
     required: true,
-    enum: [1,2],
+    enum: [1, 2],
     default: 1,
   },
-  problems: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Problem',
-    required: true,
-  }],
+  problems: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Problem",
+      required: true,
+    },
+  ],
   user1Score: {
     type: Number,
     required: true,
@@ -46,7 +48,7 @@ const ChallengeSchema = new Schema({
   currentProblem: {
     type: Number,
     required: true,
-    enum: [0,1,2,3,4],
+    enum: [0, 1, 2, 3, 4, 5],
     default: 0,
   },
   subtopicName: {
@@ -58,12 +60,16 @@ const ChallengeSchema = new Schema({
     enum: ["EASY", "MEDIUM", "HARD"],
     required: true,
   },
-  user1Result: [{
-    type: Number,
-  }],
-  user2Result: [{
-    type: Number,
-  }],
+  user1Result: [
+    {
+      type: Number,
+    },
+  ],
+  user2Result: [
+    {
+      type: Number,
+    },
+  ],
   user1IsRead: {
     type: Boolean,
     default: false,
@@ -87,7 +93,7 @@ const ChallengeSchema = new Schema({
   user2GainExp: {
     type: Number,
     default: 0,
-  }
-})
+  },
+});
 
-module.exports = mongoose.model('Challenge', ChallengeSchema);
+module.exports = mongoose.model("Challenge", ChallengeSchema);

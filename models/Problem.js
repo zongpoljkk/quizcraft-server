@@ -37,6 +37,37 @@ const ProblemSchema = new Schema({
   title: {
     type:String,
     required: true
+  },
+  usedItems: [{
+    _id: false,
+    itemName: {
+      type: String,
+    },
+    amount: {
+      type: Number,
+      default: 1,
+    },
+    userId: [{
+      type: Schema.Types.ObjectId,
+    }]
+  }],
+  answerBody: {
+    type: String,
+    required: true,
+  },
+  solution: {
+    type: String,
+  },
+  checkAnswerType: {
+    type: String,
+    enum: ["MATH_EVALUATE","EQUAL_STRING","RULE_BASE","POWER_OVER_ONE"],
+    default: "EQUAL_STRING",
+  },
+  answerForDisplay: {
+    type: String,
+  },
+  hintBody: {
+    type: String,
   }
 });
 
