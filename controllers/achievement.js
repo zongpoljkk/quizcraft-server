@@ -315,7 +315,7 @@ exports.checkAchievement = async (req, res) => {
       });
 
       // Update User achievements field
-      user_achievement_names.forEach((new_achievement_name) => {
+      user_achievement_names.forEach(async (new_achievement_name) => {
         user.achievements = [
           ...user.achievements,
           {
@@ -323,8 +323,17 @@ exports.checkAchievement = async (req, res) => {
             achievementName: new_achievement_name,
           },
         ];
+
+        // TODO: Add user exp and coin
+        await Achievement.findOne({ name: new_achievement_name })
+          .exec()
+          .then((achievement) => {
+            user.coin += achievement.rewardCoin;
+            user.exp += achievement.rewardEXP;
+            user.save();
+          });
       });
-      user.save();
+
     })
     .catch((error) => {
       console.log(error);
