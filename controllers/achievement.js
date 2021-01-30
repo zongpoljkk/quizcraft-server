@@ -339,6 +339,7 @@ exports.checkAchievement = async (req, res) => {
       console.log(error);
     });
 
+  console.log("PRINTING NAMES");
   console.log(user_achievement_names);
 
   await Achievement.aggregate(
