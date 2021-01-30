@@ -1,34 +1,31 @@
 const Problem = require("../../../models/Problem");
-const Answer = require("../../../models/Answer");
-const Hint = require("../../../models/Hint");
 const math = require("mathjs");
-const { randInt, shuffle, baseSelector } = require("../globalFunction");
+const { randInt } = require("../globalFunction");
 const {
   CHECK_ANSWER_TYPE,
   DIFFICULTY,
   ANSWER_TYPE,
-  ALPHABET,
 } = require("../../../utils/const");
 const {
   moveThePoint,
   genAddSubStn,
   getStn,
   stnString,
+  stnString2,
   genSolutionAddSub,
   randFloat,
   multipleConcat,
   genSolutionAddSubDiv, 
 } = require("./scientificNotationFunction");
-const { genSolution } = require("../operationsOfExponents/operationsOfExponentsFunction");
 const { PROBLEM_TITLE, SUFFIX } = require("./const");
 const { bignumber } = require("mathjs");
 
 const generateScientificNotation = async (subtopicName, difficulty) => {
   let problemTitle, problemBody, answerBody, hintBody, choices;
   let solution, answerType, answerForDisplay, checkAnswerType;
-  let a, n, stn, num, opt, nn, ff, allPos, allInt, rand, n2;
-  let i, m, min, baseOut, positiveBase, solutionList, degreeOut;
-  let problem, problemId, answer, hint, newProblem, newAnswer, newHint;
+  let a, n, stn, num, opt, nn, ff, allInt, rand, n2;
+  let i, baseOut, positiveBase, solutionList;
+  let problem, answer, newProblem;
   let termNum, baseList, nList, randList;
   let baseList2, nList2, randList2, temp, top, buttom;
   switch (difficulty) {
@@ -116,7 +113,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
             } else {
               a = randFloat(10);
             }
-            stn = stnString(a, n);
+            stn = stnString2(a, n);
             baseList.push(a);
             nList.push(n);
             if (i == 0) {
@@ -248,7 +245,6 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
       problemTitle = PROBLEM_TITLE.FIND_VALUE_STN;
       problemBody = "";
       opt = randInt(1,3);
-      opt = 2;
       switch (opt) {
         case 1:
           termNum = randInt(2,4);
@@ -296,10 +292,11 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
             }
             nList.push(n);
             baseOut += a;
+            positiveBase = Math.abs(a);
             if (i==0) {
-              problemBody += `${stnString(a,n)}`;
+              problemBody += a<0 ? `-${stnString2(positiveBase,n)}` : `${stnString2(positiveBase,n)}`;
             } else {
-              problemBody += a<0 ? `${stnString(a,n)}`: `+${stnString(a,n)}`;
+              problemBody += a<0 ? `-${stnString2(positiveBase,n)}`: `+${stnString2(positiveBase,n)}`;
             }
           }
 
@@ -324,14 +321,18 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
             }
             nList2.push(n2);
             baseOut += a;
+            positiveBase = Math.abs(a);
             if (i==0) {
-              temp += `${stnString(a,n2)}`;
+              temp += a<0 ? `-${stnString2(positiveBase,n2)}` : `${stnString2(positiveBase,n2)}`;
             } else {
-              temp += a<0 ? `${stnString(a,n2)}`: `+${stnString(a,n2)}`;
+              temp += a<0 ? `-${stnString2(positiveBase,n2)}`: `+${stnString2(positiveBase,n2)}`;
             }
           }
           problemBody = `(${problemBody})/(${temp})`;
           [{ solution, solutionList }] = genSolutionAddSubDiv(baseList,nList,randList,baseList2,nList2,randList2);
+          if (solutionList[0] != problemBody) {
+            solution = problemBody + "\n" + solution;
+          }
           answerBody = solutionList[solutionList.length-1];
           answerForDisplay = answerBody.replace("*10","{*10}");
           checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
@@ -368,9 +369,9 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
             nList.push(n-rand);
             baseOut += a;
             if (i==0) {
-              problemBody += a<0? `${stnString(-positiveBase,n-rand)}`:`${stnString(positiveBase,n-rand)}`;
+              problemBody += a<0? `-${stnString2(positiveBase,n-rand)}`:`${stnString2(positiveBase,n-rand)}`;
             } else {
-              problemBody += a<0 ? `-${stnString(positiveBase,n-rand)}`: `+${stnString(positiveBase,n-rand)}`;
+              problemBody += a<0 ? `-${stnString2(positiveBase,n-rand)}`: `+${stnString2(positiveBase,n-rand)}`;
             }
           }
 
@@ -394,13 +395,16 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
             nList2.push(n2-rand);
             baseOut += a;
             if (i==0) {
-              temp += a<0? `${stnString(-positiveBase,n2-rand)}`:`${stnString(positiveBase,n2-rand)}`;
+              temp += a<0? `-${stnString2(positiveBase,n2-rand)}`:`${stnString2(positiveBase,n2-rand)}`;
             } else {
-              temp += a<0 ? `-${stnString(positiveBase,n2-rand)}`: `+${stnString(positiveBase,n2-rand)}`;
+              temp += a<0 ? `-${stnString2(positiveBase,n2-rand)}`: `+${stnString2(positiveBase,n2-rand)}`;
             }
           }
           problemBody = `(${problemBody})/(${temp})`;
           [{ solution, solutionList }] = genSolutionAddSubDiv(baseList,nList,randList,baseList2,nList2,randList2);
+          if (solutionList[0] != problemBody) {
+            solution = problemBody + "\n" + solution;
+          }
           answerBody = solutionList[solutionList.length-1];
           answerForDisplay = answerBody.replace("*10","{*10}");
           checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
@@ -424,21 +428,10 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
     answerForDisplay: answerForDisplay,
     hintBody: hintBody,
   });
-  problemId = problem._id;
-  answer = new Answer({
-    problemId: problemId,
-    body: answerBody,
-    solution: solution,
-    answerForDisplay: answerForDisplay,
-    checkAnswerType: checkAnswerType
-  });
-  hint = new Hint({ problemId: problemId, body: hintBody });
   
   // save to database
   try {
     newProblem = await problem.save();
-    newAnswer = await answer.save();
-    newHint = await hint.save();
     return newProblem;
   } catch (err) {
     console.log(err)

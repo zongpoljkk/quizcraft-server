@@ -1,6 +1,4 @@
 const Problem = require("../../../models/Problem");
-const Answer = require("../../../models/Answer");
-const Hint = require("../../../models/Hint");
 const math = require("mathjs");
 const { randInt, shuffle, baseSelector } = require("../globalFunction");
 const { CHECK_ANSWER_TYPE, DIFFICULTY, ANSWER_TYPE, ALPHABET } = require("../../../utils/const");
@@ -10,7 +8,7 @@ const { multiplicationTerm } = require("./meaningOfExponentsFunction");
 const generateMeaningOfExponents = async (subtopicName, difficulty) => {
   var problemTitle,problemBody,answerBody,hintBody,solution,answerType,answerForDisplay, checkAnswerType ;
   var expo, num,a ,n, rand, positiveBase, opt, selectedExpo, expoList, numList, choices;
-  let problem, problemId, answer, hint, newProblem,newAnswer,newHint;
+  let problem, newProblem;
   let i,temp,primeList;
   switch (difficulty) {
     case DIFFICULTY.EASY:
@@ -213,6 +211,10 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           answerForDisplay = n;
           answerType = ANSWER_TYPE.MATH_INPUT;
           checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
+          
+          //create hint 
+          hintBody = `ถ้า a^[n] = a^[m] โดยที่ a ไม่เท่ากับ 0 จะได้ว่า n = m`;
+          hintBody += `\nเช่น ถ้า 3^[x] = 81 = 3^[4] จะได้ว่า x = 4`;
           break;
         case 2:
           problemTitle = "จงเขียนจำนวนต่อไปนี้ ให้อยู่ในรูปเลขยกกำลังที่มีฐานเป็นจำนวนเฉพาะ"
@@ -275,7 +277,6 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
       break;
     case DIFFICULTY.HARD:
       opt = randInt(1,3);
-      opt = 3;
       switch (opt) {
         case 1:
           problemTitle = "จงหาว่าเลขยกกำลังต่อไปนี้มีค่าเท่ากันหรือไม่"
@@ -352,7 +353,6 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
                   +`\nเช่น (-${a})^[2] = (-${a})*(-${a}) แต่ -${a}^[2] = -(${a}*${a})`;
           break;
         case 3:
-          problemTitle = "จงหาค่าของ x เมื่อ";
           a = randInt(2,50,true);
           positiveBase = Math.abs(a);
           if (1 <= positiveBase && positiveBase <= 2) {
@@ -370,15 +370,16 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
 
           //create answer
           if (n%2 == 0) {
+            problemTitle = `จงหาค่าของ x ที่เป็นจำนวนเต็มบวกเมื่อ`;
             answerBody = Math.abs(a);
             answerForDisplay = answerBody;
-            answerBody += `|${-Math.abs(a)}`;
           } else {
+            problemTitle = `จงหาค่าของ x เมื่อ`;
             answerBody = a;
             answerForDisplay = answerBody;
           }
           answerType = ANSWER_TYPE.MATH_INPUT;
-          checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
+          checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
 
           //crete solution
           solution = problemBody;
@@ -407,21 +408,10 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
     answerForDisplay: answerForDisplay,
     hintBody: hintBody,
   });
-  problemId = problem._id;
-  answer = new Answer({
-    problemId: problemId,
-    body: answerBody,
-    solution: solution,
-    answerForDisplay: answerForDisplay,
-    checkAnswerType: checkAnswerType
-  });
-  hint = new Hint({ problemId: problemId, body: hintBody });
-  
+
   // save to database
   try {
     newProblem = await problem.save();
-    newAnswer = await answer.save();
-    newHint = await hint.save();
     return newProblem;
   } catch (err) {
     console.log(err)
