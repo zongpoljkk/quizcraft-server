@@ -43,6 +43,20 @@ exports.getProfileByUID = async (req, res) => {
       },
       {
         $lookup: {
+          from: "uploads.chunks",
+          localField: "photo.id",
+          foreignField: "files_id",
+          as: "photo",
+        },
+      },
+      {
+        $unwind: {
+          path: "$photo",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
           from: "items",
           localField: "items.itemName",
           foreignField: "name",
@@ -56,20 +70,6 @@ exports.getProfileByUID = async (req, res) => {
           foreignField: "files_id",
           as: "itemImages",
         },
-      },
-      {
-        $lookup: {
-          from: "uploads.chunks",
-          localField: "photo.id",
-          foreignField: "files_id",
-          as: "photo",
-        },
-      },
-      { 
-        $unwind: {
-          path: "$photo",
-          "preserveNullAndEmptyArrays": true 
-        }
       },
       {
         $addFields: {
@@ -101,7 +101,7 @@ exports.getProfileByUID = async (req, res) => {
       {
         $project: {
           items: 0,
-          fromItems: 0,
+          // fromItems: 0,
           achievements: 0,
           __v: 0,
           "photo._id": 0,
@@ -115,8 +115,18 @@ exports.getProfileByUID = async (req, res) => {
           "itemInfoWithoutImgs.lottie": 0,
         },
       },
-      {$unwind: "$itemInfoWithoutImgs"},
-      {$unwind: "$itemInfoWithoutImgs.image"},
+      {
+        $unwind: {
+          path: "$itemInfoWithoutImgs",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $unwind: {
+          path: "$itemInfoWithoutImgs.image",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
       {
         $group: {
           _id: "$_id",
