@@ -71,7 +71,7 @@ exports.sendEventToUser = async (userId, sseTopic) => {
 
   //send to user
   this.subscribers.forEach(s => {
-    if(s.userId === userId) s.res.write(`data: ${JSON.stringify(event)}\n\n`)
+    if(s.userId == userId) s.res.write(`data: ${JSON.stringify(event)}\n\n`)
   });
 }
 
