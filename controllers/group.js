@@ -406,15 +406,24 @@ exports.nextProblem = async (req, res) => {
   const userId = req.userId;
   Group.findOneAndUpdate(
     { _id: groupId, creatorId: userId },
-    { $inc: { currentIndex: 1 } },
+    { $inc: { currentIndex: 1 } , answersNumber: 0},
     { new: true},
     (err, group) => {
       if (err) return res.status(500).json({ success: false, error: err.toString() });
       else if (!group) return res.status(400).json({ success: false, error: "Cannot do next problem" });
-      res.status(200).json({ success: true, data: {currentIndex: group.currentIndex}});
+      res.status(200).json({ success: true, data: { currentIndex: group.currentIndex }});
       // Server-sent-event
       sendEventToGroupMember(groupId, SSE_TOPIC.NEXT_PROBLEM);
     }
   );
 };
+
+exports.getNumberOfAnswer = (req, res) => {
+  const groupId = req.query.groupId;
+  Group.findById(groupId).exec((err, group) => {
+    if (err) return res.status(500).json({ success: false, error: err.toString() });
+    else if (!group) return res.status(400).json({ success: false, error: "Group not found" });
+    return res.status(200).json({ success: true, data: { numberOfAnswer: group.answersNumber, numberOfMembers: group.members.length } })
+  })
+}
 
