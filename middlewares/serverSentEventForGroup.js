@@ -55,7 +55,7 @@ exports.sendEventToGroupMember = async (groupId, sseTopic) => {
 
   //send to people in group
   this.subscribers.forEach(s => {
-    if(s.groupId === groupId) s.res.write(`data: ${JSON.stringify(event)}\n\n`)
+    if(s.groupId == groupId) s.res.write(`data: ${JSON.stringify(event)}\n\n`)
   });
 }
 
