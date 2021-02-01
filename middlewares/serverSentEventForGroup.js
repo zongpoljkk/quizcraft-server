@@ -1,4 +1,5 @@
 const { SSE_TOPIC } = require("../utils/const");
+const { v4:uuidv4 } = require('uuid');
 
 exports.subscribers = [];
 
@@ -17,7 +18,9 @@ exports.groupEventsHandler = (req, res, next) => {
   // After client opens connection send init data
   const groupId = req.query.groupId;
   const userId = req.userId;
+  const processId = uuidv4().substring(0, 8);
   const initSubscribeData = {
+    processId,
     groupId,
     startProcessAt: Date.now(),
     type: SSE_TOPIC.INIT_CONNECTION
@@ -28,6 +31,7 @@ exports.groupEventsHandler = (req, res, next) => {
 
   // Generate subscriber data bind userId and groupId with HTTP response object
   const newSubscriber = {
+    processId,
     groupId,
     userId,
     res
@@ -39,7 +43,7 @@ exports.groupEventsHandler = (req, res, next) => {
   req.on("close", () => {
     // for debug
     // console.log(`${userId} connection closed`);
-    this.subscribers = this.subscribers.filter(s => s.userId !== userId);
+    this.subscribers = this.subscribers.filter(s => s.processId !== processId);
   });
 }
 
