@@ -1,7 +1,6 @@
 const User = require("../models/User");
 const Counter = require("../models/Counter");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
 const config = require("../config/keys");
 const axios = require('axios');
 const { updateStreak } = require("./user")
@@ -126,5 +125,5 @@ exports.refreshToken = async (req, res) => {
   const token = jwt.sign({userId: req.userId, role: req.role}, config.secret, {
     expiresIn: 14400 // 4 hours
   });
-  return res.header("auth-token",token).status(200).json({ success: true, token: token});
+  return res.header("refresh-token",token).status(200).json({ success: true, token: token});
 }
