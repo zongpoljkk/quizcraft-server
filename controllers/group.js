@@ -279,7 +279,18 @@ exports.joinGroup = async (req, res) => {
               .status(400)
               .json({ success: false, error: "The game has already started" });
           }
-          res.status(200).json({ success: true, data: { groupId: group._id } });
+          res.status(200).json({ 
+            success: true,
+            data: { 
+              groupId: group._id, 
+              groupInfo: { 
+                subject: group.subject,
+                topic: group.topic,
+                subtopic: group.subtopic,
+                difficulty: group.difficulty
+              } 
+            } 
+          });
           sendEventToGroupMember(group._id, SSE_TOPIC.UPDATE_MEMBER);
         }
       );

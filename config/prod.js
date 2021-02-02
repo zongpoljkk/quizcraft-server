@@ -8,5 +8,5 @@ module.exports = {
   mcvClientId: process.env.MCV_CLIENT_ID,
   mcvClientSecret: process.env.MCV_CLIENT_SECRET,
   redirect_uri: process.env.REDIRECT_URI,
+  cors_origin: process.env.CORS_ORIGIN
 };
-
