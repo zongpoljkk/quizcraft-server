@@ -98,7 +98,8 @@ exports.deleteGroup = async (req, res) => {
       if (!user) {
         return res.status(400).json({ success: false, error: "no data" });
       }
-      return res.status(200).json({ success: true, data: "delete group success!" });
+      res.status(200).json({ success: true, data: "delete group success!" });
+      sendEventToGroupMember(body.groupId, SSE_TOPIC.DELETE_GROUP);
     }
   );
 };
