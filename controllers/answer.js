@@ -115,7 +115,6 @@ exports.checkAnswer = async (req, res, next) => {
               const tempUserAnswer = userAnswer.split("[").join("(");
               tempUserAnswer2 = tempUserAnswer.split("]").join(")");
             } catch {
-              // TODO: DEBUG for now
               tempUserAnswer2 = RANDOM_MATH;
             }
             const tempAnswerBody = answer.answerBody.split("[").join("(");
@@ -142,7 +141,6 @@ exports.checkAnswer = async (req, res, next) => {
                 const tempUserAnswer = userAnswer.split("[").join("(");
                 tempUserAnswer2 = tempUserAnswer.split("]").join(")");
               } catch {
-                // TODO: DEBUG for now
                 tempUserAnswer2 = RANDOM_MATH;
               }
               const tempAnswerBody = answer.answerBody.split("[").join("(");
