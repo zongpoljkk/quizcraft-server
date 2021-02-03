@@ -21,9 +21,11 @@ router.post("/gen-problems-when-group-start", [authJwt], groupController.genProb
 router.get("/group-scoreboard/", [authJwt], groupController.getGroupScoreboard);
 router.put("/join-group", [authJwt], groupController.joinGroup);
 router.get("/get-group-game", [authJwt], groupController.getGroupGame);
+router.put("/reset-group-game", [authJwt], groupController.resetAfterGameEnd);
 router.post("/next-problem", [authJwt], groupController.nextProblem);
 router.get("/event/", [authJwt], groupEventsHandler);
 router.delete("/close/", [authJwt], closeConnection);
+router.get("/get-number-of-answer", [authJwt], groupController.getNumberOfAnswer);
 //for test
 router.get("/status", (req, res) => res.json({ clients: subscribers.length }));
 

@@ -98,7 +98,8 @@ exports.deleteGroup = async (req, res) => {
       if (!user) {
         return res.status(400).json({ success: false, error: "no data" });
       }
-      return res.status(200).json({ success: true, data: "delete group success!" });
+      res.status(200).json({ success: true, data: "delete group success!" });
+      sendEventToGroupMember(body.groupId, SSE_TOPIC.DELETE_GROUP);
     }
   );
 };
@@ -252,23 +253,39 @@ exports.joinGroup = async (req, res) => {
 
   var user = await User.findById(body.userId);
 
-  Group.findOneAndUpdate(
-    {
-      pin: body.pin
-    },
-    { $addToSet: { members: { userId: body.userId, username: user.username } } },
-    { new: true },
-    (err, group) => {
-      if (err) {
-        return res.status(500).json({ success: false, error: err });
-      }
-      else if (!group) {
-        return res.status(400).json({ success: false, error: "no data" });
-      }
-      res.status(200).json({ success: true, data: { groupId: group._id } });
-      sendEventToGroupMember(group._id, SSE_TOPIC.UPDATE_MEMBER);
+  Group.findOne({ pin: body.pin }, (err, group) => {
+    if (err) {
+      return res.status(500).json({ success: false, error: err });
+    } else if (!group) {
+      return res
+        .status(400)
+        .json({ success: false, error: "The group does not exist" });
+    } else {
+      Group.findOneAndUpdate(
+        {
+          pin: body.pin,
+          problems: [],
+        },
+        {
+          $addToSet: {
+            members: { userId: body.userId, username: user.username },
+          },
+        },
+        { new: true },
+        (err, group) => {
+          if (err) {
+            return res.status(500).json({ success: false, error: err });
+          } else if (!group) {
+            return res
+              .status(400)
+              .json({ success: false, error: "The game has already started" });
+          }
+          res.status(200).json({ success: true, data: { groupId: group._id } });
+          sendEventToGroupMember(group._id, SSE_TOPIC.UPDATE_MEMBER);
+        }
+      );
     }
-  );
+  });
 };
 
 exports.getGroupGame = async (req, res) => {
@@ -349,20 +366,65 @@ exports.getGroupGame = async (req, res) => {
   };
 };
 
+exports.resetAfterGameEnd = async (req, res) => {
+  const body = req.body;
+  if (!body) {
+    return res.status(400).json({
+      success: false,
+      error: "You must provide a body to update",
+    });
+  }
+
+  Group.findOneAndUpdate(
+    {
+      _id: body.groupId,
+      creatorId: body.userId,
+    },
+    {
+      $set: {
+        "members.$[].score": 0,
+        "members.$[].point": 0,
+        problems: [],
+        currentIndex: 0,
+      },
+    },
+    { multi: true },
+    (err, user) => {
+      if (err) {
+        return res.status(500).json({ success: false, error: err });
+      }
+      if (!user) {
+        return res.status(400).json({ success: false, error: "no data" });
+      }
+      res.status(200).json({ success: true, data: "reset group success!" });
+      sendEventToGroupMember(groupId, SSE_TOPIC.RESTART_GAME);
+    }
+  );
+};
+
 exports.nextProblem = async (req, res) => {
   const groupId = req.body.groupId;
   const userId = req.userId;
   Group.findOneAndUpdate(
     { _id: groupId, creatorId: userId },
-    { $inc: { currentIndex: 1 } },
+    { $inc: { currentIndex: 1 } , answersNumber: 0},
     { new: true},
     (err, group) => {
       if (err) return res.status(500).json({ success: false, error: err.toString() });
       else if (!group) return res.status(400).json({ success: false, error: "Cannot do next problem" });
-      res.status(200).json({ success: true, data: {currentIndex: group.currentIndex}});
+      res.status(200).json({ success: true, data: { currentIndex: group.currentIndex }});
       // Server-sent-event
       sendEventToGroupMember(groupId, SSE_TOPIC.NEXT_PROBLEM);
     }
   );
 };
+
+exports.getNumberOfAnswer = (req, res) => {
+  const groupId = req.query.groupId;
+  Group.findById(groupId).exec((err, group) => {
+    if (err) return res.status(500).json({ success: false, error: err.toString() });
+    else if (!group) return res.status(400).json({ success: false, error: "Group not found" });
+    return res.status(200).json({ success: true, data: { numberOfAnswer: group.answersNumber, numberOfMembers: group.members.length } })
+  })
+}
 
