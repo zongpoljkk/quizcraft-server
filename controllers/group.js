@@ -280,7 +280,18 @@ exports.joinGroup = async (req, res) => {
               .status(400)
               .json({ success: false, error: "The game has already started" });
           }
-          res.status(200).json({ success: true, data: { groupId: group._id } });
+          res.status(200).json({ 
+            success: true,
+            data: { 
+              groupId: group._id, 
+              groupInfo: { 
+                subject: group.subject,
+                topic: group.topic,
+                subtopic: group.subtopic,
+                difficulty: group.difficulty
+              } 
+            } 
+          });
           sendEventToGroupMember(group._id, SSE_TOPIC.UPDATE_MEMBER);
         }
       );
@@ -397,7 +408,7 @@ exports.resetAfterGameEnd = async (req, res) => {
         return res.status(400).json({ success: false, error: "no data" });
       }
       res.status(200).json({ success: true, data: "reset group success!" });
-      sendEventToGroupMember(groupId, SSE_TOPIC.RESTART_GAME);
+      sendEventToGroupMember(body.groupId, SSE_TOPIC.RESTART_GAME);
     }
   );
 };
