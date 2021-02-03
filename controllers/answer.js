@@ -30,15 +30,11 @@ const updateChallengeScore = async (
         challenge.user1Time =
           +challenge.user1Time.toString() + parseFloat(userTime);
         if (correct) {
-          console.log("IF");
-          console.log(`problemIndex: ${problemIndex}`);
           challenge.user1Result.set(problemIndex, 1);
           challenge.user1Score++;
           challenge.user1GainExp += earnedExp;
           challenge.user1GainCoin += earnedCoins;
         } else {
-          console.log("ELSE");
-          console.log(`problemIndex: ${problemIndex}`);
           challenge.user1Result.set(problemIndex, 0);
         }
       } else {
@@ -56,7 +52,6 @@ const updateChallengeScore = async (
 
       // Update whoTurn when player finished NUMBER_OF_PROBLEM
       if (problemIndex === NUMBER_OF_PROBLEM - 1) {
-        console.log(`probleMIndex: ${problemIndex}`);
         switch (challenge.whoTurn) {
           case 1:
             challenge.whoTurn = 2;
@@ -69,14 +64,12 @@ const updateChallengeScore = async (
         challenge.user2IsRead = false;
       }
 
-      console.log(challenge);
       // No need to update current index because already did when getting problem by challenge id
       challenge.save();
     });
 };
 
 exports.checkAnswer = async (req, res, next) => {
-  console.log(req.body);
   let problemId = req.body.problemId;
   const userId = req.body.userId;
   const userAnswer = req.body.userAnswer;
@@ -127,16 +120,12 @@ exports.checkAnswer = async (req, res, next) => {
             }
             const tempAnswerBody = answer.answerBody.split("[").join("(");
             const tempAnswerBody2 = tempAnswerBody.split("]").join(")");
-            console.log("MATHEVAL");
-            console.log(tempAnswerBody2);
-            console.log(tempUserAnswer2);
             let user_answer_math_able;
             try {
               user_answer_math_able = math.evaluate(tempUserAnswer2)
             } catch {
               user_answer_math_able = "0.123454321"
             }
-            console.log(`user_answer_math_able: ${user_answer_math_able}`);
             if (
               math.evaluate(user_answer_math_able) === math.evaluate(tempAnswerBody2)
             ) {
@@ -158,16 +147,12 @@ exports.checkAnswer = async (req, res, next) => {
               }
               const tempAnswerBody = answer.answerBody.split("[").join("(");
               const tempAnswerBody2 = tempAnswerBody.split("]").join(")");
-              console.log("POWEROVERONE");
-              console.log(tempAnswerBody2);
-              console.log(tempUserAnswer2);
               let user_answer_math_able;
               try {
                 user_answer_math_able = math.evaluate(tempUserAnswer2)
               } catch {
                 user_answer_math_able = "0.123454321"
               }
-              console.log(`user_answer_math_able: ${user_answer_math_able}`);
               if (
                 math.evaluate(user_answer_math_able) ===
                 math.evaluate(tempAnswerBody2)
