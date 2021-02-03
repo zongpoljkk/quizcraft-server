@@ -14,4 +14,5 @@ exports.MODE_SURPLUS = {
   CHALLENGE: 1.2,
   QUIZ: 1.4,
   GROUP: 0,
+  PRACTICE: 1,
 }
