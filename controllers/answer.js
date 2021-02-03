@@ -76,6 +76,7 @@ const updateChallengeScore = async (
 };
 
 exports.checkAnswer = async (req, res, next) => {
+  console.log(req.body);
   let problemId = req.body.problemId;
   const userId = req.body.userId;
   const userAnswer = req.body.userAnswer;
@@ -116,10 +117,19 @@ exports.checkAnswer = async (req, res, next) => {
             }
             break;
           case CHECK_ANSWER_TYPE.MATH_EVALUATE: {
-            const tempUserAnswer = userAnswer.split("[").join("(");
-            const tempUserAnswer2 = tempUserAnswer.split("]").join(")");
+            let tempUserAnswer2;
+            try {
+              const tempUserAnswer = userAnswer.split("[").join("(");
+              tempUserAnswer2 = tempUserAnswer.split("]").join(")");
+            } catch {
+              // TODO: DEBUG for now
+              tempUserAnswer2 = "0.11*(3)";
+            }
             const tempAnswerBody = answer.answerBody.split("[").join("(");
             const tempAnswerBody2 = tempAnswerBody.split("]").join(")");
+            console.log("MATHEVAL");
+            console.log(tempAnswerBody2);
+            console.log(tempUserAnswer2);
             if (
               math.evaluate(tempUserAnswer2) === math.evaluate(tempAnswerBody2)
             ) {
@@ -127,14 +137,23 @@ exports.checkAnswer = async (req, res, next) => {
             }
           }
           case CHECK_ANSWER_TYPE.POWER_OVER_ONE: {
+            let tempUserAnswer2;
             // POWER equals 1
             if (userAnswer.includes("[1]")) {
               correctFlag = false;
             } else {
-              const tempUserAnswer = userAnswer.split("[").join("(");
-              const tempUserAnswer2 = tempUserAnswer.split("]").join(")");
+              try {
+                const tempUserAnswer = userAnswer.split("[").join("(");
+                tempUserAnswer2 = tempUserAnswer.split("]").join(")");
+              } catch {
+                // TODO: DEBUG for now
+                tempUserAnswer2 = "0.11*(3)";
+              }
               const tempAnswerBody = answer.answerBody.split("[").join("(");
               const tempAnswerBody2 = tempAnswerBody.split("]").join(")");
+              console.log("POWEROVERONE");
+              console.log(tempAnswerBody2);
+              console.log(tempUserAnswer2);
               if (
                 math.evaluate(tempUserAnswer2) ===
                 math.evaluate(tempAnswerBody2)
@@ -149,7 +168,7 @@ exports.checkAnswer = async (req, res, next) => {
           User.findById(userId)
             .exec()
             .then((user) => {
-              const updated = updateCoinAndExp(user, mode, answer.difficulty)
+              const updated = updateCoinAndExp(user, mode, answer.difficulty);
               user.save();
 
               // * Update Challenge Field * //
