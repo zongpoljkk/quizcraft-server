@@ -10,7 +10,7 @@ const Problem = require("../models/Problem");
 const levelDictionary = levelSystem();
 const rankDictionary = rankSystem();
 
-const { CHECK_ANSWER_TYPE, DIFFICULTY } = require("../utils/const");
+const { CHECK_ANSWER_TYPE, DIFFICULTY, RANDOM_MATH } = require("../utils/const");
 const { updateCoinAndExp } = require("./user");
 const { SUBJECT, SSE_TOPIC } = require("../utils/const");
 const { sendEventToGroupMember, sendEventToUser } = require("../middlewares");
@@ -116,7 +116,7 @@ exports.checkAnswer = async (req, res, next) => {
               tempUserAnswer2 = tempUserAnswer.split("]").join(")");
             } catch {
               // TODO: DEBUG for now
-              tempUserAnswer2 = "0.123454321";
+              tempUserAnswer2 = RANDOM_MATH;
             }
             const tempAnswerBody = answer.answerBody.split("[").join("(");
             const tempAnswerBody2 = tempAnswerBody.split("]").join(")");
@@ -124,7 +124,7 @@ exports.checkAnswer = async (req, res, next) => {
             try {
               user_answer_math_able = math.evaluate(tempUserAnswer2)
             } catch {
-              user_answer_math_able = "0.123454321"
+              user_answer_math_able = RANDOM_MATH;
             }
             if (
               math.evaluate(user_answer_math_able) === math.evaluate(tempAnswerBody2)
@@ -143,7 +143,7 @@ exports.checkAnswer = async (req, res, next) => {
                 tempUserAnswer2 = tempUserAnswer.split("]").join(")");
               } catch {
                 // TODO: DEBUG for now
-                tempUserAnswer2 = "0.123454321";
+                tempUserAnswer2 = RANDOM_MATH;
               }
               const tempAnswerBody = answer.answerBody.split("[").join("(");
               const tempAnswerBody2 = tempAnswerBody.split("]").join(")");
@@ -151,7 +151,7 @@ exports.checkAnswer = async (req, res, next) => {
               try {
                 user_answer_math_able = math.evaluate(tempUserAnswer2)
               } catch {
-                user_answer_math_able = "0.123454321"
+                user_answer_math_able = RANDOM_MATH;
               }
               if (
                 math.evaluate(user_answer_math_able) ===
