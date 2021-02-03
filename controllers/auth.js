@@ -3,7 +3,7 @@ const Counter = require("../models/Counter");
 const jwt = require("jsonwebtoken");
 const config = require("../config/keys");
 const axios = require('axios');
-const { updateStreak } = require("./user")
+const { updateStreak } = require("./user");
 
 const tokenURL = "https://www.mycourseville.com/api/oauth/access_token";
 const userURL = "https://www.mycourseville.com/api/v1/public/users/me";
@@ -83,7 +83,10 @@ exports.loginViaMCV = async (req, res) => {
     const token = jwt.sign({userId: user._id, role: user.role}, config.secret, {
       expiresIn: 14400 // 4 hours
     });
-    return res.header("auth-token",token).status(200).json({ success: true, token: token});
+    const refreshToken = jwt.sign({userId: user._id, role: user.role}, config.refreshSecret, {
+      expiresIn: 14400 + 900 // 4 hours + 15 min
+    });
+    return res.status(200).json({ success: true, token: token, refreshToken: refreshToken});
   } else {
     console.log('Cannot get data from MCVplatefrom');
     return res.status(400).json({ success: false, error: "Something went wrong!" });
@@ -122,8 +125,21 @@ exports.register = async (req,res) => {
 }
 
 exports.refreshToken = async (req, res) => {
-  const token = jwt.sign({userId: req.userId, role: req.role}, config.secret, {
+  const refreshToken = req.body.refreshToken;
+  var userId, role;
+  jwt.verify(refreshToken, config.refreshSecret, (err, decoded) => {
+    if (err) {
+      console.log(err)
+      return res.status(401).json({ success: false, error: "Unauthorized! by refresh token" });
+    }
+    userId = decoded.userId;
+    role = decoded.role;
+  });
+  const token = jwt.sign({userId: userId, role: role}, config.secret, {
     expiresIn: 14400 // 4 hours
   });
-  return res.header("refresh-token",token).status(200).json({ success: true, token: token});
+  const newRefreshToken = jwt.sign({userId: userId, role: role}, config.refreshSecret, {
+    expiresIn: 14400 + 900 // 4 hours + 15 min
+  });
+  return res.status(200).json({ success: true, token: token, refreshToken: newRefreshToken});
 }
