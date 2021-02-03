@@ -408,7 +408,7 @@ exports.resetAfterGameEnd = async (req, res) => {
         return res.status(400).json({ success: false, error: "no data" });
       }
       res.status(200).json({ success: true, data: "reset group success!" });
-      sendEventToGroupMember(groupId, SSE_TOPIC.RESTART_GAME);
+      sendEventToGroupMember(body.groupId, SSE_TOPIC.RESTART_GAME);
     }
   );
 };
