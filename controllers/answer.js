@@ -3,12 +3,17 @@ const { levelSystem } = require("../utils/level");
 const { rankSystem } = require("../utils/level");
 const { NUMBER_OF_PROBLEM } = require("../utils/challenge");
 
-const Answer = require("../models/Answer");
 const User = require("../models/User");
 const Challenge = require("../models/Challenge");
+const Problem = require("../models/Problem");
 
 const levelDictionary = levelSystem();
 const rankDictionary = rankSystem();
+
+const { CHECK_ANSWER_TYPE, DIFFICULTY } = require("../utils/const");
+const { updateCoinAndExp } = require("./user");
+const { SUBJECT, SSE_TOPIC } = require("../utils/const");
+const { sendEventToGroupMember, sendEventToUser } = require("../middlewares");
 
 const updateChallengeScore = async (
   challengeId,
@@ -16,7 +21,7 @@ const updateChallengeScore = async (
   userTime,
   problemIndex,
   earnedExp,
-  earnedCoins,
+  earnedCoins
 ) => {
   await Challenge.findById(challengeId)
     .exec()
@@ -51,7 +56,7 @@ const updateChallengeScore = async (
 
       // Update whoTurn when player finished NUMBER_OF_PROBLEM
       if (problemIndex === NUMBER_OF_PROBLEM - 1) {
-        console.log(`probleMIndex: ${problemIndex}`)
+        console.log(`probleMIndex: ${problemIndex}`);
         switch (challenge.whoTurn) {
           case 1:
             challenge.whoTurn = 2;
@@ -85,21 +90,7 @@ exports.checkAnswer = async (req, res, next) => {
   let earnedExp = 0;
   let earnedCoins = 0;
 
-  // ------ Handle mode surplus ------ //
-  let mode_surplus = 1;
-  switch (mode) {
-    case "challenge":
-      mode_surplus = 1.2;
-      break;
-    case "quiz":
-      mode_surplus = 1.4;
-      break;
-    case "group":
-      mode_surplus = 0;
-      break;
-  }
-
-  Answer.findOne({ problemId: problemId })
+  Problem.findById(problemId)
     .populate("problemId", "difficulty")
     .exec((err, answer) => {
       if (err) {
@@ -111,94 +102,94 @@ exports.checkAnswer = async (req, res, next) => {
           .send("The answer with the given problem id was not found");
         return;
       } else {
-        if (
-          userAnswer === answer.body
-          // TODO: Evaluate Math expression for subtopic "การดำเนินการของเลขยกกำลัง"
-          // (subtopic === "การดำเนินการของเลขยกกำลัง" && // For this topic, there are many possible answers
-          //   math.evaluate(userAnswer) === math.evaluate(answer.body))
-          // math.compare(userAnswer, answer.body) === true)
-        ) {
-          //  || subtopic === "การดำเนินการของเลขยกกำลัง") {
+        let correctFlag = false;
+        switch (answer.checkAnswerType) {
+          case CHECK_ANSWER_TYPE.EQUAL_STRING:
+            if (userAnswer === answer.answerBody) {
+              correctFlag = true;
+            }
+            if (answer.answerBody.includes("|")) {
+              const correctAnswers = answer.answerBody.split("|");
+              if (correctAnswers.includes(userAnswer)) {
+                correctFlag = true;
+              }
+            }
+            break;
+          case CHECK_ANSWER_TYPE.MATH_EVALUATE: {
+            const tempUserAnswer = userAnswer.split("[").join("(");
+            const tempUserAnswer2 = tempUserAnswer.split("]").join(")");
+            const tempAnswerBody = answer.answerBody.split("[").join("(");
+            const tempAnswerBody2 = tempAnswerBody.split("]").join(")");
+            if (
+              math.evaluate(tempUserAnswer2) === math.evaluate(tempAnswerBody2)
+            ) {
+              correctFlag = true;
+            }
+          }
+          case CHECK_ANSWER_TYPE.POWER_OVER_ONE: {
+            // POWER equals 1
+            if (userAnswer.includes("[1]")) {
+              correctFlag = false;
+            } else {
+              const tempUserAnswer = userAnswer.split("[").join("(");
+              const tempUserAnswer2 = tempUserAnswer.split("]").join(")");
+              const tempAnswerBody = answer.answerBody.split("[").join("(");
+              const tempAnswerBody2 = tempAnswerBody.split("]").join(")");
+              if (
+                math.evaluate(tempUserAnswer2) ===
+                math.evaluate(tempAnswerBody2)
+              ) {
+                correctFlag = true;
+              }
+            }
+          }
+        }
 
-          // try {
-          //    const eval = math.evaluate(userAnswer) === math.evaluate(answer.body)
-          // }
-          // catch (err) {
-          //   console.log(`Can't evaluate string: ${err}`)
-          // }
-
+        if (correctFlag) {
           User.findById(userId)
             .exec()
             .then((user) => {
-              // * Handle Earned coins * //
-              switch (answer.problemId.difficulty) {
-                case "EASY":
-                  earnedExp = 10 * mode_surplus;
-                  earnedCoins = 10 * mode_surplus;
-                  user.exp += earnedExp;
-                  user.coin += earnedCoins;
-                  break;
-                case "MEDIUM":
-                  earnedExp = 20 * mode_surplus;
-                  earnedCoins = 20 * mode_surplus;
-                  user.exp += earnedExp;
-                  user.coin += earnedCoins;
-                  break;
-                case "HARD":
-                  earnedExp = 30 * mode_surplus;
-                  earnedCoins = 30 * mode_surplus;
-                  user.exp += earnedExp;
-                  user.coin += earnedCoins;
-                  break;
-              }
-
-              // * Handle Level up * //
-              // Compare user exp if it exceeds the limit of his/her level
-              let level_up;
-              let rank_up;
-              if (user.exp >= levelDictionary[parseInt(user.level)]) {
-                if (user.level == 40) {
-                } else {
-                  level_up = true;
-                  user.exp -= levelDictionary[parseInt(user.level)];
-                  user.maxExp = levelDictionary[parseInt(user.level + 1)];
-                  user.level += 1;
-                  // ? Handle Rank up ? //
-                  if (user.level in rankDictionary) {
-                    user.rank = rankDictionary[user.level];
-                    rank_up = true;
-                  }
-                }
-              } else {
-                level_up = false;
-                rank_up = false;
-              }
+              const updated = updateCoinAndExp(user, mode, answer.difficulty)
               user.save();
 
               // * Update Challenge Field * //
               if (mode === "challenge") {
-                updateChallengeScore(challengeId, true, userTime, problemIndex, earnedExp, earnedCoins);
+                updateChallengeScore(
+                  challengeId,
+                  true,
+                  userTime,
+                  problemIndex,
+                  updated.earnedExp,
+                  updated.earnedCoins
+                );
               }
 
               const returnedSolution = {
                 correct: true,
                 solution: answer.solution,
-                user: user,
+                user: updated.user,
               };
               req.correct = returnedSolution.correct;
               req.solution = returnedSolution.solution;
               req.user = returnedSolution.user._id;
-              req.level_up = level_up;
-              req.rank_up = rank_up;
-              req.answer = answer.body;
-              req.earned_exp = earnedExp;
-              req.earned_coins = earnedCoins;
+              req.level_up = updated.levelUp;
+              req.rank_up = updated.rankUp;
+              req.answer = answer.answerBody;
+              req.earned_exp = updated.earnedExp;
+              req.earned_coins = updated.earnedCoins;
               next();
             });
         } else {
           // * Update Challenge Field * //
           if (mode === "challenge") {
-            updateChallengeScore(challengeId, false, userTime, problemIndex, earnedExp, earnedCoins);
+            updateChallengeScore(
+              challengeId,
+              false,
+              userTime,
+              problemIndex,
+              earnedExp,
+              earnedCoins
+            );
           }
 
           const user = User.findById(userId)
@@ -214,7 +205,7 @@ exports.checkAnswer = async (req, res, next) => {
               req.user = returnedSolution.user._id;
               req.level_up = false;
               req.rank_up = false;
-              req.answer = answer.body;
+              req.answer = answer.answerBody;
               req.earned_exp = earnedExp;
               req.earned_coins = earnedCoins;
               next();

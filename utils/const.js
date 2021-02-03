@@ -20,7 +20,8 @@ exports.SUBJECT = {
 exports.GAME_MODE = {
   PRACTICE: "PRACTICE",
   QUIZ: "QUIZ",
-  CHALLENGE: "CHALLENGE"
+  CHALLENGE: "CHALLENGE",
+  GROUP: "GROUP",
 }
 
 exports.ITEM_NAME = {
