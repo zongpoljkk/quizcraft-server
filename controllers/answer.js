@@ -123,15 +123,22 @@ exports.checkAnswer = async (req, res, next) => {
               tempUserAnswer2 = tempUserAnswer.split("]").join(")");
             } catch {
               // TODO: DEBUG for now
-              tempUserAnswer2 = "0.11*(3)";
+              tempUserAnswer2 = "0.123454321";
             }
             const tempAnswerBody = answer.answerBody.split("[").join("(");
             const tempAnswerBody2 = tempAnswerBody.split("]").join(")");
             console.log("MATHEVAL");
             console.log(tempAnswerBody2);
             console.log(tempUserAnswer2);
+            let user_answer_math_able;
+            try {
+              user_answer_math_able = math.evaluate(tempUserAnswer2)
+            } catch {
+              user_answer_math_able = "0.123454321"
+            }
+            console.log(`user_answer_math_able: ${user_answer_math_able}`);
             if (
-              math.evaluate(tempUserAnswer2) === math.evaluate(tempAnswerBody2)
+              math.evaluate(user_answer_math_able) === math.evaluate(tempAnswerBody2)
             ) {
               correctFlag = true;
             }
@@ -147,15 +154,22 @@ exports.checkAnswer = async (req, res, next) => {
                 tempUserAnswer2 = tempUserAnswer.split("]").join(")");
               } catch {
                 // TODO: DEBUG for now
-                tempUserAnswer2 = "0.11*(3)";
+                tempUserAnswer2 = "0.123454321";
               }
               const tempAnswerBody = answer.answerBody.split("[").join("(");
               const tempAnswerBody2 = tempAnswerBody.split("]").join(")");
               console.log("POWEROVERONE");
               console.log(tempAnswerBody2);
               console.log(tempUserAnswer2);
+              let user_answer_math_able;
+              try {
+                user_answer_math_able = math.evaluate(tempUserAnswer2)
+              } catch {
+                user_answer_math_able = "0.123454321"
+              }
+              console.log(`user_answer_math_able: ${user_answer_math_able}`);
               if (
-                math.evaluate(tempUserAnswer2) ===
+                math.evaluate(user_answer_math_able) ===
                 math.evaluate(tempAnswerBody2)
               ) {
                 correctFlag = true;
