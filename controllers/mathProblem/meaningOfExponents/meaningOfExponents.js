@@ -370,16 +370,18 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
 
           //create answer
           if (n%2 == 0) {
-            problemTitle = `จงหาค่าของ x ที่เป็นจำนวนเต็มบวกเมื่อ`;
-            answerBody = Math.abs(a);
-            answerForDisplay = answerBody;
+            problemTitle = `จงหาค่าของ x ที่เป็นจำนวนเต็ม${a<0? 'ลบ': 'บวก'}เมื่อ`;
           } else {
             problemTitle = `จงหาค่าของ x เมื่อ`;
-            answerBody = a;
-            answerForDisplay = answerBody;
           }
+          answerBody = a;
+          answerForDisplay = answerBody;
           answerType = ANSWER_TYPE.MATH_INPUT;
           checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
+
+          //create hint 
+          hintBody = `ถ้า a^[n] = b^[n] โดยที่ n ไม่เท่ากับ 0 จะได้ว่า a = b`;
+          hintBody += `\nเช่น ถ้า x^[4] = 81 = 3^[4] จะได้ว่า x = 3`;
 
           //crete solution
           solution = problemBody;

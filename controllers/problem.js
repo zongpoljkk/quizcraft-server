@@ -225,6 +225,11 @@ exports.getProblemForUser = async (req, res, next) => {
         { $push: { users: userId } },
       );
     }
+
+    let haveHint = false;
+    if (problem.hintBody) {
+      haveHint = true;
+    }
   
     problemOut = {
       _id: problem._id,
@@ -232,6 +237,7 @@ exports.getProblemForUser = async (req, res, next) => {
       body: problem.body,
       answerType: problem.answerType,
       title: problem.title,
+      haveHint: haveHint,
     } 
     if (problem.answerType == ANSWER_TYPE.MATH_INPUT) {
       return res.status(200).json({ 
