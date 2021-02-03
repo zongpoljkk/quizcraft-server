@@ -2,7 +2,7 @@ const math = require("mathjs");
 const { levelSystem } = require("../utils/level");
 const { rankSystem } = require("../utils/level");
 const { NUMBER_OF_PROBLEM } = require("../utils/challenge");
-const { calculatePoints } = require("../utils/group");
+const { calculatePoints, POINTS_POSSIBLE } = require("../utils/group");
 
 const User = require("../models/User");
 const Challenge = require("../models/Challenge");
@@ -12,13 +12,9 @@ const Problem = require("../models/Problem");
 const levelDictionary = levelSystem();
 const rankDictionary = rankSystem();
 
-const { SUBJECT, SSE_TOPIC } = require("../utils/const");
+const { SUBJECT, SSE_TOPIC, CHECK_ANSWER_TYPE, DIFFICULTY, GAME_MODE } = require("../utils/const");
 const { sendEventToGroupMember, sendEventToUser } = require("../middlewares");
-
-const { CHECK_ANSWER_TYPE, DIFFICULTY } = require("../utils/const");
 const { updateCoinAndExp } = require("./user");
-const { SUBJECT, SSE_TOPIC } = require("../utils/const");
-const { sendEventToGroupMember, sendEventToUser } = require("../middlewares");
 
 const updateGroupScore = async (res, groupId, userId, correct, usedTime, correctAnswer) => {
   await Group.findById(groupId).exec().then((group) => {
@@ -27,7 +23,7 @@ const updateGroupScore = async (res, groupId, userId, correct, usedTime, correct
     }
     else {
       group.members.find(member => member.userId.toString() === userId).score++;
-      group.members.find(member => member.userId.toString() === userId).point += calculatePoints(usedTime, group.timePerProblem);
+      group.members.find(member => member.userId.toString() === userId).point += calculatePoints(usedTime, group.timePerProblem, POINTS_POSSIBLE / group.problems.length);
     }
     group.save();
     res.status(200).json({ success: true, data: {correct: correct, correctAnswer: correctAnswer} });
@@ -172,7 +168,7 @@ exports.checkAnswer = async (req, res, next) => {
               user.save();
 
               // ? Update Challenge Field ? //
-              if (mode === "challenge") {
+              if (mode === GAME_MODE.CHALLENGE) {
                 updateChallengeScore(
                   challengeId,
                   true,
@@ -184,14 +180,14 @@ exports.checkAnswer = async (req, res, next) => {
               }
 
               // * Update Group Field * //
-              if (mode === "group") {
+              if (mode === GAME_MODE.GROUP) {
                 return updateGroupScore(
                   res,
                   groupId,
                   userId,
                   true,
                   usedTime,
-                  answer.body,
+                  answer.answerBody,
                 )
               }
 
@@ -213,7 +209,7 @@ exports.checkAnswer = async (req, res, next) => {
             });
         } else {
           // ? Update Challenge Field ? //
-          if (mode === "challenge") {
+          if (mode === GAME_MODE.CHALLENGE) {
             updateChallengeScore(
               challengeId,
               false,
@@ -225,14 +221,14 @@ exports.checkAnswer = async (req, res, next) => {
           }
 
           // * Update Group Field * //
-          if (mode === "group") {
+          if (mode === GAME_MODE.GROUP) {
             return updateGroupScore(
               res,
               groupId,
               userId,
               false,
               usedTime,
-              answer.body,
+              answer.answerBody,
             )
           }
 
