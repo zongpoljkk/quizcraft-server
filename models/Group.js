@@ -68,6 +68,10 @@ const GroupSchema = new Schema({
   currentIndex: {
     type: Number,
     default: 0,
+  },
+  answersNumber: {
+    type: Number,
+    default: 0,
   }
 })
 

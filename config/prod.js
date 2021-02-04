@@ -10,4 +10,3 @@ module.exports = {
   redirect_uri: process.env.REDIRECT_URI,
   cors_origin: process.env.CORS_ORIGIN
 };
-

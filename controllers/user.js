@@ -43,6 +43,20 @@ exports.getProfileByUID = async (req, res) => {
       },
       {
         $lookup: {
+          from: "uploads.chunks",
+          localField: "photo.id",
+          foreignField: "files_id",
+          as: "photo",
+        },
+      },
+      {
+        $unwind: {
+          path: "$photo",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
           from: "items",
           localField: "items.itemName",
           foreignField: "name",
@@ -56,20 +70,6 @@ exports.getProfileByUID = async (req, res) => {
           foreignField: "files_id",
           as: "itemImages",
         },
-      },
-      {
-        $lookup: {
-          from: "uploads.chunks",
-          localField: "photo.id",
-          foreignField: "files_id",
-          as: "photo",
-        },
-      },
-      { 
-        $unwind: {
-          path: "$photo",
-          "preserveNullAndEmptyArrays": true 
-        }
       },
       {
         $addFields: {
@@ -101,7 +101,7 @@ exports.getProfileByUID = async (req, res) => {
       {
         $project: {
           items: 0,
-          fromItems: 0,
+          // fromItems: 0,
           achievements: 0,
           __v: 0,
           "photo._id": 0,
@@ -115,8 +115,18 @@ exports.getProfileByUID = async (req, res) => {
           "itemInfoWithoutImgs.lottie": 0,
         },
       },
-      {$unwind: "$itemInfoWithoutImgs"},
-      {$unwind: "$itemInfoWithoutImgs.image"},
+      {
+        $unwind: {
+          path: "$itemInfoWithoutImgs",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $unwind: {
+          path: "$itemInfoWithoutImgs.image",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
       {
         $group: {
           _id: "$_id",
@@ -524,10 +534,12 @@ exports.buyItem = async (req, res) => {
   );
 };
 
-exports.updateCoinAndExp = async (user, gameMode, difficulty) => {  
+exports.updateCoinAndExp = (user, gameMode, difficulty) => {  
   const levelDictionary = levelSystem();
   const rankDictionary = rankSystem();
-  let earnedCoins, earnedExp, modeSurplus;
+  let earnedCoins = 0, earnedExp = 0, modeSurplus = 1;
+
+  // ------ Handle mode surplus ------ //
   switch (gameMode) {
     case GAME_MODE.CHALLENGE:
       modeSurplus = MODE_SURPLUS.CHALLENGE;
@@ -535,8 +547,11 @@ exports.updateCoinAndExp = async (user, gameMode, difficulty) => {
     case GAME_MODE.QUIZ:
       modeSurplus = MODE_SURPLUS.QUIZ;
       break;
+    case GAME_MODE.GROUP:
+      modeSurplus = MODE_SURPLUS.GROUP;
+      break;
     default:
-      modeSurplus = 1;
+      modeSurplus = MODE_SURPLUS.PRACTICE;
       break;
   }
 
@@ -558,7 +573,7 @@ exports.updateCoinAndExp = async (user, gameMode, difficulty) => {
 
   let activeItem = findActiveItem(user, ITEM_NAME.DOUBLE);
   if (activeItem && Date.now() <= activeItem.expiredDate) {
-    earnedCoins *= 2;
+    earnedExp *= 2;
   }
 
   user.exp += earnedExp;
@@ -582,5 +597,5 @@ exports.updateCoinAndExp = async (user, gameMode, difficulty) => {
       }
     }
   }
-  return [{ user, levelUp, rankUp, earnedCoins, earnedExp }];
+  return { user: user, levelUp: levelUp, rankUp: rankUp, earnedCoins: earnedCoins, earnedExp: earnedExp };
 };

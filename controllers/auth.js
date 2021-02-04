@@ -76,10 +76,7 @@ exports.loginViaMCV = async (req, res) => {
         smartSchoolAccount: mcvUserInfo.user.id,
         username: `qc${num}`
       });
-      user.save((err, newUser) => {
-        if (err) return res.status(500).json({ success: false, error: err });
-        else if (!newUser) return res.status(400).json({ success: false, error: "Cannot add new user" });
-      });
+      user = await user.save();
     }
     //update streak
     await updateStreak(user._id);
