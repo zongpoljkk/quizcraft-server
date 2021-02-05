@@ -58,6 +58,9 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
 
           //edit problemBody to show in math
           problemBody = `{${problemBody}}`;
+
+          //edit solution to show in math
+          solution = `{${solution.split("\n").join("}\n{")}}`;
           break;
         case 2: //(3^[5])/(3^[2]) = 3^[3]
           base = randInt(2, 10);
@@ -86,6 +89,9 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
 
           //edit problemBody to show in math
           problemBody = `{${problemBody}}`;
+
+          //edit solution to show in math
+          solution = `{${solution.split("\n").join("}\n{")}}`;
           break;
         case 3: //3^[0] = 1;
           problemTitle = PROBLEM_TITLE.FIND_VALUE_EXPO;
@@ -102,6 +108,9 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
 
           //edit problemBody to show in math
           problemBody = `{${problemBody}}`;
+
+          //edit solution to show in math
+          solution = `{${solution.split("\n").join("}\n{")}}`;
           break;
         case 4: //3^[-2] = 1/(3^[2]) or 1/9
           base = randInt(2, 10);
@@ -121,6 +130,9 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
 
           //edit problemBody to show in math
           problemBody = `{${problemBody}}`;
+
+          //edit solution to show in math
+          solution = `{${solution.split("\n").join("}\n{")}}`;
           break;
       }
       break;
@@ -172,6 +184,9 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
 
           //edit problemBody to show in math
           problemBody = `{${problemBody}}`;
+
+          //edit solution to show in math
+          solution = `{${solution.split("\n").join("}\n{")}}`;
           break;
         case 2: //(1/2)^2*(0.5)^[3]
           let bList = [2, 4, 5, 10, 20, 25, 50, 100];
@@ -210,6 +225,9 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
 
           //edit problemBody to show in math
           problemBody = `{${problemBody}}`;
+
+          //edit solution to show in math
+          solution = `{${solution.split("\n").join("}\n{")}}`;
           break;
         case 3: //similar to easy but harder and base is not int -> multiply
           termNum = randInt(2, 4);
@@ -238,6 +256,9 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
 
           //edit problemBody to show in math
           problemBody = `{${problemBody}}`;
+
+          //edit solution to show in math
+          solution = `{${solution.split("\n").join("}\n{")}}`;
           break;
         case 4: //similar to easy but harder and base is not int -> divided
           base = baseSelectorNoInt();
@@ -266,6 +287,9 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
 
           //edit problemBody to show in math
           problemBody = `{${problemBody}}`;
+
+          //edit solution to show in math
+          solution = `{${solution.split("\n").join("}\n{")}}`;
           break;
         case 5:
           problemTitle = PROBLEM_TITLE.FIND_VALUE_EXPO;
@@ -311,6 +335,9 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
 
           //edit problemBody to show in math
           problemBody = `{${problemBody}}`;
+
+          //edit solution to show in math
+          solution = `{${solution.split("\n").join("}\n{")}}`;
           break;
       }
       break;
@@ -364,6 +391,9 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
 
           //edit problemBody to show in math
           problemBody = `{${problemBody}}`;
+
+          //edit solution to show in math
+          solution = `{${solution.split("\n").join("}\n{")}}`;
           break;
         case 2: // (-3)^[2]*3^[1] = 3^[3]
           base1 = randInt(2, 25, false); //random [2,25]
@@ -471,6 +501,9 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
 
           //edit problemBody to show in math
           problemBody = `{${problemBody}}`;
+
+          //edit solution to show in math
+          solution = `{${solution.split("\n").join("}\n{")}}`;
           break;
         case 3: // (-5)^[2]*25*5^[7] = 5^[2]*5^[2]*5^[7] = 5^[(2+2+7)] = 5^[11]
           base1 = randInt(2, 25);
@@ -642,6 +675,9 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
 
           //edit problemBody to show in math
           problemBody = `{${problemBody}}`;
+
+          //edit solution to show in math
+          solution = `{${solution.split("\n").join("}\n{")}}`;
           break;
       }
       break;

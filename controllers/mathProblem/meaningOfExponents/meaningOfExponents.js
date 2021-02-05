@@ -100,6 +100,9 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
 
           //edit problemBody to show in math
           problemBody = `{${problemBody}}`;
+
+          //edit solution to show in math
+          solution = `{${solution.split("\n").join("}\n{")}}`;
           break;
         case 2: // 3*3*3*3 = 3^[4] or 3^[4] = 3*3*3*3
           rand = randInt(0,1);
@@ -334,9 +337,9 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           answerForDisplay = answerBody;
           checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           choices = ["เท่ากัน","ไม่เท่า"]
-          solution = `${selectedExpo[0]} มีค่าเป็น${numList[indexList[0]]==1? `บวก`:`ลบ`} `
+          solution = `{${selectedExpo[0]}} มีค่าเป็น${numList[indexList[0]]==1? `บวก`:`ลบ`} `
                     + `${answerBody==`เท่ากัน`? `และ`:`ในขณะที่`} `
-                    +`${selectedExpo[1]} ${answerBody==`เท่ากัน`? `ก็`:``}มีค่าเป็น`
+                    +`{${selectedExpo[1]}} ${answerBody==`เท่ากัน`? `ก็`:``}มีค่าเป็น`
                     +`${numList[indexList[1]]==1? `บวก`:`ลบ`}${answerBody==`เท่ากัน`? `เช่นเดียวกัน`:``}`;
                     
           //create hint
@@ -418,6 +421,9 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
 
           //edit problemBody to show in math
           problemBody = `{${problemBody}}`;
+
+          //edit solution to show in math
+          solution = `{${solution.split("\n").join("}\n{")}}`;
           break;
       }
       break;
