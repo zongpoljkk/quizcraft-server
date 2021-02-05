@@ -95,8 +95,8 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           }
 
           //create hint
-          hintBody = "a^[n] = a คูณกัน n ตัว\nเช่น 3^[4] = 3*3*3*3 --> 3 คูณกัน 4 ตัว";
-          if (n == 0) hintBody += "\na^[0] = 1 เมื่อ a ไม่เท่ากับ 0 เช่น 3^[0] = 1";
+          hintBody = "{a^[n] = a} คูณกัน {n} ตัว\nเช่น {3^[4] = 3*3*3*3 -> 3} คูณกัน {4} ตัว";
+          if (n == 0) hintBody += "\n{a^[0] = 1} เมื่อ {a} ไม่เท่ากับ {0} เช่น {3^[0] = 1}";
           break;
         case 2: // 3*3*3*3 = 3^[4] or 3^[4] = 3*3*3*3
           rand = randInt(0,1);
@@ -117,6 +117,9 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           answerForDisplay = answerBody;
           checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           answerType = randInt(0,1)? ANSWER_TYPE.MATH_INPUT : ANSWER_TYPE.RADIO_CHOICE;
+          if (answerType == ANSWER_TYPE.RADIO_CHOICE && rand) {
+            problemTitle = "จงเขียนเลขยกกำลังต่อไปนี้ในรูปผลคูณ";
+          }
           if(answerType == ANSWER_TYPE.RADIO_CHOICE) {
             //gen list of choices
             choices = [answerBody];
@@ -159,8 +162,8 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           }
 
           //create hint
-          hintBody = rand? "a^[n] = a คูณกัน n ตัว\nเช่น 3^[4] = 3*3*3*3 --> 3 คูณกัน 4 ตัว" 
-                    : "a*a*a = a^[3]\na คูณกันสามตัว เท่ากับ a ยกกำลัง 3";
+          hintBody = rand? "{a^[n] = a} คูณกัน {n} ตัว\nเช่น {3^[4] = 3*3*3*3 -> 3} คูณกัน {4} ตัว" 
+                    : "{a*a*a = a^[3]}\n{a} คูณกันสามตัว เท่ากับ {a} ยกกำลัง {3}";
           break;
         case 3: 
           a = baseSelector();
@@ -180,7 +183,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           }
 
           //create hint
-          hintBody = "จาก a^[n]\nจะได้ว่า a คือ ฐาน และ n คือ เลขชี้กำลัง";
+          hintBody = "จาก {a^[n]}\nจะได้ว่า {a} คือ ฐาน และ {n} คือ เลขชี้กำลัง";
           break;
       }
       break;
@@ -213,8 +216,8 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
           
           //create hint 
-          hintBody = `ถ้า a^[n] = a^[m] โดยที่ a ไม่เท่ากับ 0 จะได้ว่า n = m`;
-          hintBody += `\nเช่น ถ้า 3^[x] = 81 = 3^[4] จะได้ว่า x = 4`;
+          hintBody = `ถ้า {a^[n] = a^[m]} โดยที่ {a} ไม่เท่ากับ {0} จะได้ว่า {n = m}`;
+          hintBody += `\nเช่น ถ้า {3^[x] = 81 = 3^[4]} จะได้ว่า {x = 4}`;
           break;
         case 2:
           problemTitle = "จงเขียนจำนวนต่อไปนี้ ให้อยู่ในรูปเลขยกกำลังที่มีฐานเป็นจำนวนเฉพาะ"
@@ -321,7 +324,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           //create hint
           hintBody = `ถ้าเลขติดลบยกกำลังด้วยเลขคู่จะได้ค่าบวก`
                     +`\nถ้าเลขติดลบยกกำลังด้วยเลขคี่จะได้ค่าลบ`
-                    +`\nเช่น (-${a})^[2] = (-${a})*(-${a}) แต่ -${a}^[2] = -(${a}*${a})`;
+                    +`\nเช่น {(-${a})^[2] = (-${a})*(-${a})} แต่ {-${a}^[2] = -(${a}*${a})}`;
           break;
         case 2:
           problemTitle = "จงหาว่าเลขยกกำลังต่อไปนี้เป็นจำนวนเต็มประเภทใด";
@@ -350,7 +353,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           //create hint
           hintBody = `ถ้าเลขติดลบยกกำลังด้วยเลขคู่จะได้ค่าบวก`
                   +`\nถ้าเลขติดลบยกกำลังด้วยเลขคี่จะได้ค่าลบ`
-                  +`\nเช่น (-${a})^[2] = (-${a})*(-${a}) แต่ -${a}^[2] = -(${a}*${a})`;
+                  +`\nเช่น {(-${a})^[2] = (-${a})*(-${a})} แต่ {-${a}^[2] = -(${a}*${a})}`;
           break;
         case 3:
           a = randInt(2,50,true);
@@ -380,8 +383,8 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
 
           //create hint 
-          hintBody = `ถ้า a^[n] = b^[n] โดยที่ n ไม่เท่ากับ 0 จะได้ว่า a = b`;
-          hintBody += `\nเช่น ถ้า x^[4] = 81 = 3^[4] จะได้ว่า x = 3`;
+          hintBody = `ถ้า {a^[n] = b^[n]} โดยที่ {n} ไม่เท่ากับ {0} จะได้ว่า {a = b}`;
+          hintBody += `\nเช่น ถ้า {x^[4] = 81 = 3^[4]} จะได้ว่า {x = 3}`;
 
           //crete solution
           solution = problemBody;
