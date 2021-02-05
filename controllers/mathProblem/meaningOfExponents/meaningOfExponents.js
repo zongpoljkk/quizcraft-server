@@ -97,6 +97,9 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           //create hint
           hintBody = "{a^[n] = a} คูณกัน {n} ตัว\nเช่น {3^[4] = 3*3*3*3 -> 3} คูณกัน {4} ตัว";
           if (n == 0) hintBody += "\n{a^[0] = 1} เมื่อ {a} ไม่เท่ากับ {0} เช่น {3^[0] = 1}";
+
+          //edit problemBody to show in math
+          problemBody = `{${problemBody}}`;
           break;
         case 2: // 3*3*3*3 = 3^[4] or 3^[4] = 3*3*3*3
           rand = randInt(0,1);
@@ -164,6 +167,9 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           //create hint
           hintBody = rand? "{a^[n] = a} คูณกัน {n} ตัว\nเช่น {3^[4] = 3*3*3*3 -> 3} คูณกัน {4} ตัว" 
                     : "{a*a*a = a^[3]}\n{a} คูณกันสามตัว เท่ากับ {a} ยกกำลัง {3}";
+
+          //edit problemBody to show in math
+          problemBody = `{${problemBody}}`;
           break;
         case 3: 
           a = baseSelector();
@@ -184,6 +190,9 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
 
           //create hint
           hintBody = "จาก {a^[n]}\nจะได้ว่า {a} คือ ฐาน และ {n} คือ เลขชี้กำลัง";
+
+          //edit problemBody to show in math
+          problemBody = `{${problemBody}}`;
           break;
       }
       break;
@@ -218,6 +227,9 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           //create hint 
           hintBody = `ถ้า {a^[n] = a^[m]} โดยที่ {a} ไม่เท่ากับ {0} จะได้ว่า {n = m}`;
           hintBody += `\nเช่น ถ้า {3^[x] = 81 = 3^[4]} จะได้ว่า {x = 4}`;
+
+          //edit problemBody to show in math
+          problemBody = `{${problemBody}}`;
           break;
         case 2:
           problemTitle = "จงเขียนจำนวนต่อไปนี้ ให้อยู่ในรูปเลขยกกำลังที่มีฐานเป็นจำนวนเฉพาะ"
@@ -247,6 +259,9 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           }
           answerType = ANSWER_TYPE.MATH_INPUT;
           checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
+
+          //edit problemBody to show in math
+          problemBody = `{${problemBody}}`;
           break;
         case 3:
           problemTitle = "จงเขียนจำนวนต่อไปนี้ให้อยู่ในรูปเลขยกกำลังที่มีเลขชี้กำลังมากกว่า 1";
@@ -275,6 +290,9 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           answerForDisplay = `${expo}`;
           checkAnswerType = CHECK_ANSWER_TYPE.POWER_OVER_ONE;
           answerType = ANSWER_TYPE.MATH_INPUT;
+
+          //edit problemBody to show in math
+          problemBody = `{${problemBody}}`;
           break;
       }
       break;
@@ -309,7 +327,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
             }
           } while (selectedExpo.length < 2);
 
-          problemBody = `${selectedExpo[0]} และ ${selectedExpo[1]}`
+          problemBody = `{${selectedExpo[0]}} และ {${selectedExpo[1]}}`
           //create answer
           answerBody = numList[indexList[0]] == numList[indexList[1]] ? "เท่ากัน" : "ไม่เท่า";
           answerType = ANSWER_TYPE.RADIO_CHOICE;
@@ -354,6 +372,9 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           hintBody = `ถ้าเลขติดลบยกกำลังด้วยเลขคู่จะได้ค่าบวก`
                   +`\nถ้าเลขติดลบยกกำลังด้วยเลขคี่จะได้ค่าลบ`
                   +`\nเช่น {(-${a})^[2] = (-${a})*(-${a})} แต่ {-${a}^[2] = -(${a}*${a})}`;
+
+          //edit problemBody to show in math
+          problemBody = `{${problemBody}}`;
           break;
         case 3:
           a = randInt(2,50,true);
@@ -394,6 +415,9 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
             solution += a<0? `\n${expo} = (${a})^[${n}]` : `\n${expo} = ${a}^[${n}]`;
           }
           solution += `\nx = ${answerForDisplay}`;
+
+          //edit problemBody to show in math
+          problemBody = `{${problemBody}}`;
           break;
       }
       break;

@@ -64,6 +64,9 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
                 : `\n${temp}*10^[${n < 0 ? -(i + 1) : i + 1}]`;
           }
           solution = problemBody + "\n" + solution;
+
+          //edit problemBody to show in math
+          problemBody = `{${problemBody}}`;
           break;
         case 2:
           problemTitle = "จงเขียนตัวเลขแทนจำนวนต่อไปนี้โดยไม่ใช้เลขยกกำลัง";
@@ -90,6 +93,9 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
             }
           }
           solution = problemBody + "\n" + solution;
+
+          //edit problemBody to show in math
+          problemBody = `{${problemBody}}`;
           break;
       }
       break;
@@ -138,6 +144,9 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           hintBody =
             "ถ้าเลขยกกำลังเท่ากัน เราสามารถนำเลขที่คูณอยู่ข้างหน้าเลขยกกำลังมาบวกลบกันได้เลย" +
             "\nเช่น {3*10^[3]+2*10^[3] = (3+2)*10^[3] = 5*10^[3]}";
+
+          //edit problemBody to show in math
+          problemBody = `{${problemBody}}`;
           break;
         case 2://1.5*2*10^[2] = 3*10^[2] → ตัวเลขคูณกับสัญกรณ์ → ตอบเป็นสัญกรณ์วิทยาศาสตร์ 
           problemTitle = PROBLEM_TITLE.FIND_VALUE_STN;
@@ -182,6 +191,9 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
 
           //create hint TODO
           hintBody = ``;
+
+          //edit problemBody to show in math
+          problemBody = `{${problemBody}}`;
           break;
         case 3:
           problemTitle = PROBLEM_TITLE.FIND_STN;
@@ -192,7 +204,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           if (rand) {
             let suffixIndex = randInt(0,suffixList.length-1);
             let preSuffix = suffixList[suffixIndex];
-            problemBody = `${a} {${preSuffix.STR}${suffix.STR}}`;
+            problemBody = `${a} ${preSuffix.STR}${suffix.STR}`;
             solution = problemBody;
             solution += "\n" + stnString(a,preSuffix.POWER);
             solution += multipleConcat(10,suffix.POWER)
@@ -204,7 +216,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
             hintBody = `${preSuffix.STR} {= ${preSuffix.NUM_STR} = ${preSuffix.EXPO_STR}}`;
             hintBody += `\n${suffix.STR} {= ${suffix.NUM_STR} = ${suffix.EXPO_STR}}`;
           } else {
-            problemBody = `${a} {${suffix.STR}}`;
+            problemBody = `${a} ${suffix.STR}`;
             solution = problemBody;
             solution += "\n" + stnString(a,suffix.POWER);
             answerBody = getStn(a,suffix.POWER);
@@ -238,6 +250,9 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
 
           //create hint TODO
           hintBody = ``;
+
+          //edit problemBody to show in math
+          problemBody = `{${problemBody}}`;
           break;
       }
       break;
@@ -261,6 +276,9 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           //create hint
           hintBody = `ทำให้เลขยกกำลังเท่ากันก่อน แล้วจึงนำเลขข้างหน้ามาบวกลบกัน`
           hintBody += `\nเช่น {3*10^[4] + 5.6*10^[6]}\n{= 3*10^[4] + 560*10[4]}\n{= 563*10[4]}\n{= 5.63*10^[6]}`;
+
+          //edit problemBody to show in math
+          problemBody = `{${problemBody}}`;
           break;
         case 2: //add sub div equalDegree top buttom
           answer = randInt(1,50,true);
@@ -339,6 +357,9 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           answerType = ANSWER_TYPE.MATH_INPUT;
           hintBody = `ถ้าเลขยกกำลังของ {10} เท่ากันแล้ว สามารถนำเลขข้างหน้า {10} มาบวกลบกันได้ จากนั้นค่อยนำเลขมาหารกัน แล้วจัดให้อยู่ในรูปสัญกรณ์วิทยาศาสตร์`;
+
+          //edit problemBody to show in math
+          problemBody = `{${problemBody}}`;
           break;
         case 3: //add sub div non-equalDegree top buttom
           answer = randInt(1,50,true);
@@ -411,6 +432,9 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           answerType = ANSWER_TYPE.MATH_INPUT;
           hintBody = `ทำให้เลขยกกำลังของ {10} เท่ากันก่อน แล้วจึงนำเลขข้างหน้า {10} มาบวกลบกัน จากนั้นค่อยนำเลขมาหารกัน แล้วจัดให้อยู่ในรูปสัญกรณ์วิทยาศาสตร์`;
+
+          //edit problemBody to show in math
+          problemBody = `{${problemBody}}`;
           break;
       }
       break;
