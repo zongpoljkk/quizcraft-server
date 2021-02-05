@@ -174,7 +174,7 @@ exports.generateProblem = async (req, res, next) => {
         problem = await mathGenerate(req.body);
         return res.send({ problem });
       } catch (err) {
-        return res.status(500).json({ success: false, error: err });
+        return res.status(500).json({ success: false, error: err.toString() });
       }
     
     case SUBJECT.ENG:
@@ -182,7 +182,7 @@ exports.generateProblem = async (req, res, next) => {
         problem = await englishGenerate(req.body);
         return res.send({ problem });
       } catch (err) {
-        return res.status(500).json({ success: false, error: err });
+        return res.status(500).json({ success: false, error: err.toString() });
       }
      default: return res.send("Default");
   }
