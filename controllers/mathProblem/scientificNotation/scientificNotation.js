@@ -292,7 +292,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
 
           //create hint
           hintBody = `ทำให้เลขยกกำลังเท่ากันก่อน แล้วจึงนำเลขข้างหน้ามาบวกลบกัน`
-          hintBody += `\nเช่น {3*10^[4] + 5.6*10^[6]}\n{= 3*10^[4] + 560*10[4]}\n{= 563*10[4]}\n{= 5.63*10^[6]}`;
+          hintBody += `\nเช่น {3*10^[4] + 5.6*10^[6]}\n{= 3*10^[4] + 560*10^[4]}\n{= 563*10^[4]}\n{= 5.63*10^[6]}`;
 
           //edit problemBody to show in math
           problemBody = `{${problemBody}}`;
