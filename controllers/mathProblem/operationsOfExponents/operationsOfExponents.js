@@ -95,7 +95,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           break;
         case 3: //3^[0] = 1;
           problemTitle = PROBLEM_TITLE.FIND_VALUE_EXPO;
-          base = randInt(2, 10);
+          base = randInt(2, 200, true);
           expo = base < 0 ? `(${base})^[0]` : `${base}^[0]`;
           // answerType = randInt(0,1)? ANSWER_TYPE.MATH_INPUT : ANSWER_TYPE.RADIO_CHOICE;
           answerType = ANSWER_TYPE.MATH_INPUT;
