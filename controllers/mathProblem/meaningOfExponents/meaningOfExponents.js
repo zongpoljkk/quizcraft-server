@@ -102,7 +102,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           problemBody = `{${problemBody}}`;
 
           //edit solution to show in math
-          solution = `{${solution.split("\n").join("}\n{")}}`;
+          solution = `{= ${solution.split("\n").join("}\n{= ")}}`;
           break;
         case 2: // 3*3*3*3 = 3^[4] or 3^[4] = 3*3*3*3
           rand = randInt(0,1);
