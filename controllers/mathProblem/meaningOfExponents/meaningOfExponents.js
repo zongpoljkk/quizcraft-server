@@ -366,7 +366,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           rand = randInt(0,expoList.length-1);
           problemBody = expoList[rand];
           //create answer
-          answerBody = expoList[rand] == 1? "จำนวนเต็มบวก" : "จำนวนเต็มลบ";
+          answerBody = numList[rand] == 1? "จำนวนเต็มบวก" : "จำนวนเต็มลบ";
           answerType = ANSWER_TYPE.RADIO_CHOICE;
           answerForDisplay = answerBody;
           checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
