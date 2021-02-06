@@ -103,7 +103,6 @@ exports.getAllAchievements = async (req, res) => {
 };
 
 exports.getMyAchievements = async (req, res) => {
-  console.log("getMyAchievements");
   const userId = req.query.userId;
 
   await User.findById(userId)
@@ -119,8 +118,6 @@ exports.getMyAchievements = async (req, res) => {
       const user_achievement_names = user.achievements.map((achievement) => {
         return achievement.achievementName;
       });
-
-      console.log(user_achievement_names);
 
       await Achievement.aggregate(
         [
