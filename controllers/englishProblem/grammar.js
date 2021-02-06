@@ -85,9 +85,11 @@ const generateGrammar = async (subtopicName, difficulty) => {
         if(!choices) {
           choices = []
           choices.push(lowerWord);
-          for (i=0;i<4;i++) {
+          while (choices.length < 4) {
             temp  = await wordpos.randAdjective({startsWith:lowerWord[0]+lowerWord[1]})
-            choices.push(temp[0])
+              if (!choices.includes(temp[0])) {
+                choices.push(temp[0]);
+              }
           }
         }
         //opt 1 select correct word
@@ -108,12 +110,11 @@ const generateGrammar = async (subtopicName, difficulty) => {
                             : sentence.replace(selectedWord,`[${temp}&${selectedWord}]`);
         } 
         else if (answerType == ANSWER_TYPE.RADIO_CHOICE) {
-          let n = choices.length 
-          if (n < 4) {
-            for (i=0;i<4-n;i++) {
-              temp  = await wordpos.randAdjective({startsWith:lowerWord[0]+lowerWord[1]})
-              choices.push(temp[0])
-            }
+          while (choices.length < 4) {
+            temp  = await wordpos.randAdjective({startsWith:lowerWord[0]+lowerWord[1]})
+              if (!choices.includes(temp[0])) {
+                choices.push(temp[0]);
+              }
           }
           answerChoices = [selectedWord]
           do {
