@@ -174,7 +174,7 @@ exports.generateProblem = async (req, res, next) => {
         problem = await mathGenerate(req.body);
         return res.send({ problem });
       } catch (err) {
-        return res.status(500).json({ success: false, error: err });
+        return res.status(500).json({ success: false, error: err.toString() });
       }
     
     case SUBJECT.ENG:
@@ -182,7 +182,7 @@ exports.generateProblem = async (req, res, next) => {
         problem = await englishGenerate(req.body);
         return res.send({ problem });
       } catch (err) {
-        return res.status(500).json({ success: false, error: err });
+        return res.status(500).json({ success: false, error: err.toString() });
       }
      default: return res.send("Default");
   }
@@ -225,6 +225,11 @@ exports.getProblemForUser = async (req, res, next) => {
         { $push: { users: userId } },
       );
     }
+
+    let haveHint = false;
+    if (problem.hintBody) {
+      haveHint = true;
+    }
   
     problemOut = {
       _id: problem._id,
@@ -232,6 +237,7 @@ exports.getProblemForUser = async (req, res, next) => {
       body: problem.body,
       answerType: problem.answerType,
       title: problem.title,
+      haveHint: haveHint,
     } 
     if (problem.answerType == ANSWER_TYPE.MATH_INPUT) {
       return res.status(200).json({ 
