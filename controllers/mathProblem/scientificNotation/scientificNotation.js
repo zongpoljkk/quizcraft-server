@@ -50,8 +50,8 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           answerForDisplay = stn.replace("*", "{*}");
           checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           answerType = ANSWER_TYPE.MATH_INPUT;
-          hintBody = `เขียนเลขให้อยู่ในรูป {a*10^[n]} โดยที่ {1 <= a < 10} \nเลื่อนจุดไปทาง${
-            n < 0 ? `ขวา {${-n}} หน่วย` : `ซ้าย {${n}} หน่วย`
+          hintBody = `เขียนเลขให้อยู่ในรูป a*10^[n] โดยที่ 1 <= a < 10 \nเลื่อนจุดไปทาง${
+            n < 0 ? `ขวา ${-n} หน่วย` : `ซ้าย ${n} หน่วย`
           }`;
           solution = "";
           temp = num;
@@ -65,11 +65,8 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           }
           solution = problemBody + "\n" + solution;
 
-          //edit problemBody to show in math
-          problemBody = `{${problemBody}}`;
-
-          //edit solution to show in math
-          solution = `{= ${solution.split("\n").join("}\n{= ")}}`;
+          ///edit solution (add =)
+          solution = `= ${solution.split("\n").join("\n= ")}`;
           break;
         case 2:
           problemTitle = "จงเขียนตัวเลขแทนจำนวนต่อไปนี้โดยไม่ใช้เลขยกกำลัง";
@@ -97,11 +94,8 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           }
           solution = problemBody + "\n" + solution;
 
-          //edit problemBody to show in math
-          problemBody = `{${problemBody}}`;
-
-          //edit solution to show in math
-          solution = `{= ${solution.split("\n").join("}\n{= ")}}`;
+          //edit solution (add =)
+          solution = `= ${solution.split("\n").join("\n= ")}`;
           break;
       }
       break;
@@ -149,13 +143,10 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           //create hint
           hintBody =
             "ถ้าเลขยกกำลังเท่ากัน เราสามารถนำเลขที่คูณอยู่ข้างหน้าเลขยกกำลังมาบวกลบกันได้เลย" +
-            "\nเช่น {3*10^[3]+2*10^[3] = (3+2)*10^[3] = 5*10^[3]}";
+            "\nเช่น 3*10^[3]+2*10^[3] = (3+2)*10^[3] = 5*10^[3]";
 
-          //edit problemBody to show in math
-          problemBody = `{${problemBody}}`;
-
-          //edit solution to show in math
-          solution = `{= ${solution.split("\n").join("}\n{= ")}}`;
+          //edit solution (add =)
+          solution = `= ${solution.split("\n").join("\n= ")}`;
           break;
         case 2://1.5*2*10^[2] = 3*10^[2] → ตัวเลขคูณกับสัญกรณ์ → ตอบเป็นสัญกรณ์วิทยาศาสตร์ 
           problemTitle = PROBLEM_TITLE.FIND_VALUE_STN;
@@ -201,11 +192,8 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           //create hint TODO
           hintBody = ``;
 
-          //edit problemBody to show in math
-          problemBody = `{${problemBody}}`;
-
-          //edit solution to show in math
-          solution = `{= ${solution.split("\n").join("}\n{= ")}}`;
+          //edit solution (add =)
+          solution = `= ${solution.split("\n").join("\n= ")}`;
           break;
         case 3:
           problemTitle = PROBLEM_TITLE.FIND_STN;
@@ -224,23 +212,23 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
             answerBody = getStn(a,temp);
             solution += "\n" + answerBody;
             //create hint
-            hintBody = `${preSuffix.STR} {= ${preSuffix.NUM_STR} = ${preSuffix.EXPO_STR}}`;
-            hintBody += `\n${suffix.STR} {= ${suffix.NUM_STR} = ${suffix.EXPO_STR}}`;
+            hintBody = `${preSuffix.STR} = ${preSuffix.NUM_STR} = ${preSuffix.EXPO_STR}`;
+            hintBody += `\n${suffix.STR} = ${suffix.NUM_STR} = ${suffix.EXPO_STR}`;
           } else {
-            problemBody = `{${a}} ${suffix.STR}`;
+            problemBody = `${a} ${suffix.STR}`;
             solution = stnString(a,suffix.POWER);
             answerBody = getStn(a,suffix.POWER);
             solution += "\n" + answerBody;
             //create hint
-            hintBody = `${suffix.STR} {= ${suffix.NUM_STR} = ${suffix.EXPO_STR}}`;
+            hintBody = `${suffix.STR} = ${suffix.NUM_STR} = ${suffix.EXPO_STR}`;
           }
           answerForDisplay = answerBody.replace("*","{*}");
           checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           answerType = ANSWER_TYPE.MATH_INPUT;
+          solution = problemBody + "\n" + solution;
 
-          //edit solution to show in math
-          solution = `{= ${solution.split("\n").join("}\n{= ")}}`;
-          solution = "= " + problemBody + "\n" + solution;
+          //edit solution (add =)
+          solution = `= ${solution.split("\n").join("\n= ")}`;
           break;
         case 4: //การหารง่ายๆ → หารลงตัว
           n = randInt(2,10,true); 
@@ -265,11 +253,8 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           //create hint TODO
           hintBody = ``;
 
-          //edit problemBody to show in math
-          problemBody = `{${problemBody}}`;
-
-          //edit solution to show in math
-          solution = `{= ${solution.split("\n").join("}\n{= ")}}`;
+          //edit solution (add =)
+          solution = `= ${solution.split("\n").join("\n= ")}`;
           break;
       }
       break;
@@ -292,13 +277,10 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
 
           //create hint
           hintBody = `ทำให้เลขยกกำลังเท่ากันก่อน แล้วจึงนำเลขข้างหน้ามาบวกลบกัน`
-          hintBody += `\nเช่น {3*10^[4] + 5.6*10^[6]}\n{= 3*10^[4] + 560*10^[4]}\n{= 563*10^[4]}\n{= 5.63*10^[6]}`;
+          hintBody += `\nเช่น 3*10^[4] + 5.6*10^[6]\n= 3*10^[4] + 560*10^[4]\n= 563*10^[4]\n= 5.63*10^[6]`;
 
-          //edit problemBody to show in math
-          problemBody = `{${problemBody}}`;
-
-          //edit solution to show in math
-          solution = `{= ${solution.split("\n").join("}\n{= ")}}`;
+          //edit solution (add =)
+          solution = `= ${solution.split("\n").join("\n= ")}`;
           break;
         case 2: //add sub div equalDegree top buttom
           answer = randInt(1,50,true);
@@ -376,13 +358,10 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           answerForDisplay = answerBody.replace("*10","{*10}");
           checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           answerType = ANSWER_TYPE.MATH_INPUT;
-          hintBody = `ถ้าเลขยกกำลังของ {10} เท่ากันแล้ว สามารถนำเลขข้างหน้า {10} มาบวกลบกันได้ จากนั้นค่อยนำเลขมาหารกัน แล้วจัดให้อยู่ในรูปสัญกรณ์วิทยาศาสตร์`;
+          hintBody = `ถ้าเลขยกกำลังของ 10 เท่ากันแล้ว สามารถนำเลขข้างหน้า 10 มาบวกลบกันได้ จากนั้นค่อยนำเลขมาหารกัน แล้วจัดให้อยู่ในรูปสัญกรณ์วิทยาศาสตร์`;
 
-          //edit problemBody to show in math
-          problemBody = `{${problemBody}}`;
-
-          //edit solution to show in math
-          solution = `{= ${solution.split("\n").join("}\n{= ")}}`;
+          //edit solution (add =)
+          solution = `= ${solution.split("\n").join("\n= ")}`;
           break;
         case 3: //add sub div non-equalDegree top buttom
           answer = randInt(1,50,true);
@@ -454,13 +433,10 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           answerForDisplay = answerBody.replace("*10","{*10}");
           checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           answerType = ANSWER_TYPE.MATH_INPUT;
-          hintBody = `ทำให้เลขยกกำลังของ {10} เท่ากันก่อน แล้วจึงนำเลขข้างหน้า {10} มาบวกลบกัน จากนั้นค่อยนำเลขมาหารกัน แล้วจัดให้อยู่ในรูปสัญกรณ์วิทยาศาสตร์`;
+          hintBody = `ทำให้เลขยกกำลังของ 10 เท่ากันก่อน แล้วจึงนำเลขข้างหน้า 10 มาบวกลบกัน จากนั้นค่อยนำเลขมาหารกัน แล้วจัดให้อยู่ในรูปสัญกรณ์วิทยาศาสตร์`;
 
-          //edit problemBody to show in math
-          problemBody = `{${problemBody}}`;
-
-          //edit solution to show in math
-          solution = `{= ${solution.split("\n").join("}\n{= ")}}`;
+          //edit solution (add =)
+          solution = `= ${solution.split("\n").join("\n= ")}`;
           break;
       }
       break;
