@@ -101,7 +101,6 @@ exports.getProfileByUID = async (req, res) => {
       {
         $project: {
           items: 0,
-          // fromItems: 0,
           achievements: 0,
           __v: 0,
           "photo._id": 0,
@@ -109,7 +108,6 @@ exports.getProfileByUID = async (req, res) => {
           "photo.n": 0,
           "itemInfoWithoutImgs.name": 0,
           "itemInfoWithoutImgs.price": 0,
-          "itemInfoWithoutImgs.description": 0,
           "itemInfoWithoutImgs.__v": 0,
           "itemInfoWithoutImgs._id": 0,
           "itemInfoWithoutImgs.lottie": 0,

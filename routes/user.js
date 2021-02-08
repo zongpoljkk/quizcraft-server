@@ -34,7 +34,7 @@ const storage = new GridFsStorage({
 const upload = multer({ storage });
 
 router.get("/", [authJwt], userController.getAllUsers);
-router.get("/get-user/", [authJwt], userController.getProfileByUID);
+router.get("/get-user/", userController.getProfileByUID);
 router.get("/get-amount-of-items", [authJwt], userController.getAmountOfItems);
 router.put("/edit-username", [authJwt], userController.editUsername);
 router.post("/add-user", [authJwt, adminOnly], userController.addUser);
@@ -43,6 +43,7 @@ router.put("/buy-item", [authJwt], userController.buyItem);
 router.put(
   "/change-profile-picture",
   upload.single("image"),
+  [authJwt],
   userController.changeProfilePicture
 );
 
