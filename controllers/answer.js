@@ -59,12 +59,14 @@ const updateChallengeScore = async (
           case 2:
             challenge.whoTurn = 1;
         }
-        challenge.currentProblem = 0;
+        // It will get increment by one when clicking next
+        challenge.currentProblem = -1;
         challenge.user1IsRead = false;
         challenge.user2IsRead = false;
       }
 
       // No need to update current index because already did when getting problem by challenge id
+      console.log(challenge)
       challenge.save();
     });
 };
