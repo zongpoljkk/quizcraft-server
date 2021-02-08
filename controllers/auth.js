@@ -22,7 +22,6 @@ const getNextSequenceValue = async (field) => {
 exports.loginViaMCV = async (req, res) => {
   const code = req.body.code;
   var accessToken;
-  var refreshToken;
   var mcvUserInfo;
   var user;
   const data = {
@@ -32,64 +31,69 @@ exports.loginViaMCV = async (req, res) => {
     redirect_uri: config.redirect_uri,
     code: code
   }
-  await axios.post(tokenURL, data
-    ).then((res) => {
-      accessToken = res.data.access_token;
-      refreshToken = res.data.refresh_token;
-    }).catch((err) => {
-      console.log("err post token")
-      return res.status(400).json({ success: false, error: "err post token" });
-    });
-
-  //get info from mcv
-  const requestHeader = {
-    Authorization: `Bearer ${accessToken}`,
-  }
-  await axios.get(userURL, {headers: requestHeader}
-    ).then((res) => {
-      mcvUserInfo = res.data;
-    }).catch((err)=> {
-      console.log('err get mcv user info')
-      return res.status(400).json({ success: false, error: "err get mcv user info" });
-  });
-  
-  //login or createUser
-  if(mcvUserInfo.status == 'success'){
-    try {
-      user = await User.findOne({smartSchoolAccount:mcvUserInfo.user.id});
-    } catch (err) {
-      return res.status(500).json({succes: false, error:err});
-    }
-    if (!user) {
-      let inc = await getNextSequenceValue('username');
-      let num = '';
-      if (inc.length < 4) {
-        for(i=0; i<4-inc.length; i++) {
-          num += '0';
-        }
-        num += inc;
-      }
-      user = new User({
-        firstname: mcvUserInfo.user.firstname_th,
-        lastname: mcvUserInfo.user.lastname_th,
-        smartSchoolAccount: mcvUserInfo.user.id,
-        username: `qc${num}`
+  try {
+    await axios.post(tokenURL, data
+      ).then((res) => {
+        accessToken = res.data.access_token;
+      }).catch((err) => {
+        console.log("err post token")
+        return res.status(400).json({ success: false, error: "err post token" });
       });
-      user = await user.save();
+  
+    //get info from mcv
+    const requestHeader = {
+      Authorization: `Bearer ${accessToken}`,
     }
-    //update streak
-    await updateStreak(user._id);
-    //Create and assign token
-    const token = jwt.sign({userId: user._id, role: user.role}, config.secret, {
-      expiresIn: 14400 // 4 hours
+    await axios.get(userURL, {headers: requestHeader}
+      ).then((res) => {
+        mcvUserInfo = res.data;
+      }).catch((err)=> {
+        console.log('err get mcv user info')
+        return res.status(400).json({ success: false, error: "err get mcv user info" });
     });
-    const refreshToken = jwt.sign({userId: user._id, role: user.role}, config.refreshSecret, {
-      expiresIn: 14400 + 900 // 4 hours + 15 min
-    });
-    return res.status(200).json({ success: true, token: token, refreshToken: refreshToken});
-  } else {
-    console.log('Cannot get data from MCVplatefrom');
-    return res.status(400).json({ success: false, error: "Something went wrong!" });
+    
+    //login or createUser
+    if(mcvUserInfo.status == 'success'){
+      try {
+        user = await User.findOne({smartSchoolAccount:mcvUserInfo.user.id});
+      } catch (err) {
+        return res.status(500).json({succes: false, error:err});
+      }
+      if (!user) {
+        let inc = await getNextSequenceValue('username');
+        let num = '';
+        if (inc.length < 4) {
+          for(i=0; i<4-inc.length; i++) {
+            num += '0';
+          }
+          num += inc;
+        }
+        user = new User({
+          firstname: mcvUserInfo.user.firstname_th,
+          lastname: mcvUserInfo.user.lastname_th,
+          smartSchoolAccount: mcvUserInfo.user.id,
+          username: `qc${num}`
+        });
+        user = await user.save();
+      }
+      //update streak
+      await updateStreak(user._id);
+      //Create and assign token
+      const token = jwt.sign({userId: user._id, role: user.role}, config.secret, {
+        expiresIn: 14400 // 4 hours
+        // expiresIn: 60 // 4 hours
+      });
+      const refreshToken = jwt.sign({userId: user._id, role: user.role}, config.refreshSecret, {
+        expiresIn: 14400 + 900 // 4 hours + 15 min
+      });
+      return res.status(200).json({ success: true, token: token, refreshToken: refreshToken});
+    } else {
+      console.log('Cannot get data from MCVplatefrom');
+      return res.status(400).json({ success: false, error: "Something went wrong!" });
+    }
+  } catch (err) {
+    console.log(err)
+    return res.status(500).json({ success: false, error: err.toString()});
   }
 }
 
@@ -127,6 +131,10 @@ exports.register = async (req,res) => {
 exports.refreshToken = async (req, res) => {
   const refreshToken = req.body.refreshToken;
   var userId, role;
+  if (!refreshToken) {
+    return res.status(400).json({ success: false, error: "Not have refresh token!"});
+  }
+  // console.log("refresh input",refreshToken)
   jwt.verify(refreshToken, config.refreshSecret, (err, decoded) => {
     if (err) {
       console.log(err)
@@ -137,9 +145,11 @@ exports.refreshToken = async (req, res) => {
   });
   const token = jwt.sign({userId: userId, role: role}, config.secret, {
     expiresIn: 14400 // 4 hours
+    // expiresIn: 60 // 4 hours
   });
   const newRefreshToken = jwt.sign({userId: userId, role: role}, config.refreshSecret, {
     expiresIn: 14400 + 900 // 4 hours + 15 min
   });
+  // console.log("refresh",token)
   return res.status(200).json({ success: true, token: token, refreshToken: newRefreshToken});
 }
