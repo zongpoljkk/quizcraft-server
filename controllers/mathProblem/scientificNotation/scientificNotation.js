@@ -69,7 +69,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           problemBody = `{${problemBody}}`;
 
           //edit solution to show in math
-          solution = `{${solution.split("\n").join("}\n{")}}`;
+          solution = `{= ${solution.split("\n").join("}\n{= ")}}`;
           break;
         case 2:
           problemTitle = "จงเขียนตัวเลขแทนจำนวนต่อไปนี้โดยไม่ใช้เลขยกกำลัง";
@@ -101,7 +101,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           problemBody = `{${problemBody}}`;
 
           //edit solution to show in math
-          solution = `{${solution.split("\n").join("}\n{")}}`;
+          solution = `{= ${solution.split("\n").join("}\n{= ")}}`;
           break;
       }
       break;
@@ -155,7 +155,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           problemBody = `{${problemBody}}`;
 
           //edit solution to show in math
-          solution = `{${solution.split("\n").join("}\n{")}}`;
+          solution = `{= ${solution.split("\n").join("}\n{= ")}}`;
           break;
         case 2://1.5*2*10^[2] = 3*10^[2] → ตัวเลขคูณกับสัญกรณ์ → ตอบเป็นสัญกรณ์วิทยาศาสตร์ 
           problemTitle = PROBLEM_TITLE.FIND_VALUE_STN;
@@ -205,7 +205,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           problemBody = `{${problemBody}}`;
 
           //edit solution to show in math
-          solution = `{${solution.split("\n").join("}\n{")}}`;
+          solution = `{= ${solution.split("\n").join("}\n{= ")}}`;
           break;
         case 3:
           problemTitle = PROBLEM_TITLE.FIND_STN;
@@ -239,8 +239,8 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           answerType = ANSWER_TYPE.MATH_INPUT;
 
           //edit solution to show in math
-          solution = `{${solution.split("\n").join("}\n{")}}`;
-          solution = problemBody + "\n" + solution;
+          solution = `{= ${solution.split("\n").join("}\n{= ")}}`;
+          solution = "= " + problemBody + "\n" + solution;
           break;
         case 4: //การหารง่ายๆ → หารลงตัว
           n = randInt(2,10,true); 
@@ -269,7 +269,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           problemBody = `{${problemBody}}`;
 
           //edit solution to show in math
-          solution = `{${solution.split("\n").join("}\n{")}}`;
+          solution = `{= ${solution.split("\n").join("}\n{= ")}}`;
           break;
       }
       break;
@@ -292,13 +292,13 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
 
           //create hint
           hintBody = `ทำให้เลขยกกำลังเท่ากันก่อน แล้วจึงนำเลขข้างหน้ามาบวกลบกัน`
-          hintBody += `\nเช่น {3*10^[4] + 5.6*10^[6]}\n{= 3*10^[4] + 560*10[4]}\n{= 563*10[4]}\n{= 5.63*10^[6]}`;
+          hintBody += `\nเช่น {3*10^[4] + 5.6*10^[6]}\n{= 3*10^[4] + 560*10^[4]}\n{= 563*10^[4]}\n{= 5.63*10^[6]}`;
 
           //edit problemBody to show in math
           problemBody = `{${problemBody}}`;
 
           //edit solution to show in math
-          solution = `{${solution.split("\n").join("}\n{")}}`;
+          solution = `{= ${solution.split("\n").join("}\n{= ")}}`;
           break;
         case 2: //add sub div equalDegree top buttom
           answer = randInt(1,50,true);
@@ -382,7 +382,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           problemBody = `{${problemBody}}`;
 
           //edit solution to show in math
-          solution = `{${solution.split("\n").join("}\n{")}}`;
+          solution = `{= ${solution.split("\n").join("}\n{= ")}}`;
           break;
         case 3: //add sub div non-equalDegree top buttom
           answer = randInt(1,50,true);
@@ -460,7 +460,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           problemBody = `{${problemBody}}`;
 
           //edit solution to show in math
-          solution = `{${solution.split("\n").join("}\n{")}}`;
+          solution = `{= ${solution.split("\n").join("}\n{= ")}}`;
           break;
       }
       break;
