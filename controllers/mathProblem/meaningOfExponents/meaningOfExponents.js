@@ -71,9 +71,6 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
               }
             } while (choices.length < 4);
             choices = await shuffle(choices);
-            for (i in choices) {
-              choices[i] = `{${choices[i]}}`;
-            }
           }
           solution = `${problemBody}\n`;
           temp = "";
@@ -168,9 +165,6 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
               } while (choices.length < 4);
             }
             choices = await shuffle(choices);
-            for (i in choices) {
-              choices[i] = `{${choices[i]}}`;
-            }
           }
 
           //create hint
@@ -195,9 +189,6 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           if (answerType =  ANSWER_TYPE.RADIO_CHOICE) {
             choices = [a,n];
             choices = await shuffle(choices);
-            for (i in choices) {
-              choices[i] = `{${choices[i]}}`;
-            }
           }
 
           //create hint
