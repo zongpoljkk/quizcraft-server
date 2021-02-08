@@ -81,10 +81,11 @@ exports.loginViaMCV = async (req, res) => {
       //Create and assign token
       const token = jwt.sign({userId: user._id, role: user.role}, config.secret, {
         expiresIn: 14400 // 4 hours
-        // expiresIn: 60 // 4 hours
+        // expiresIn: 10 // 4 hours
       });
       const refreshToken = jwt.sign({userId: user._id, role: user.role}, config.refreshSecret, {
         expiresIn: 14400 + 900 // 4 hours + 15 min
+        // expiresIn: 15 // 4 hours
       });
       return res.status(200).json({ success: true, token: token, refreshToken: refreshToken});
     } else {
@@ -132,24 +133,31 @@ exports.refreshToken = async (req, res) => {
   const refreshToken = req.body.refreshToken;
   var userId, role;
   if (!refreshToken) {
-    return res.status(400).json({ success: false, error: "Not have refresh token!"});
+    return res.status(400).json({ success: false, error: "Not have refresh token!", from: "refresh token"});
   }
   // console.log("refresh input",refreshToken)
-  jwt.verify(refreshToken, config.refreshSecret, (err, decoded) => {
-    if (err) {
-      console.log(err)
-      return res.status(401).json({ success: false, error: "Unauthorized! by refresh token" });
-    }
-    userId = decoded.userId;
-    role = decoded.role;
-  });
-  const token = jwt.sign({userId: userId, role: role}, config.secret, {
-    expiresIn: 14400 // 4 hours
-    // expiresIn: 60 // 4 hours
-  });
-  const newRefreshToken = jwt.sign({userId: userId, role: role}, config.refreshSecret, {
-    expiresIn: 14400 + 900 // 4 hours + 15 min
-  });
-  // console.log("refresh",token)
-  return res.status(200).json({ success: true, token: token, refreshToken: newRefreshToken});
+  try {
+    jwt.verify(refreshToken, config.refreshSecret, (err, decoded) => {
+      if (err) {
+        // console.log(err.toString())
+        return res.status(401).json({ success: false, error: "Unauthorized by refresh token", from: "refresh token" });
+      } else {
+        userId = decoded.userId;
+        role = decoded.role;
+        const token = jwt.sign({userId: userId, role: role}, config.secret, {
+          expiresIn: 14400 // 4 hours
+          // expiresIn: 10 // 4 hours
+        });
+        const newRefreshToken = jwt.sign({userId: userId, role: role}, config.refreshSecret, {
+          expiresIn: 14400 + 900 // 4 hours + 15 min
+          // expiresIn: 15 // 4 hours
+        });
+        // console.log("refresh",token)
+        return res.status(200).json({ success: true, token: token, refreshToken: newRefreshToken});
+      }
+    });
+  } catch (err) {
+    // console.log("eiei")
+    return res.status(401).json({ success: false, error: err.toString(), from: "refresh token" });
+  }
 }
