@@ -47,6 +47,7 @@ router.put(
     { name: "subjectImage", maxCount: 1 },
     { name: "topicImage", maxCount: 1 },
   ]),
+  [authJwt, adminOnly], 
   subtopicController.addFile
 );
 
