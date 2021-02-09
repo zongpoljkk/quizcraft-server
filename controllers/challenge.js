@@ -241,8 +241,6 @@ exports.getProblemByChallengeId = (req, res) => {
           });
         }
 
-        console.log(challenge.currentProblem)
-
         // ? Handle user lost connection by skip user's current problem and mark as incorrect  ? //
         if (challenge.currentProblem === NUMBER_OF_PROBLEM) {
           challenge.whoTurn === 1
