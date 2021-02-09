@@ -230,8 +230,6 @@ exports.getProblemByChallengeId = (req, res) => {
   const challengeId = req.query.challenge_id;
   const problemIndex = req.query.problem_index;
 
-  console.log(`problemIndex: ${problemIndex}`)
-
   try {
     Challenge.findById(challengeId)
       .exec()
