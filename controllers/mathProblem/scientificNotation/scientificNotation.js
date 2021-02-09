@@ -76,7 +76,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           answerType = ANSWER_TYPE.MATH_INPUT;
           hintBody = `เลื่อนจุดไปทาง${
-            n < 0 ? `ซ้าย {${-n}} หน่วย` : `ขวา {${n}} หน่วย`
+            n < 0 ? `ซ้าย ${-n} หน่วย` : `ขวา ${n} หน่วย`
           }`;
           solution = "";
           temp = a;
@@ -204,7 +204,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           if (rand) {
             let suffixIndex = randInt(0,suffixList.length-1);
             let preSuffix = suffixList[suffixIndex];
-            problemBody = `{${a}} ${preSuffix.STR}${suffix.STR}`;
+            problemBody = `${a} ${preSuffix.STR}${suffix.STR}`;
             solution = stnString(a,preSuffix.POWER);
             solution += multipleConcat(10,suffix.POWER)
             temp = preSuffix.POWER + suffix.POWER;

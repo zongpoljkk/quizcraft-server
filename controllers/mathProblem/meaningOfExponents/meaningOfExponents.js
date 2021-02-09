@@ -165,8 +165,8 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           }
 
           //create hint
-          hintBody = rand? "{a^[n] = a} คูณกัน {n} ตัว\nเช่น {3^[4] = 3*3*3*3 -> 3} คูณกัน {4} ตัว" 
-                    : "{a*a*a = a^[3]}\n{a} คูณกันสามตัว เท่ากับ {a} ยกกำลัง {3}";
+          hintBody = rand? "a^[n] = a คูณกัน n ตัว\nเช่น 3^[4] = 3*3*3*3 -> 3 คูณกัน 4 ตัว" 
+                    : "a*a*a = a^[3]\n-> a คูณกันสามตัว เท่ากับ a ยกกำลัง 3";
           break;
         case 3: 
           a = baseSelector();
