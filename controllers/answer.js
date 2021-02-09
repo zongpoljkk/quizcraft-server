@@ -12,6 +12,8 @@ const Problem = require("../models/Problem");
 const levelDictionary = levelSystem();
 const rankDictionary = rankSystem();
 
+const { CHECK_ANSWER_TYPE, DIFFICULTY, RANDOM_MATH } = require("../utils/const");
+const { updateCoinAndExp } = require("./user");
 const { SUBJECT, SSE_TOPIC, CHECK_ANSWER_TYPE, DIFFICULTY, GAME_MODE } = require("../utils/const");
 const { sendEventToGroupMember, sendEventToUser } = require("../middlewares");
 const { updateCoinAndExp } = require("./user");
@@ -133,27 +135,49 @@ exports.checkAnswer = async (req, res, next) => {
             }
             break;
           case CHECK_ANSWER_TYPE.MATH_EVALUATE: {
-            const tempUserAnswer = userAnswer.split("[").join("(");
-            const tempUserAnswer2 = tempUserAnswer.split("]").join(")");
+            let tempUserAnswer2;
+            try {
+              const tempUserAnswer = userAnswer.split("[").join("(");
+              tempUserAnswer2 = tempUserAnswer.split("]").join(")");
+            } catch {
+              tempUserAnswer2 = RANDOM_MATH;
+            }
             const tempAnswerBody = answer.answerBody.split("[").join("(");
             const tempAnswerBody2 = tempAnswerBody.split("]").join(")");
+            let user_answer_math_able;
+            try {
+              user_answer_math_able = math.evaluate(tempUserAnswer2)
+            } catch {
+              user_answer_math_able = RANDOM_MATH;
+            }
             if (
-              math.evaluate(tempUserAnswer2) === math.evaluate(tempAnswerBody2)
+              math.evaluate(user_answer_math_able) === math.evaluate(tempAnswerBody2)
             ) {
               correctFlag = true;
             }
           }
           case CHECK_ANSWER_TYPE.POWER_OVER_ONE: {
+            let tempUserAnswer2;
             // POWER equals 1
             if (userAnswer.includes("[1]")) {
               correctFlag = false;
             } else {
-              const tempUserAnswer = userAnswer.split("[").join("(");
-              const tempUserAnswer2 = tempUserAnswer.split("]").join(")");
+              try {
+                const tempUserAnswer = userAnswer.split("[").join("(");
+                tempUserAnswer2 = tempUserAnswer.split("]").join(")");
+              } catch {
+                tempUserAnswer2 = RANDOM_MATH;
+              }
               const tempAnswerBody = answer.answerBody.split("[").join("(");
               const tempAnswerBody2 = tempAnswerBody.split("]").join(")");
+              let user_answer_math_able;
+              try {
+                user_answer_math_able = math.evaluate(tempUserAnswer2)
+              } catch {
+                user_answer_math_able = RANDOM_MATH;
+              }
               if (
-                math.evaluate(tempUserAnswer2) ===
+                math.evaluate(user_answer_math_able) ===
                 math.evaluate(tempAnswerBody2)
               ) {
                 correctFlag = true;
@@ -166,7 +190,7 @@ exports.checkAnswer = async (req, res, next) => {
           User.findById(userId)
             .exec()
             .then((user) => {
-              const updated = updateCoinAndExp(user, mode, answer.difficulty)
+              const updated = updateCoinAndExp(user, mode, answer.difficulty);
               user.save();
 
               // ? Update Challenge Field ? //

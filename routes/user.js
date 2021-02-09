@@ -43,6 +43,7 @@ router.put("/buy-item", [authJwt], userController.buyItem);
 router.put(
   "/change-profile-picture",
   upload.single("image"),
+  [authJwt],
   userController.changeProfilePicture
 );
 
