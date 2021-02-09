@@ -12,11 +12,9 @@ const Problem = require("../models/Problem");
 const levelDictionary = levelSystem();
 const rankDictionary = rankSystem();
 
-const { CHECK_ANSWER_TYPE, DIFFICULTY, RANDOM_MATH } = require("../utils/const");
+const { SUBJECT, SSE_TOPIC, CHECK_ANSWER_TYPE, DIFFICULTY, GAME_MODE, RANDOM_MATH } = require("../utils/const");
 const { updateCoinAndExp } = require("./user");
-const { SUBJECT, SSE_TOPIC, CHECK_ANSWER_TYPE, DIFFICULTY, GAME_MODE } = require("../utils/const");
 const { sendEventToGroupMember, sendEventToUser } = require("../middlewares");
-const { updateCoinAndExp } = require("./user");
 
 const updateGroupScore = async (res, groupId, userId, correct, usedTime, correctAnswer) => {
   await Group.findById(groupId).exec().then((group) => {

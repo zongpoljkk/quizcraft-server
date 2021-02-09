@@ -50,6 +50,6 @@ exports.SSE_TOPIC = {
   DELETE_GROUP: "DELETE_GROUP",
   SHOW_ANSWER: "SHOW_ANSWER",
 }
-}
+
 
 exports.RANDOM_MATH = "0.123454321";
