@@ -5,6 +5,7 @@ module.exports = {
   mongoURI: process.env.MONGO_URI,
   cookieKey: process.env.COOKIE_KEY,
   secret: process.env.SECRET,
+  refreshSecret: process.env.REFRESH_SECRET,
   mcvClientId: process.env.MCV_CLIENT_ID,
   mcvClientSecret: process.env.MCV_CLIENT_SECRET,
   redirect_uri: process.env.REDIRECT_URI,

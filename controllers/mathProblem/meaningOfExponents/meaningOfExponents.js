@@ -95,8 +95,11 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           }
 
           //create hint
-          hintBody = "a^[n] = a คูณกัน n ตัว\nเช่น 3^[4] = 3*3*3*3 --> 3 คูณกัน 4 ตัว";
+          hintBody = "a^[n] = a คูณกัน n ตัว\nเช่น 3^[4] = 3*3*3*3 -> 3 คูณกัน 4 ตัว";
           if (n == 0) hintBody += "\na^[0] = 1 เมื่อ a ไม่เท่ากับ 0 เช่น 3^[0] = 1";
+
+          //edit solution (add =)
+          solution = `= ${solution.split("\n").join("\n= ")}`;
           break;
         case 2: // 3*3*3*3 = 3^[4] or 3^[4] = 3*3*3*3
           rand = randInt(0,1);
@@ -117,6 +120,9 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           answerForDisplay = answerBody;
           checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           answerType = randInt(0,1)? ANSWER_TYPE.MATH_INPUT : ANSWER_TYPE.RADIO_CHOICE;
+          if (answerType == ANSWER_TYPE.RADIO_CHOICE && rand) {
+            problemTitle = "จงเขียนเลขยกกำลังต่อไปนี้ในรูปผลคูณ";
+          }
           if(answerType == ANSWER_TYPE.RADIO_CHOICE) {
             //gen list of choices
             choices = [answerBody];
@@ -159,8 +165,8 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           }
 
           //create hint
-          hintBody = rand? "a^[n] = a คูณกัน n ตัว\nเช่น 3^[4] = 3*3*3*3 --> 3 คูณกัน 4 ตัว" 
-                    : "a*a*a = a^[3]\na คูณกันสามตัว เท่ากับ a ยกกำลัง 3";
+          hintBody = rand? "a^[n] = a คูณกัน n ตัว\nเช่น 3^[4] = 3*3*3*3 -> 3 คูณกัน 4 ตัว" 
+                    : "a*a*a = a^[3]\n-> a คูณกันสามตัว เท่ากับ a ยกกำลัง 3";
           break;
         case 3: 
           a = baseSelector();
@@ -342,7 +348,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           rand = randInt(0,expoList.length-1);
           problemBody = expoList[rand];
           //create answer
-          answerBody = expoList[rand] == 1? "จำนวนเต็มบวก" : "จำนวนเต็มลบ";
+          answerBody = numList[rand] == 1? "จำนวนเต็มบวก" : "จำนวนเต็มลบ";
           answerType = ANSWER_TYPE.RADIO_CHOICE;
           answerForDisplay = answerBody;
           checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
@@ -370,16 +376,18 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
 
           //create answer
           if (n%2 == 0) {
-            problemTitle = `จงหาค่าของ x ที่เป็นจำนวนเต็มบวกเมื่อ`;
-            answerBody = Math.abs(a);
-            answerForDisplay = answerBody;
+            problemTitle = `จงหาค่าของ x ที่เป็นจำนวนเต็ม${a<0? 'ลบ': 'บวก'}เมื่อ`;
           } else {
             problemTitle = `จงหาค่าของ x เมื่อ`;
-            answerBody = a;
-            answerForDisplay = answerBody;
           }
+          answerBody = a;
+          answerForDisplay = answerBody;
           answerType = ANSWER_TYPE.MATH_INPUT;
           checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
+
+          //create hint 
+          hintBody = `ถ้า a^[n] = b^[n] โดยที่ n ไม่เท่ากับ 0 จะได้ว่า a = b`;
+          hintBody += `\nเช่น ถ้า x^[4] = 81 = 3^[4] จะได้ว่า x = 3`;
 
           //crete solution
           solution = problemBody;

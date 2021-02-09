@@ -55,6 +55,9 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
           //create hint
           hintBody = PROPERTY_EXPO.MULTIPLY;
+
+          //edit solution (add =)
+          solution = `= ${solution.split("\n").join("\n= ")}`;
           break;
         case 2: //(3^[5])/(3^[2]) = 3^[3]
           base = randInt(2, 10);
@@ -80,10 +83,13 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
           //create hint
           hintBody = PROPERTY_EXPO.DIVIDE;
+
+          //edit solution (add =)
+          solution = `= ${solution.split("\n").join("\n= ")}`;
           break;
         case 3: //3^[0] = 1;
           problemTitle = PROBLEM_TITLE.FIND_VALUE_EXPO;
-          base = randInt(2, 10);
+          base = randInt(2, 200, true);
           expo = base < 0 ? `(${base})^[0]` : `${base}^[0]`;
           // answerType = randInt(0,1)? ANSWER_TYPE.MATH_INPUT : ANSWER_TYPE.RADIO_CHOICE;
           answerType = ANSWER_TYPE.MATH_INPUT;
@@ -93,6 +99,9 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           solution = problemBody + "\n" + answerBody;
           checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
           hintBody = PROPERTY_EXPO.POWER_ZERO;
+
+          //edit solution (add =)
+          solution = `= ${solution.split("\n").join("\n= ")}`;
           break;
         case 4: //3^[-2] = 1/(3^[2]) or 1/9
           base = randInt(2, 10);
@@ -109,6 +118,9 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
           solution = problemBody + "\n" + answerBody;
           hintBody = PROPERTY_EXPO.POWER_NEGATIVE;
+
+          //edit solution (add =)
+          solution = `= ${solution.split("\n").join("\n= ")}`;
           break;
       }
       break;
@@ -157,6 +169,9 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
 
           // create hint
           hintBody = `ลองเปลี่ยนเลขธรรมดาให้เป็นเลขยกกำลังที่ฐานเท่ากับเลขยกกำลังตัวอื่นดูสิ`;
+
+          //edit solution (add =)
+          solution = `= ${solution.split("\n").join("\n= ")}`;
           break;
         case 2: //(1/2)^2*(0.5)^[3]
           let bList = [2, 4, 5, 10, 20, 25, 50, 100];
@@ -192,6 +207,9 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
 
           //create hint
           hintBody = `ถ้าสังเกตดี ๆ จะเห็นว่าฐานเท่ากันนะ,\n${PROPERTY_EXPO.MULTIPLY}`;
+
+          //edit solution (add =)
+          solution = `= ${solution.split("\n").join("\n= ")}`;
           break;
         case 3: //similar to easy but harder and base is not int -> multiply
           termNum = randInt(2, 4);
@@ -217,6 +235,9 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           answerType = ANSWER_TYPE.MATH_INPUT;
           //create hint
           hintBody = PROPERTY_EXPO.MULTIPLY;
+
+          //edit solution (add =)
+          solution = `= ${solution.split("\n").join("\n= ")}`;
           break;
         case 4: //similar to easy but harder and base is not int -> divided
           base = baseSelectorNoInt();
@@ -242,6 +263,9 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
 
           //create hint
           hintBody = PROPERTY_EXPO.DIVIDE;
+
+          //edit solution (add =)
+          solution = `= ${solution.split("\n").join("\n= ")}`;
           break;
         case 5:
           problemTitle = PROBLEM_TITLE.FIND_VALUE_EXPO;
@@ -283,7 +307,10 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
           solution = problemBody + "\n" + solution + "\n1";
           hintBody = PROPERTY_EXPO.MULTIPLY;
-          hintBody += `\n${PROPERTY_EXPO.DIVIDE}`;
+          hintBody += `\nและ ${PROPERTY_EXPO.DIVIDE}`;
+
+          //edit solution (add =)
+          solution = `= ${solution.split("\n").join("\n= ")}`;
           break;
       }
       break;
@@ -333,7 +360,10 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
             ? CHECK_ANSWER_TYPE.EQUAL_STRING
             : CHECK_ANSWER_TYPE.MATH_EVALUATE;
           hintBody = PROPERTY_EXPO.MULTIPLY;
-          hintBody += `\n${PROPERTY_EXPO.DIVIDE}`;
+          hintBody += `\nและ ${PROPERTY_EXPO.DIVIDE}`;
+
+          //edit solution (add =)
+          solution = `= ${solution.split("\n").join("\n= ")}`;
           break;
         case 2: // (-3)^[2]*3^[1] = 3^[3]
           base1 = randInt(2, 25, false); //random [2,25]
@@ -437,7 +467,10 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           hintBody = `ถ้าเลขติดลบยกกำลังด้วยเลขคู่จะกลายเป็นค่าบวก เช่น (-3)^[2] = 9 = 3^[2]`;
           hintBody += `\nแต่ถ้าเลขติดลบยกกำลังด้วยเลขคี่จะกลายเป็นค่าลบ เช่น (-3)^[3] = -27 = -(3^[3])`;
           hintBody += `\n${PROPERTY_EXPO.MULTIPLY}`;
-          if (isDivided) hintBody += `\n${PROPERTY_EXPO.DIVIDE}`;
+          if (isDivided) hintBody += `\nและ ${PROPERTY_EXPO.DIVIDE}`;
+
+          //edit solution (add =)
+          solution = `= ${solution.split("\n").join("\n= ")}`;
           break;
         case 3: // (-5)^[2]*25*5^[7] = 5^[2]*5^[2]*5^[7] = 5^[(2+2+7)] = 5^[11]
           base1 = randInt(2, 25);
@@ -605,7 +638,10 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           hintBody += `\nถ้าเลขติดลบยกกำลังด้วยเลขคู่จะกลายเป็นค่าบวก เช่น (-3)^[2] = 9 = 3^[2]`;
           hintBody += `\nแต่ถ้าเลขติดลบยกกำลังด้วยเลขคี่จะกลายเป็นค่าลบ เช่น (-3)^[3] = -27 = -(3^[3])`;
           hintBody += `\n${PROPERTY_EXPO.MULTIPLY}`;
-          if (isDivided) hintBody += `\n${PROPERTY_EXPO.DIVIDE}`;
+          if (isDivided) hintBody += `\nและ ${PROPERTY_EXPO.DIVIDE}`;
+
+          //edit solution (add =)
+          solution = `= ${solution.split("\n").join("\n= ")}`;
           break;
       }
       break;

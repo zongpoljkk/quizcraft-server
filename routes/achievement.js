@@ -42,6 +42,7 @@ router.put(
     { name: "image", maxCount: 1 },
     { name: "lottie", maxCount: 1 },
   ]),
+  [authJwt, adminOnly], 
   achievementController.addFile
 );
 

@@ -11,7 +11,6 @@ const verifyToken = (req, res, next) => {
   if (token.startsWith("Bearer ")) {
     // Remove Bearer from string
     token = token.slice(7, token.length).trimLeft();
-  } else {
   }
   jwt.verify(token, config.secret, (err, decoded) => {
     if (err)
