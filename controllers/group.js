@@ -424,7 +424,6 @@ exports.nextProblem = async (req, res) => {
     (err, group) => {
       if (err) return res.status(500).json({ success: false, error: err.toString() });
       else if (!group) return res.status(400).json({ success: false, error: "Cannot do next problem" });
-      console.log(group.currentIndex)
       res.status(200).json({ success: true, data: { currentIndex: group.currentIndex }});
       // Server-sent-event
       sendEventToGroupMember(groupId, SSE_TOPIC.NEXT_PROBLEM);
