@@ -416,6 +416,7 @@ exports.resetAfterGameEnd = async (req, res) => {
 exports.nextProblem = async (req, res) => {
   const groupId = req.body.groupId;
   const userId = req.userId;
+
   Group.findOneAndUpdate(
     { _id: groupId, creatorId: userId },
     { $inc: { currentIndex: 1 } , answersNumber: 0},
@@ -439,3 +440,7 @@ exports.getNumberOfAnswer = (req, res) => {
   })
 }
 
+exports.showAnswer = (req, res) => {
+  const groupId = req.query.groupId;
+  sendEventToGroupMember(groupId, SSE_TOPIC.SHOW_ANSWER);
+}

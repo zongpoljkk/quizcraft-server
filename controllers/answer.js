@@ -2,18 +2,36 @@ const math = require("mathjs");
 const { levelSystem } = require("../utils/level");
 const { rankSystem } = require("../utils/level");
 const { NUMBER_OF_PROBLEM } = require("../utils/challenge");
+const { calculatePoints, POINTS_POSSIBLE } = require("../utils/group");
 
 const User = require("../models/User");
 const Challenge = require("../models/Challenge");
+const Group = require("../models/Group");
 const Problem = require("../models/Problem");
 
 const levelDictionary = levelSystem();
 const rankDictionary = rankSystem();
 
-const { CHECK_ANSWER_TYPE, DIFFICULTY, RANDOM_MATH } = require("../utils/const");
+const { SUBJECT, SSE_TOPIC, CHECK_ANSWER_TYPE, DIFFICULTY, GAME_MODE, RANDOM_MATH } = require("../utils/const");
 const { updateCoinAndExp } = require("./user");
-const { SUBJECT, SSE_TOPIC } = require("../utils/const");
 const { sendEventToGroupMember, sendEventToUser } = require("../middlewares");
+
+const updateGroupScore = async (res, groupId, userId, correct, usedTime, correctAnswer) => {
+  await Group.findById(groupId).exec().then((group) => {
+    // User either took too long or answer incorrectly or hit skip
+    if (usedTime >= +group.timePerProblem.toString() || !correct) {
+    }
+    else {
+      group.members.find(member => member.userId.toString() === userId).score++;
+      group.members.find(member => member.userId.toString() === userId).point += calculatePoints(usedTime, group.timePerProblem, POINTS_POSSIBLE / group.problems.length);
+    }
+    group.answersNumber++;
+    group.save();
+    res.status(200).json({ success: true, data: {correct: correct, correctAnswer: correctAnswer} });
+    sendEventToUser(group.creatorId, SSE_TOPIC.SEND_ANSWER);
+    return;
+  })
+};
 
 const updateChallengeScore = async (
   challengeId,
@@ -80,6 +98,10 @@ exports.checkAnswer = async (req, res, next) => {
   const challengeId = req.body.challengeId;
   const problemIndex = req.body.problemIndex;
   const userTime = req.body.userTime;
+
+  // * For Group Mode * //
+  const groupId = req.body.groupId;
+  const usedTime = req.body.usedTime; // Doesn't update difficulty index
 
   let earnedExp = 0;
   let earnedCoins = 0;
@@ -168,8 +190,8 @@ exports.checkAnswer = async (req, res, next) => {
               const updated = updateCoinAndExp(user, mode, answer.difficulty);
               user.save();
 
-              // * Update Challenge Field * //
-              if (mode === "challenge") {
+              // ? Update Challenge Field ? //
+              if (mode === GAME_MODE.CHALLENGE) {
                 updateChallengeScore(
                   challengeId,
                   true,
@@ -180,11 +202,24 @@ exports.checkAnswer = async (req, res, next) => {
                 );
               }
 
+              // * Update Group Field * //
+              if (mode === GAME_MODE.GROUP) {
+                return updateGroupScore(
+                  res,
+                  groupId,
+                  userId,
+                  true,
+                  usedTime,
+                  answer.answerBody,
+                )
+              }
+
               const returnedSolution = {
                 correct: true,
                 solution: answer.solution,
                 user: updated.user,
               };
+
               req.correct = returnedSolution.correct;
               req.solution = returnedSolution.solution;
               req.user = returnedSolution.user._id;
@@ -196,8 +231,8 @@ exports.checkAnswer = async (req, res, next) => {
               next();
             });
         } else {
-          // * Update Challenge Field * //
-          if (mode === "challenge") {
+          // ? Update Challenge Field ? //
+          if (mode === GAME_MODE.CHALLENGE) {
             updateChallengeScore(
               challengeId,
               false,
@@ -206,6 +241,18 @@ exports.checkAnswer = async (req, res, next) => {
               earnedExp,
               earnedCoins
             );
+          }
+
+          // * Update Group Field * //
+          if (mode === GAME_MODE.GROUP) {
+            return updateGroupScore(
+              res,
+              groupId,
+              userId,
+              false,
+              usedTime,
+              answer.answerBody,
+            )
           }
 
           const user = User.findById(userId)
