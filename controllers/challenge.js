@@ -230,6 +230,8 @@ exports.getProblemByChallengeId = (req, res) => {
   const challengeId = req.query.challenge_id;
   const problemIndex = req.query.problem_index;
 
+  console.log(`problemIndex: ${problemIndex}`)
+
   try {
     Challenge.findById(challengeId)
       .exec()
@@ -240,6 +242,8 @@ exports.getProblemByChallengeId = (req, res) => {
             error: `Unable to find challenge given challenge id`,
           });
         }
+
+        console.log(challenge.currentProblem)
 
         // ? Handle user lost connection by skip user's current problem and mark as incorrect  ? //
         if (challenge.currentProblem === NUMBER_OF_PROBLEM) {
