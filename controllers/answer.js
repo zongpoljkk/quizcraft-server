@@ -83,7 +83,6 @@ const updateChallengeScore = async (
       }
 
       // No need to update current index because already did when getting problem by challenge id
-      console.log(challenge)
       challenge.save();
     });
 };
