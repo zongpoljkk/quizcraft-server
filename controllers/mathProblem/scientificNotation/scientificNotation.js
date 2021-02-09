@@ -213,7 +213,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
             solution += "\n" + answerBody;
             //create hint
             hintBody = `${preSuffix.STR} = ${preSuffix.NUM_STR} = ${preSuffix.EXPO_STR}`;
-            hintBody += `\n${suffix.STR} = ${suffix.NUM_STR} = ${suffix.EXPO_STR}`;
+            hintBody += `\nและ ${suffix.STR} = ${suffix.NUM_STR} = ${suffix.EXPO_STR}`;
           } else {
             problemBody = `${a} ${suffix.STR}`;
             solution = stnString(a,suffix.POWER);
