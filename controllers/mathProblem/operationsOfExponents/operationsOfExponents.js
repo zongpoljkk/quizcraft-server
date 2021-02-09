@@ -307,7 +307,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
           solution = problemBody + "\n" + solution + "\n1";
           hintBody = PROPERTY_EXPO.MULTIPLY;
-          hintBody += `\n${PROPERTY_EXPO.DIVIDE}`;
+          hintBody += `\nและ ${PROPERTY_EXPO.DIVIDE}`;
 
           //edit solution (add =)
           solution = `= ${solution.split("\n").join("\n= ")}`;
@@ -360,7 +360,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
             ? CHECK_ANSWER_TYPE.EQUAL_STRING
             : CHECK_ANSWER_TYPE.MATH_EVALUATE;
           hintBody = PROPERTY_EXPO.MULTIPLY;
-          hintBody += `\n${PROPERTY_EXPO.DIVIDE}`;
+          hintBody += `\nและ ${PROPERTY_EXPO.DIVIDE}`;
 
           //edit solution (add =)
           solution = `= ${solution.split("\n").join("\n= ")}`;
@@ -464,10 +464,10 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           }
 
           //create hint
-          hintBody = `ถ้าเลขติดลบยกกำลังด้วยเลขคู่จะกลายเป็นค่าบวก เช่น {(-3)^[2] = 9 = 3^[2]}`;
-          hintBody += `\nแต่ถ้าเลขติดลบยกกำลังด้วยเลขคี่จะกลายเป็นค่าลบ เช่น {(-3)^[3] = -27 = -(3^[3])}`;
+          hintBody = `ถ้าเลขติดลบยกกำลังด้วยเลขคู่จะกลายเป็นค่าบวก เช่น (-3)^[2] = 9 = 3^[2]`;
+          hintBody += `\nแต่ถ้าเลขติดลบยกกำลังด้วยเลขคี่จะกลายเป็นค่าลบ เช่น (-3)^[3] = -27 = -(3^[3])`;
           hintBody += `\n${PROPERTY_EXPO.MULTIPLY}`;
-          if (isDivided) hintBody += `\n${PROPERTY_EXPO.DIVIDE}`;
+          if (isDivided) hintBody += `\nและ ${PROPERTY_EXPO.DIVIDE}`;
 
           //edit solution (add =)
           solution = `= ${solution.split("\n").join("\n= ")}`;
@@ -635,10 +635,10 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
 
           // create hint 
           hintBody = `ลองเปลี่ยนเลขธรรมดาให้เป็นเลขยกกำลังที่ฐานเท่ากับเลขยกกำลังตัวอื่นดูสิ`;
-          hintBody += `\nถ้าเลขติดลบยกกำลังด้วยเลขคู่จะกลายเป็นค่าบวก เช่น {(-3)^[2] = 9 = 3^[2]}`;
-          hintBody += `\nแต่ถ้าเลขติดลบยกกำลังด้วยเลขคี่จะกลายเป็นค่าลบ เช่น {(-3)^[3] = -27 = -(3^[3])}`;
+          hintBody += `\nถ้าเลขติดลบยกกำลังด้วยเลขคู่จะกลายเป็นค่าบวก เช่น (-3)^[2] = 9 = 3^[2]`;
+          hintBody += `\nแต่ถ้าเลขติดลบยกกำลังด้วยเลขคี่จะกลายเป็นค่าลบ เช่น (-3)^[3] = -27 = -(3^[3])`;
           hintBody += `\n${PROPERTY_EXPO.MULTIPLY}`;
-          if (isDivided) hintBody += `\n${PROPERTY_EXPO.DIVIDE}`;
+          if (isDivided) hintBody += `\nและ ${PROPERTY_EXPO.DIVIDE}`;
 
           //edit solution (add =)
           solution = `= ${solution.split("\n").join("\n= ")}`;
