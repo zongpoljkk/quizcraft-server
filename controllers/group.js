@@ -417,18 +417,19 @@ exports.nextProblem = async (req, res) => {
   const groupId = req.body.groupId;
   const userId = req.userId;
 
-  await Group.findOneAndUpdate(
+  Group.findOneAndUpdate(
     { _id: groupId, creatorId: userId },
     { $inc: { currentIndex: 1 } , answersNumber: 0},
     { new: true},
     (err, group) => {
       if (err) return res.status(500).json({ success: false, error: err.toString() });
       else if (!group) return res.status(400).json({ success: false, error: "Cannot do next problem" });
+      console.log(group.currentIndex)
       res.status(200).json({ success: true, data: { currentIndex: group.currentIndex }});
       // Server-sent-event
+      sendEventToGroupMember(groupId, SSE_TOPIC.NEXT_PROBLEM);
     }
-    );
-    sendEventToGroupMember(groupId, SSE_TOPIC.NEXT_PROBLEM);
+  );
 };
 
 exports.getNumberOfAnswer = (req, res) => {
