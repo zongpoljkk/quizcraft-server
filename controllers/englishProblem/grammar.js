@@ -138,7 +138,7 @@ const generateGrammar = async (subtopicName, difficulty) => {
           answerChoices = await shuffle(answerChoices);
           problemBody = sentence.replace(selectedWord,`[]`);
         }
-      }catch(err){
+      } catch (err) {
         console.log(err);
         return err;
       }
