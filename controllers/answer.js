@@ -153,6 +153,7 @@ exports.checkAnswer = async (req, res, next) => {
             ) {
               correctFlag = true;
             }
+            break;
           }
           case CHECK_ANSWER_TYPE.POWER_OVER_ONE: {
             let tempUserAnswer2;
@@ -181,6 +182,7 @@ exports.checkAnswer = async (req, res, next) => {
                 correctFlag = true;
               }
             }
+            break;
           }
         }
 
