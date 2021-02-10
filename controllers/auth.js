@@ -9,15 +9,19 @@ const tokenURL = "https://www.mycourseville.com/api/oauth/access_token";
 const userURL = "https://www.mycourseville.com/api/v1/public/users/me";
 
 const getNextSequenceValue = async (field) => {
-  var sequence = await Counter.findOneAndUpdate({
-    field: field
-  },{
-    $inc: {
-      sequenceValue:1
-    }
-  });
+  var sequence = await Counter.findOneAndUpdate(
+    {
+      field: field,
+    },
+    {
+      $inc: {
+        sequenceValue: 1,
+      },
+    },
+    { upsert: true, new: true }
+  );
   return `${sequence.sequenceValue}`;
-}
+};
 
 exports.loginViaMCV = async (req, res) => {
   const code = req.body.code;
