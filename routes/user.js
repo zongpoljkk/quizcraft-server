@@ -39,9 +39,11 @@ router.get("/get-amount-of-items", [authJwt], userController.getAmountOfItems);
 router.put("/edit-username", [authJwt], userController.editUsername);
 router.post("/add-user", [authJwt, adminOnly], userController.addUser);
 router.put("/used-item", [authJwt], userController.usedItem);
+router.put("/buy-item", [authJwt], userController.buyItem);
 router.put(
   "/change-profile-picture",
   upload.single("image"),
+  [authJwt],
   userController.changeProfilePicture
 );
 

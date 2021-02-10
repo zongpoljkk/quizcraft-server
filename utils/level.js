@@ -22,3 +22,5 @@ exports.rankSystem = () => {
     30: "GOLD",
   };
 };
+
+exports.MAX_LEVEL = 40;

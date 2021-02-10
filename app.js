@@ -5,6 +5,7 @@ const cookieSession = require("cookie-session");
 const keys = require("./config/keys");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const helmet = require("helmet")
 
 const problemRouter = require("./routes/problem");
 const subtopicRouter = require("./routes/subtopic");
@@ -16,6 +17,9 @@ const itemRouter = require("./routes/item");
 const achievementRouter = require("./routes/achievement");
 const leaderboardRouter = require("./routes/leaderBoard");
 const englishRouter = require("./routes/english");
+const challengeRouter = require("./routes/challenge");
+const reportRouter = require("./routes/report");
+const groupRouter = require("./routes/group");
 
 mongoose.set("useNewUrlParser", true);
 mongoose.set("useFindAndModify", false);
@@ -29,6 +33,7 @@ mongoose.connect(keys.mongoURI, () => {
 // Listen to node and route http request to the route handler
 const app = express();
 
+app.use(helmet())
 app.use(bodyParser.json());
 app.use(
   cookieSession({
@@ -39,7 +44,7 @@ app.use(
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: keys.cors_origin,
   })
 );
 
@@ -58,6 +63,9 @@ app.use("/api/item", itemRouter);
 app.use("/api/achievement", achievementRouter);
 app.use("/api/leader-board", leaderboardRouter);
 app.use("/api/english", englishRouter);
+app.use("/api/challenge", challengeRouter);
+app.use("/api/report", reportRouter);
+app.use("/api/group", groupRouter);
 
 // app.use((req, res, next) => {
 //   res.status(404).render('404', { pageTitle: ' Page Not Found'});

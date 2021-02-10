@@ -14,6 +14,14 @@ const AnswerSchema = new Schema({
   solution: {
     type: String,
   },
+  checkAnswerType: {
+    type: String,
+    enum: ["MATH_EVALUATE","EQUAL_STRING","RULE_BASE","POWER_OVER_ONE"],
+    default: "EQUAL_STRING",
+  },
+  answerForDisplay: {
+    type: String,
+  }
 });
 
 module.exports = mongoose.model("Answer", AnswerSchema);

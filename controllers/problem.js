@@ -1,11 +1,9 @@
 const Problem = require("../models/Problem");
-const Subtopic = require("../models/Subtopic");
 const Answer = require("../models/Answer");
 const Hint = require("../models/Hint");
 const { mathGenerate } = require("./mathProblem/mathProblemGenerator");
 const { englishGenerate } = require("./englishProblem/englishProblemGenerator");
-const MATH = "คณิตศาสตร์";
-const ENG = "ภาษาอังกฤษ";
+const { ANSWER_TYPE, SUBJECT, DIFFICULTY } = require("../utils/const");
 
 exports.getAllProblems = (req, res, next) => {
   Problem.find().exec((err, problems) => {
@@ -62,6 +60,8 @@ exports.checkAnswerAndUpdateDifficulty = async (req, res, next) => {
   const user = req.user;
   const level_up = req.level_up;
   const rank_up = req.rank_up;
+  const earned_exp = req.earned_exp;
+  const earned_coins = req.earned_coins;
 
   Problem.findById(problemId).exec(async (err, problem) => {
     if (err)
@@ -77,82 +77,76 @@ exports.checkAnswerAndUpdateDifficulty = async (req, res, next) => {
       problem.users = [...problem.users, user];
     }
 
-    // update problem times and user Array
-    const sumUserTime = problem.toJSON().times.reduce((sum, time) => {
-      return sum + +time.toString();
-    }, 0);
-    const avgUserTime = sumUserTime / problem.toJSON().times.length;
-
     // TODO: filter outliers
-    // Copy the values, rather than operating on references to existing values
-    let copyTimes = [];
-    for (let time of problem.toJSON().times) {
-      copyTimes.push(+time.toString());
+    if (problem.times.length > 10) {
+      // Copy the values, rather than operating on references to existing values
+      let copyTimes = [];
+      for (let time of problem.toJSON().times) {
+        copyTimes.push(+time.toString());
+      }
+
+      // Then sort
+      const sortedCopyTimes = copyTimes.sort((a, b) => {
+        return a - b;
+      });
+
+      const q1 = sortedCopyTimes[Math.floor(sortedCopyTimes.length / 4)];
+      // Likewise for q3.
+      const q3 = sortedCopyTimes[Math.ceil(sortedCopyTimes.length * (3 / 4))];
+      const iqr = q3 - q1;
+
+      // Then find min and max values
+      const maxValue = q3 + iqr * 1.5;
+      const minValue = q1 - iqr * 1.5;
+
+      // Then filter anything beyond or beneath these values.
+      const filteredValues = sortedCopyTimes.filter((time) => {
+        return time <= maxValue && time >= minValue;
+      });
+
+      sumProblemTime = filteredValues.reduce((sum, time) => {
+        return sum + time;
+      });
+
+      avgProblemTime = sumProblemTime / filteredValues.length;
+    } else {
+      avgProblemTime = -1;
     }
 
-    // Then sort
-    const sortedCopyTimes = copyTimes.sort((a, b) => {
-      return a - b;
-    });
-
-    const q1 = sortedCopyTimes[Math.floor(sortedCopyTimes.length / 4)];
-    // Likewise for q3.
-    const q3 = sortedCopyTimes[Math.ceil(sortedCopyTimes.length * (3 / 4))];
-    const iqr = q3 - q1;
-
-    // Then find min and max values
-    const maxValue = q3 + iqr * 1.5;
-    const minValue = q1 - iqr * 1.5;
-
-    // Then filter anything beyond or beneath these values.
-    const filteredValues = sortedCopyTimes.filter((time) => {
-      return time <= maxValue && time >= minValue;
-    });
-
-    sumProblemTime = filteredValues.reduce((sum, time) => {
-      return sum + time;
-    });
-
-    avgProblemTime = sumProblemTime / filteredValues.length;
-
     // Time limit for a problem to be in the specific difficulty level
-    const EASY_CEIL = 13;
-    const MEDIUM_CEIL = 150;
+    const EASY_CEIL = 30;
+    const MEDIUM_CEIL = 60;
 
-    // Dealing with returned earned coin
-    let earned_coins = 0;
+    const old_difficulty = problem.difficulty;
 
     switch (problem.difficulty) {
-      case "EASY":
-        earned_coins = 10;
-        earned_exp = 10;
+      case DIFFICULTY.EASY:
         if (avgProblemTime >= EASY_CEIL) {
           if (avgProblemTime >= MEDIUM_CEIL) {
-            problem.difficulty = "HARD";
+            problem.difficulty = DIFFICULTY.HARD;
           } else {
-            problem.difficulty = "MEDIUM";
+            problem.difficulty = DIFFICULTY.MEDIUM;
           }
         }
         break;
-      case "MEDIUM":
-        earned_coins = 20;
-        earned_exp = 20;
+      case DIFFICULTY.MEDIUM:
         if (avgProblemTime >= MEDIUM_CEIL) {
-          problem.difficulty = "HARD";
+          problem.difficulty = DIFFICULTY.HARD;
         } else if (avgProblemTime < EASY_CEIL) {
-          problem.difficulty = "EASY";
+          problem.difficulty = DIFFICULTY.EASY;
         }
         break;
-      case "HARD":
-        earned_coins = 30;
-        earned_exp = 30;
+      case DIFFICULTY.HARD:
         if (avgProblemTime < MEDIUM_CEIL) {
           if (avgProblemTime < EASY_CEIL) {
-            problem.difficulty = "EASY";
+            problem.difficulty = DIFFICULTY.EASY;
           } else {
-            problem.difficulty = "MEDIUM";
+            problem.difficulty = DIFFICULTY.MEDIUM;
           }
         }
+    }
+    if (avgProblemTime === -1) {
+      problem.difficulty = old_difficulty;
     }
     problem.save();
 
@@ -172,11 +166,25 @@ exports.checkAnswerAndUpdateDifficulty = async (req, res, next) => {
 
 // for testing
 exports.generateProblem = async (req, res, next) => {
-  try {
-    const [{ problem, answer, hint }] = await mathGenerate(req.body);
-    return res.send({ problem, answer, hint });
-  } catch (err) {
-    return res.status(500).json({ success: false, error: err });
+  let subject = req.body.subject;
+  let problem;
+  switch (subject) {
+    case SUBJECT.MATH: 
+      try {
+        problem = await mathGenerate(req.body);
+        return res.send({ problem });
+      } catch (err) {
+        return res.status(500).json({ success: false, error: err.toString() });
+      }
+    
+    case SUBJECT.ENG:
+      try {
+        problem = await englishGenerate(req.body);
+        return res.send({ problem });
+      } catch (err) {
+        return res.status(500).json({ success: false, error: err.toString() });
+      }
+     default: return res.send("Default");
   }
 };
 
@@ -185,91 +193,70 @@ exports.getProblemForUser = async (req, res, next) => {
   const subject = req.body.subject;
   const subtopicName = req.body.subtopicName;
   const difficulty = req.body.difficulty;
-  var answer;
-  var problem = await Problem.findOneAndUpdate(
-    {
-      subtopicName: subtopicName,
-      difficulty: difficulty,
-      users: { $ne: userId },
-    },
-    { $push: { users: userId } },
-    { projection: { users: 0, times: 0, subtopicName: 0, difficulty: 0 } }
-  );
-  if (problem == null) {
-    //generate problem
-    switch (subject) {
-      case MATH:
-        try {
+  var problemOut;
+  try {
+    var problem = await Problem.findOneAndUpdate(
+      {
+        subtopicName: subtopicName,
+        difficulty: difficulty,
+        users: { $ne: userId },
+      },
+      { $push: { users: userId } },
+    );
+    if (problem == null) {
+      //generate problem
+      switch (subject) {
+        case SUBJECT.MATH:
           await mathGenerate({ subtopicName, difficulty });
-          problem = await Problem.findOneAndUpdate(
-            {
-              subtopicName: subtopicName,
-              difficulty: difficulty,
-              users: { $ne: userId },
-            },
-            { $push: { users: userId } },
-            {
-              projection: {
-                users: 0,
-                times: 0,
-                subtopicName: 0,
-                difficulty: 0,
-              },
-            }
-          );
-          answer = await Answer.findOne({ problemId: problem._id });
-          return res.status(200).json({
-            success: true,
-            data: { problem, correctAnswer: answer.body },
-          });
-        } catch (err) {
-          return res.status(400).json({ success: false, error: err });
-        }
-
-      case ENG:
-        try {
+          break;
+        case SUBJECT.ENG:
           await englishGenerate({ subtopicName, difficulty });
-          problem = await Problem.findOneAndUpdate(
-            {
-              subtopicName: subtopicName,
-              difficulty: difficulty,
-              users: { $ne: userId },
-            },
-            { $push: { users: userId } },
-            {
-              projection: {
-                users: 0,
-                times: 0,
-                subtopicName: 0,
-                difficulty: 0,
-              },
-            }
-          );
-          return res.status(200).json({
-            success: true,
-            data: { problem },
-          });
-        } catch (err) {
-          return res.status(400).json({ success: false, error: err });
-        }
+          break;
+        default:
+          return res.status(404).json({ success: false, error: "Problem out of stock" });
+      }
+      //find problem again
+      problem = await Problem.findOneAndUpdate(
+        {
+          subtopicName: subtopicName,
+          difficulty: difficulty,
+          users: { $ne: userId },
+        },
+        { $push: { users: userId } },
+      );
+    }
 
-      default:
-        return res
-          .status(404)
-          .json({ success: false, error: "Problem out of stock" });
+    let haveHint = false;
+    if (problem.hintBody) {
+      haveHint = true;
     }
-  } else {
-    if (subject == MATH) {
-      answer = await Answer.findOne({ problemId: problem._id });
-      return res
-        .status(200)
-        .json({ success: true, data: { problem, correctAnswer: answer.body } });
+  
+    problemOut = {
+      _id: problem._id,
+      choices: problem.choices,
+      body: problem.body,
+      answerType: problem.answerType,
+      title: problem.title,
+      haveHint: haveHint,
     } 
-    else {
-      return res
-        .status(200)
-        .json({ success: true, data: { problem } });  
+    if (problem.answerType == ANSWER_TYPE.MATH_INPUT) {
+      return res.status(200).json({ 
+        success: true, 
+        data: { 
+          problem: problemOut, 
+          correctAnswer: problem.answerForDisplay 
+        } 
+      });
+    } else {
+      return res.status(200).json({ 
+        success: true, 
+        data: { problem: problemOut } 
+      });
     }
+  } catch (err) {
+    if (!problem) return res.status(404).json({ success: false, error: "Problem out of stock and cannot generate problem" });
+    else if (err) return res.status(500).json({ success: false, error: err.toString() });
+    else return res.status(400).json({ success: false, error: "Something went wrong" });
   }
 };
 
@@ -299,3 +286,15 @@ exports.addProblemAnswerHint = async (req, res, next) => {
     return res.status(500).json({ success: false, error: err });
   }
 };
+
+exports.getProblemAnswerHint = async (req, res) => {
+  const problemId = req.query.problemId;
+  try {
+    const problem = await Problem.findById(problemId);
+    const answer = await Answer.findOne({ problemId: problemId });
+    const hint = await Hint.findOne({ problemId: problemId });
+    return res.status(200).json({ success: true, data: { problem, answer, hint } });
+  } catch {
+    return res.status(500).json({ success: false, error: err.toString() });
+  }
+}
