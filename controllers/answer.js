@@ -148,7 +148,7 @@ exports.checkAnswer = async (req, res, next) => {
             } catch {
               user_answer_math_able = RANDOM_MATH;
             }
-            if (!user_answer_math_able) {
+            if (typeof user_answer_math_able === 'undefined' || user_answer_math_able === null) {
               user_answer_math_able = RANDOM_MATH;
             }
             if (
