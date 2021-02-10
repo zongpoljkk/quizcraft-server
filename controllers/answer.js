@@ -78,7 +78,7 @@ const updateChallengeScore = async (
             challenge.whoTurn = 1;
         }
         // It will get increment by one when clicking next
-        challenge.currentProblem = -1;
+        challenge.currentProblem = 0;
         challenge.user1IsRead = false;
         challenge.user2IsRead = false;
       }
@@ -146,6 +146,9 @@ exports.checkAnswer = async (req, res, next) => {
             try {
               user_answer_math_able = math.evaluate(tempUserAnswer2)
             } catch {
+              user_answer_math_able = RANDOM_MATH;
+            }
+            if (!user_answer_math_able) {
               user_answer_math_able = RANDOM_MATH;
             }
             if (

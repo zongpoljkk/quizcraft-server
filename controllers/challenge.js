@@ -24,7 +24,7 @@ exports.randomChallenge = async (req, res) => {
     const user1 = await User.aggregate([
       {
         $match: {
-         _id: ObjectId(user1Id)
+          _id: ObjectId(user1Id),
         },
       },
       {
@@ -35,11 +35,11 @@ exports.randomChallenge = async (req, res) => {
           as: "photo",
         },
       },
-      { 
+      {
         $unwind: {
           path: "$photo",
-          "preserveNullAndEmptyArrays": true 
-        }
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
         $project: {
@@ -47,9 +47,9 @@ exports.randomChallenge = async (req, res) => {
           firstname: 1,
           lastname: 1,
           username: 1,
-          "photo.data":1
-        }
-      }
+          "photo.data": 1,
+        },
+      },
     ]);
     let count = await User.countDocuments({ _id: { $ne: user1Id } });
     let random = randInt(0, count - 1);
@@ -62,7 +62,7 @@ exports.randomChallenge = async (req, res) => {
     const randomUserInfo = await User.aggregate([
       {
         $match: {
-          _id: ObjectId(user2Id)
+          _id: ObjectId(user2Id),
         },
       },
       {
@@ -73,11 +73,11 @@ exports.randomChallenge = async (req, res) => {
           as: "photo",
         },
       },
-      { 
+      {
         $unwind: {
           path: "$photo",
-          "preserveNullAndEmptyArrays": true 
-        }
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
         $project: {
@@ -85,9 +85,9 @@ exports.randomChallenge = async (req, res) => {
           firstname: 1,
           lastname: 1,
           username: 1,
-          "photo.data":1
-        }
-      }
+          "photo.data": 1,
+        },
+      },
     ]);
 
     //step2: get <NUMBER_OF_PROBLEM> question for both user (both user should never seen all questions before)
@@ -243,9 +243,8 @@ exports.getProblemByChallengeId = (req, res) => {
 
         // ? Handle user lost connection by skip user's current problem and mark as incorrect  ? //
         if (challenge.currentProblem === NUMBER_OF_PROBLEM) {
-          challenge.whoTurn === 1
-            ? (challenge.user1IsRead = false)
-            : (challenge.user2IsRead = false);
+          challenge.user1IsRead = false;
+          challenge.user2IsRead = false;
           challenge.whoTurn === 1
             ? (challenge.whoTurn = 2)
             : (challenge.whoTurn = 1);
@@ -279,14 +278,19 @@ exports.getProblemByChallengeId = (req, res) => {
               body: problem.body,
               answerType: problem.answerType,
               title: problem.title,
-            } 
+            };
             if (problem.answerType === ANSWER_TYPE.MATH_INPUT) {
-              return res.status(200).json({ 
-                success: true, 
-                data: { problem: problemOut, correct_answer: problem.answerForDisplay } 
+              return res.status(200).json({
+                success: true,
+                data: {
+                  problem: problemOut,
+                  correct_answer: problem.answerForDisplay,
+                },
               });
             }
-            return res.status(200).json({ success: true, data: { problem: problemOut } });
+            return res
+              .status(200)
+              .json({ success: true, data: { problem: problemOut } });
           });
       });
   } catch (err) {
@@ -370,11 +374,11 @@ exports.getChallengeInfo = async (req, res) => {
           as: "fromUser1Photo",
         },
       },
-      { 
+      {
         $unwind: {
           path: "$fromUser1Photo",
-          "preserveNullAndEmptyArrays": true 
-        }
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
         $lookup: {
@@ -393,11 +397,11 @@ exports.getChallengeInfo = async (req, res) => {
           as: "fromUser2Photo",
         },
       },
-      { 
+      {
         $unwind: {
           path: "$fromUser2Photo",
-          "preserveNullAndEmptyArrays": true 
-        }
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
         $addFields: {
@@ -419,8 +423,8 @@ exports.getChallengeInfo = async (req, res) => {
           "user2Photo.n": 0,
           "user2Photo.files_id": 0,
           "user2Photo._id": 0,
-        }
-      }
+        },
+      },
     ]);
 
     challenge = challenge[0];
@@ -540,11 +544,11 @@ exports.getAllMyChallenges = async (req, res) => {
           as: "user1Photo",
         },
       },
-      { 
+      {
         $unwind: {
           path: "$user1Photo",
-          "preserveNullAndEmptyArrays": true 
-        }
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
         $lookup: {
@@ -563,10 +567,10 @@ exports.getAllMyChallenges = async (req, res) => {
           as: "user2Photo",
         },
       },
-      { 
+      {
         $unwind: {
-          path: "$user2Photo" ,
-          "preserveNullAndEmptyArrays": true 
+          path: "$user2Photo",
+          preserveNullAndEmptyArrays: true,
         },
       },
       {
@@ -689,11 +693,11 @@ exports.getFinalChallengeResult = async (req, res) => {
           as: "user1Photo",
         },
       },
-      { 
+      {
         $unwind: {
           path: "$user1Photo",
-          "preserveNullAndEmptyArrays": true 
-        }
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
         $lookup: {
@@ -712,11 +716,11 @@ exports.getFinalChallengeResult = async (req, res) => {
           as: "user2Photo",
         },
       },
-      { 
+      {
         $unwind: {
           path: "$user2Photo",
-          "preserveNullAndEmptyArrays": true 
-        }
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
         $project: {
@@ -726,8 +730,8 @@ exports.getFinalChallengeResult = async (req, res) => {
           "user2Photo._id": 0,
           "user2Photo.files_id": 0,
           "user2Photo.n": 0,
-        }
-      }
+        },
+      },
     ]);
 
     challenge = challenge[0];
