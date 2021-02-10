@@ -514,7 +514,7 @@ exports.readChallenge = async (req, res) => {
   });
 };
 
-exports.getAllMyChallenges = async (req, res) => {
+exports.getAllMyChallengesByDifficultyAndSubtopic = async (req, res) => {
   const userId = req.query.userId;
   const subtopicName = req.query.subtopicName;
   const difficulty = req.query.difficulty;
@@ -791,6 +791,159 @@ exports.getFinalChallengeResult = async (req, res) => {
         .json({ success: false, error: "Cannot find the challenge" });
     else if (err)
       return res.status(500).json({ success: false, error: err.toString() });
+    else
+      return res
+        .status(400)
+        .json({ succes: false, error: "Something went wrong" });
+  }
+};
+
+exports.getAllMyChallenges = async (req, res) => {
+  const userId = req.query.userId;
+  try {
+    const challenges = await Challenge.aggregate([
+      {
+        $match: {
+          $or: [{ user1Id: ObjectId(userId) }, { user2Id: ObjectId(userId) }],
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user1Id",
+          foreignField: "_id",
+          as: "user1",
+        },
+      },
+      { $unwind: "$user1" },
+      {
+        $lookup: {
+          from: "uploads.chunks",
+          localField: "user1.photo.id",
+          foreignField: "files_id",
+          as: "user1Photo",
+        },
+      },
+      {
+        $unwind: {
+          path: "$user1Photo",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user2Id",
+          foreignField: "_id",
+          as: "user2",
+        },
+      },
+      { $unwind: "$user2" },
+      {
+        $lookup: {
+          from: "uploads.chunks",
+          localField: "user2.photo.id",
+          foreignField: "files_id",
+          as: "user2Photo",
+        },
+      },
+      {
+        $unwind: {
+          path: "$user2Photo",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          subtopicName: 1,
+          difficulty: 1,
+          whoTurn: 1,
+          user1Score: 1,
+          user2Score: 1,
+          user1Id: 1,
+          user2Id: 1,
+          user1Result: 1,
+          user2Result: 1,
+          user1IsRead: 1,
+          user2IsRead: 1,
+          user1: {
+            photo: "$user1Photo",
+            firstname: 1,
+            lastname: 1,
+            username: 1,
+          },
+          user2: {
+            photo: "$user2Photo",
+            firstname: 1,
+            lastname: 1,
+            username: 1,
+          },
+        },
+      },
+    ]);
+
+    var myTurn = [];
+    var theirTurn = [];
+    var result = [];
+    var temp;
+    for (challenge of challenges) {
+      if (challenge.user1Id == userId) {
+        temp = {
+          challengeId: challenge._id,
+          userId: challenge.user2Id,
+          firstname: challenge.user2.firstname,
+          lastname: challenge.user2.lastname,
+          username: challenge.user2.username,
+          photo: challenge.user2.photo,
+          myScore: challenge.user1Score,
+          theirScore: challenge.user2Score,
+          isRead: challenge.user1IsRead,
+          subtopicName: challenge.subtopicName,
+          difficulty: challenge.difficulty,
+        };
+        if (
+          challenge.user1Result.length >= NUMBER_OF_PROBLEM &&
+          challenge.user2Result.length >= NUMBER_OF_PROBLEM
+        ) {
+          result.push(temp);
+        } else if (challenge.whoTurn == 1) {
+          myTurn.push(temp);
+        } else if (challenge.whoTurn == 2) {
+          theirTurn.push(temp);
+        }
+      } else if (challenge.user2Id == userId) {
+        temp = {
+          challengeId: challenge._id,
+          userId: challenge.user1Id,
+          firstname: challenge.user1.firstname,
+          lastname: challenge.user1.lastname,
+          username: challenge.user1.username,
+          photo: challenge.user1.photo,
+          myScore: challenge.user2Score,
+          theirScore: challenge.user1Score,
+          isRead: challenge.user2IsRead,
+          subtopicName: challenge.subtopicName,
+          difficulty: challenge.difficulty,
+        };
+        if (
+          challenge.user1Result.length >= NUMBER_OF_PROBLEM &&
+          challenge.user2Result.length >= NUMBER_OF_PROBLEM
+        ) {
+          result.push(temp);
+        } else if (challenge.whoTurn == 1) {
+          theirTurn.push(temp);
+        } else if (challenge.whoTurn == 2) {
+          myTurn.push(temp);
+        }
+      }
+    }
+    return res
+      .status(200)
+      .json({ succes: true, data: { myTurn, theirTurn, result } });
+  } catch (err) {
+    if (err)
+      return res.status(500).json({ succes: false, error: err.toString() });
     else
       return res
         .status(400)
