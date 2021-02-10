@@ -110,7 +110,7 @@ const generateGrammar = async (subtopicName, difficulty) => {
           } while (temp.toLowerCase() == selectedWord.toLowerCase());
           
           if (isUpperCase) {
-            temp = temp.toUpperCase() + temp.substring(1,temp.length);
+            temp = temp[0].toUpperCase() + temp.substring(1,temp.length);
           }
 
           problemBody = randInt(0,1)? sentence.replace(selectedWord,`[${selectedWord}&${temp}]`) 
@@ -156,7 +156,7 @@ const generateGrammar = async (subtopicName, difficulty) => {
     difficulty: difficulty,
     answerType: answerType,
     title: problemTitle,
-    choices: answerType == ANSWER_TYPE.RADIO_CHOICE? choices : [],
+    choices: answerType == ANSWER_TYPE.RADIO_CHOICE? answerChoices : [],
     answerBody: answerBody,
     solution: solution,
     checkAnswerType: checkAnswerType,
