@@ -112,7 +112,6 @@ const generateGrammar = async (subtopicName, difficulty) => {
           
           if (isUpperCase) {
             temp = temp[0].toUpperCase() + temp.substring(1,temp.length);
-            console.log(temp)
           }
 
           problemBody = randInt(0,1)? sentence.replace(selectedWord,`[${selectedWord}&${temp}]`) 
