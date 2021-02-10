@@ -48,7 +48,7 @@ const ChallengeSchema = new Schema({
   currentProblem: {
     type: Number,
     required: true,
-    enum: [0, 1, 2, 3, 4, 5],
+    enum: [-1, 0, 1, 2, 3, 4, 5],
     default: 0,
   },
   subtopicName: {
