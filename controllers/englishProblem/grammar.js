@@ -10,7 +10,8 @@ var sentences = [`She quickly types the letter.`
                 ,'He kept telling himself that one day it would all somehow make sense.'
                 ,'He swore he just saw his sushi move.'
                 ,'He was surprised that his immense laziness was inspirational to others.'
-                ,"She borrowed the book from him many years ago and hasn't yet returned it."]
+                ,"She borrowed the book from him many years ago and hasn't yet returned it."
+                ,"I usually write an essay fast. Then I have a break and check it."]
 
 const wordpos = new WordPOS({stopwords: false});
 const {
@@ -63,7 +64,7 @@ const generateGrammar = async (subtopicName, difficulty) => {
   switch (difficulty) {
     case DIFFICULTY.EASY:
       try {
-        // sentence = sentences[6]
+        // sentence = sentences[7]
         sentence = await getSentence()
         words = new pos.Lexer().lex(sentence);
         var tagger = new pos.Tagger();
@@ -110,7 +111,7 @@ const generateGrammar = async (subtopicName, difficulty) => {
           } while (temp.toLowerCase() == selectedWord.toLowerCase());
           
           if (isUpperCase) {
-            temp = temp.toUpperCase() + temp.substring(1,temp.length);
+            temp = temp[0].toUpperCase() + temp.substring(1,temp.length);
           }
 
           problemBody = randInt(0,1)? sentence.replace(selectedWord,`[${selectedWord}&${temp}]`) 
@@ -129,7 +130,7 @@ const generateGrammar = async (subtopicName, difficulty) => {
             random = randInt(0,choices.length-1);
             word = choices[random];
             if (isUpperCase) {
-              word = word.toUpperCase() + word.substring(1,word.length);
+              word = word[0].toUpperCase() + word.substring(1,word.length);
             }
             if (!answerChoices.includes(word)) {
               answerChoices.push(word);
@@ -138,7 +139,7 @@ const generateGrammar = async (subtopicName, difficulty) => {
           answerChoices = await shuffle(answerChoices);
           problemBody = sentence.replace(selectedWord,`[]`);
         }
-      }catch(err){
+      } catch (err) {
         console.log(err);
         return err;
       }
@@ -156,7 +157,7 @@ const generateGrammar = async (subtopicName, difficulty) => {
     difficulty: difficulty,
     answerType: answerType,
     title: problemTitle,
-    choices: answerType == ANSWER_TYPE.RADIO_CHOICE? choices : [],
+    choices: answerType == ANSWER_TYPE.RADIO_CHOICE? answerChoices : [],
     answerBody: answerBody,
     solution: solution,
     checkAnswerType: checkAnswerType,
