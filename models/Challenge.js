@@ -94,6 +94,11 @@ const ChallengeSchema = new Schema({
     type: Number,
     default: 0,
   },
+  lastUpdated: {
+    type: Date,
+    default: Date.now,
+    expires: 2592000, //1 month
+  }
 });
 
 module.exports = mongoose.model("Challenge", ChallengeSchema);

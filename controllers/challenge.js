@@ -493,6 +493,7 @@ exports.readChallenge = async (req, res) => {
         .json({ success: false, error: "Challenge not exist" });
     if (challenge.user1Id == userId) challenge.user1IsRead = true;
     else challenge.user2IsRead = true;
+    challenge.lastUpdated = Date.now();
     challenge.save((err, newChallenge) => {
       if (err) return res.status(500).json({ success: false, error: err });
       else if (!newChallenge)
@@ -505,6 +506,7 @@ exports.readChallenge = async (req, res) => {
           newChallenge.user1Id == userId
             ? newChallenge.user1IsRead
             : newChallenge.user2IsRead,
+        lastUpdated: newChallenge.lastUpdated
       });
     });
   });
