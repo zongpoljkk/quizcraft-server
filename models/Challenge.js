@@ -97,7 +97,7 @@ const ChallengeSchema = new Schema({
   lastUpdated: {
     type: Date,
     default: Date.now,
-    expires: 2592000, //1 month
+    expires: 2592000, //30 days
   }
 });
 
