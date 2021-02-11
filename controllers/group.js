@@ -212,7 +212,12 @@ exports.getGroupScoreboard = async (req, res) => {
           isCreator: { $eq: [ "$creatorId", ObjectId(userId) ] },
         },
       },
-      { $unwind: "$members" },
+      {
+        $unwind: {
+          path: "$members",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
       { $sort: { "members.point": -1 } },
       {
         $group: {
