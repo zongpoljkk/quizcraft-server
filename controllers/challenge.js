@@ -809,6 +809,15 @@ exports.getAllMyChallenges = async (req, res) => {
       },
       {
         $lookup: {
+          from: "subtopics",
+          localField: "subtopicName",
+          foreignField: "subtopicName",
+          as: "subtopic",
+        },
+      },
+      { $unwind: "$subtopic" },
+      {
+        $lookup: {
           from: "users",
           localField: "user1Id",
           foreignField: "_id",
@@ -856,6 +865,10 @@ exports.getAllMyChallenges = async (req, res) => {
       {
         $project: {
           _id: 1,
+          subtopic: {
+            subject: 1,
+            topic: 1,
+          },
           subtopicName: 1,
           difficulty: 1,
           whoTurn: 1,
@@ -899,6 +912,8 @@ exports.getAllMyChallenges = async (req, res) => {
           myScore: challenge.user1Score,
           theirScore: challenge.user2Score,
           isRead: challenge.user1IsRead,
+          subject: challenge.subtopic.subject,
+          topic: challenge.subtopic.topic,
           subtopicName: challenge.subtopicName,
           difficulty: challenge.difficulty,
         };
@@ -923,6 +938,8 @@ exports.getAllMyChallenges = async (req, res) => {
           myScore: challenge.user2Score,
           theirScore: challenge.user1Score,
           isRead: challenge.user2IsRead,
+          subject: challenge.subtopic.subject,
+          topic: challenge.subtopic.topic,
           subtopicName: challenge.subtopicName,
           difficulty: challenge.difficulty,
         };
