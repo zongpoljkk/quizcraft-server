@@ -13,7 +13,7 @@ const PinSchema = new Schema({
   createdAt: {
     type: Date,
     default: Date.now,
-    expires: 172800, //2 days 
+    expires: '2d', //2 days 
   }
 })
 
