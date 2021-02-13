@@ -15,7 +15,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
       opt = randInt(1,3);
       switch (opt) {
         case 1:  //3^[4] = 81
-          problemTitle = `จงหาว่าเลขยกกำลังต่อไปนี้แทนจำนวนใด`;
+          problemTitle = `จงหาว่าเลขยกกำลังต่อไปนี้มีค่าเท่าใด`;
           a = randInt(1,30,true);
           positiveBase = Math.abs(a);
           if (1 <= positiveBase && positiveBase <= 2) {
@@ -34,7 +34,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           if (a < 0 && rand) {
             //ex -3^[4]
             expo = `${a}^[${n}]`;
-            num = -1*math.pow(math.bignumber(positiveBase),math.bignumber(n));
+            num = -1 * math.pow(math.bignumber(positiveBase),math.bignumber(n));
           }
           else {
             expo = a<0? `(${a})^[${n}]`: `${a}^[${n}]`;
@@ -54,22 +54,34 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
             if (!choices.includes(temp)) {
               choices.push(temp);
             }
-            temp = `${math.pow(bignumber(n),bignumber(positiveBase))}`;
-            if (!choices.includes(temp)) {
-              choices.push(temp);
+            if (positiveBase < 10) {
+              temp = `${math.pow(bignumber(n),bignumber(positiveBase))}`;
+              if (!choices.includes(temp)) {
+                choices.push(temp);
+              }
             }
-            if (n==0) {
+            if (n == 0) {
               temp = `${a}`;
               if (!choices.includes(temp)) {
                 choices.push(temp);
               }
             }
-            do {
+            if (a < 0 && rand) { //-3^[4]
+              temp = `${math.multiply(math.bignumber(positiveBase),math.bignumber(n))}`;
+              if (!choices.includes(temp)) {
+                choices.push(temp);
+              }
+              temp = `${answerBody*-1}`;
+              if (!choices.includes(temp)) {
+                choices.push(temp);
+              }
+            }
+            while (choices.length < 4) {
               temp = `${math.multiply(math.bignumber(answerBody),randInt(2,4))}`;
               if (!choices.includes(temp)) {
                 choices.push(temp);
               }
-            } while (choices.length < 4);
+            }
             choices = await shuffle(choices);
           }
           solution = `${problemBody}\n`;
@@ -106,10 +118,11 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           problemTitle = rand? "จงเขียนเลขยกกำลังต่อไปนี้ในรูปผลคูณ โดยใช้เครื่องหมาย * แทนเครื่องหมายการคูณ" : "จงเขียนผลคูณต่อไปนี้ในรูปเลขยกกำลัง";
           if (rand) {
             a = randInt(2,99,true);
+            n = randInt(2,5);
           } else {
             a = randInt(0,1)? randInt(2,99,true) : ALPHABET[randInt(0,ALPHABET.length)];
+            n = randInt(2,7);
           }
-          n = randInt(2,7);
           problemBody = await multiplicationTerm(a,n);
 
           //create answer
@@ -163,6 +176,9 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
             }
             choices = await shuffle(choices);
           }
+
+          //create solution
+          solution = `= ${problemBody}\n= ${a} คูณกัน ${n} ตัว\n= ${answerBody}`;
 
           //create hint
           hintBody = rand? "a^[n] = a คูณกัน n ตัว\nเช่น 3^[4] = 3*3*3*3 -> 3 คูณกัน 4 ตัว" 
@@ -225,7 +241,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
         case 2:
           problemTitle = "จงเขียนจำนวนต่อไปนี้ ให้อยู่ในรูปเลขยกกำลังที่มีฐานเป็นจำนวนเฉพาะ"
           primeList = [2,3,5,7,11,13,17,19,23];
-          a = primeList[randInt(0,primeList.length-1)]*((-1) ** Math.floor(Math.random() * 2));
+          a = primeList[randInt(0,primeList.length-1)];
           positiveBase = Math.abs(a);
           if (2 <= positiveBase && positiveBase <= 3) { // 2 3
             n = randInt(2,10);
@@ -250,6 +266,9 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           }
           answerType = ANSWER_TYPE.MATH_INPUT;
           checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
+
+          //create hint
+          hintBody = "ลองแยกตัวประกอบของฐานให้อยู่ในรูปจำนวนเฉพาะคูณกัน เช่น ให้ a เป็นจำนวนเฉพาะใดๆ และ a*a*a = a^[3]"
           break;
         case 3:
           problemTitle = "จงเขียนจำนวนต่อไปนี้ให้อยู่ในรูปเลขยกกำลังที่มีเลขชี้กำลังมากกว่า 1";
@@ -325,9 +344,9 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
                     +`${numList[indexList[1]]==1? `บวก`:`ลบ`}${answerBody==`เท่ากัน`? `เช่นเดียวกัน`:``}`;
                     
           //create hint
-          hintBody = `ถ้าเลขติดลบยกกำลังด้วยเลขคู่จะได้ค่าบวก`
-                    +`\nถ้าเลขติดลบยกกำลังด้วยเลขคี่จะได้ค่าลบ`
-                    +`\nเช่น (-${a})^[2] = (-${a})*(-${a}) แต่ -${a}^[2] = -(${a}*${a})`;
+          hintBody = `ถ้าจำนวนลบทั้งหมดยกกำลังด้วยเลขคู่จะได้ค่าเป็นบวก`
+                    +`\nแต่ถ้าจำนวนลบทั้งหมดยกกำลังด้วยเลขคี่จะได้ค่าเป็นลบ`
+                    +`\nเช่น (-${a})^[2] = (-${a})*(-${a}) และ (-${a})^[3] = (-${a})*(-${a})*(-${a}) แต่ -${a}^[2] = -(${a}*${a})`;
           break;
         case 2:
           problemTitle = "จงหาว่าเลขยกกำลังต่อไปนี้เป็นจำนวนเต็มประเภทใด";
@@ -354,9 +373,9 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           choices = ["จำนวนเต็มบวก","จำนวนเต็มลบ"];
           //create hint
-          hintBody = `ถ้าเลขติดลบยกกำลังด้วยเลขคู่จะได้ค่าบวก`
-                  +`\nถ้าเลขติดลบยกกำลังด้วยเลขคี่จะได้ค่าลบ`
-                  +`\nเช่น (-${a})^[2] = (-${a})*(-${a}) แต่ -${a}^[2] = -(${a}*${a})`;
+          hintBody = `ถ้าจำนวนลบทั้งหมดยกกำลังด้วยเลขคู่จะได้ค่าเป็นบวก`
+                  +`\nแต่ถ้าจำนวนลบทั้งหมดยกกำลังด้วยเลขคี่จะได้ค่าเป็นลบ`
+                  +`\nเช่น (-${a})^[2] = (-${a})*(-${a}) และ (-${a})^[3] = (-${a})*(-${a})*(-${a}) แต่ -${a}^[2] = -(${a}*${a})`;
           break;
         case 3:
           a = randInt(2,50,true);
