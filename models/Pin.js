@@ -9,6 +9,11 @@ const PinSchema = new Schema({
   count: {
     type: Number,
     default: 1,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+    expires: '2d', //2 days 
   }
 })
 
