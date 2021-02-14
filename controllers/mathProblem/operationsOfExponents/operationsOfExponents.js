@@ -168,7 +168,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
 
           // create hint
-          hintBody = `ลองเปลี่ยนเลขธรรมดาให้เป็นเลขยกกำลังที่ฐานเท่ากับเลขยกกำลังตัวอื่นดูสิ`;
+          hintBody = `ลองเปลี่ยนบางจำนวนให้เป็นเลขยกกำลังที่ฐานเท่ากับเลขยกกำลังตัวอื่นดูสิ`;
 
           //edit solution (add =)
           solution = `= ${solution.split("\n").join("\n= ")}`;
@@ -464,9 +464,9 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           }
 
           //create hint
-          hintBody = `ถ้าเลขติดลบยกกำลังด้วยเลขคู่จะกลายเป็นค่าบวก เช่น (-3)^[2] = 9 = 3^[2]`;
-          hintBody += `\nแต่ถ้าเลขติดลบยกกำลังด้วยเลขคี่จะกลายเป็นค่าลบ เช่น (-3)^[3] = -27 = -(3^[3])`;
-          hintBody += `\n${PROPERTY_EXPO.MULTIPLY}`;
+          hintBody = `ถ้าจำนวนลบทั้งหมดยกกำลังด้วยเลขคู่จะได้ค่าเป็นบวก เช่น (-3)^[2] = 9 = 3^[2]`;
+          hintBody += `\nแต่ถ้าจำนวนลบทั้งหมดยกกำลังด้วยเลขคี่จะได้ค่าเป็นลบ เช่น (-3)^[3] = -27 = -(3^[3])`;
+          hintBody += `\nใช้${PROPERTY_EXPO.MULTIPLY}`;
           if (isDivided) hintBody += `\nและ ${PROPERTY_EXPO.DIVIDE}`;
 
           //edit solution (add =)
@@ -634,10 +634,10 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           solution += `\n${answerBody}`;
 
           // create hint 
-          hintBody = `ลองเปลี่ยนเลขธรรมดาให้เป็นเลขยกกำลังที่ฐานเท่ากับเลขยกกำลังตัวอื่นดูสิ`;
-          hintBody += `\nถ้าเลขติดลบยกกำลังด้วยเลขคู่จะกลายเป็นค่าบวก เช่น (-3)^[2] = 9 = 3^[2]`;
-          hintBody += `\nแต่ถ้าเลขติดลบยกกำลังด้วยเลขคี่จะกลายเป็นค่าลบ เช่น (-3)^[3] = -27 = -(3^[3])`;
-          hintBody += `\n${PROPERTY_EXPO.MULTIPLY}`;
+          hintBody = `ลองเปลี่ยนบางจำนวนให้เป็นเลขยกกำลังที่ฐานเท่ากับเลขยกกำลังตัวอื่นดูสิ`;
+          hintBody += `\nถ้าจำนวนลบทั้งหมดยกกำลังด้วยเลขคู่จะได้ค่าเป็นบวก เช่น (-3)^[2] = 9 = 3^[2]`;
+          hintBody += `\nแต่ถ้าจำนวนลบทั้งหมดยกกำลังด้วยเลขคี่จะได้ค่าเป็นลบ เช่น (-3)^[3] = -27 = -(3^[3])`;
+          hintBody += `\nแล้วใช้${PROPERTY_EXPO.MULTIPLY}`;
           if (isDivided) hintBody += `\nและ ${PROPERTY_EXPO.DIVIDE}`;
 
           //edit solution (add =)

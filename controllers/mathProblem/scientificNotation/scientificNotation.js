@@ -17,7 +17,8 @@ const {
   multipleConcat,
   genSolutionAddSubDiv, 
 } = require("./scientificNotationFunction");
-const { PROBLEM_TITLE, SUFFIX } = require("./const");
+const { PROBLEM_TITLE, SUFFIX, STN_FORMAT } = require("./const");
+const { PROPERTY_EXPO } = require("../operationsOfExponents/const");
 const { bignumber } = require("mathjs");
 
 const generateScientificNotation = async (subtopicName, difficulty) => {
@@ -50,9 +51,8 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           answerForDisplay = stn.replace("*", "{*}");
           checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           answerType = ANSWER_TYPE.MATH_INPUT;
-          hintBody = `เขียนเลขให้อยู่ในรูป a*10^[n] โดยที่ 1 <= a < 10 \nเลื่อนจุดไปทาง${
-            n < 0 ? `ขวา ${-n} หน่วย` : `ซ้าย ${n} หน่วย`
-          }`;
+          hintBody = `เขียนจำนวนให้อยู่ในรูป a*10^[n] โดยที่ 1 <= a < 10`;
+          hintBody += ` เช่น ${n < 0 ? `0.00123 = 1.23*10^[-3]`:`123000 = 1.23*10^[5]`}`; 
           solution = "";
           temp = num;
           absN = Math.abs(n);
@@ -141,9 +141,9 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           answerType = ANSWER_TYPE.MATH_INPUT;
           //create hint
-          hintBody =
-            "ถ้าเลขยกกำลังเท่ากัน เราสามารถนำเลขที่คูณอยู่ข้างหน้าเลขยกกำลังมาบวกลบกันได้เลย" +
-            "\nเช่น 3*10^[3]+2*10^[3] = (3+2)*10^[3] = 5*10^[3]";
+          hintBody = "นำสมบัติการแจกแจงมาช่วยคิด : (a*b)+(c*b) = (a+c)*b กล่าวคือ" + 
+                    " ถ้าเลขยกกำลังเท่ากัน เราสามารถนำเลขที่คูณอยู่ข้างหน้าเลขยกกำลังมาบวกลบกันได้เลย" +
+                    "\nเช่น (3*10^[3])+(2*10^[3]) = (3+2)*10^[3] = 5*10^[3]";
 
           //edit solution (add =)
           solution = `= ${solution.split("\n").join("\n= ")}`;
@@ -190,7 +190,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           answerType = ANSWER_TYPE.MATH_INPUT;
 
           //create hint TODO
-          hintBody = ``;
+          hintBody = `หาผลคูณของจำนวนที่กำหนดให้ แล้วตอบใน${STN_FORMAT}`;
 
           //edit solution (add =)
           solution = `= ${solution.split("\n").join("\n= ")}`;
@@ -251,7 +251,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           answerType = ANSWER_TYPE.MATH_INPUT;
 
           //create hint TODO
-          hintBody = ``;
+          hintBody = `หาผลหารของจำนวนที่กำหนดให้โดยใช้${PROPERTY_EXPO.DIVIDE} \nแล้วตอบให้อยู่ใน${STN_FORMAT}`;
 
           //edit solution (add =)
           solution = `= ${solution.split("\n").join("\n= ")}`;
@@ -276,8 +276,8 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           answerType = ANSWER_TYPE.MATH_INPUT;
 
           //create hint
-          hintBody = `ทำให้เลขยกกำลังเท่ากันก่อน แล้วจึงนำเลขข้างหน้ามาบวกลบกัน`
-          hintBody += `\nเช่น 3*10^[4] + 5.6*10^[6]\n= 3*10^[4] + 560*10^[4]\n= 563*10^[4]\n= 5.63*10^[6]`;
+          hintBody = `ทำให้ 10^[n] เท่ากันก่อน แล้วจึงนำจำนวนข้างหน้ามาบวกลบกัน`
+          hintBody += ` เช่น (3*10^[4]) + (5.6*10^[6])\n= (3*10^[4]) + (560*10^[4])\n= 563*10^[4]\n= 5.63*10^[6]`;
 
           //edit solution (add =)
           solution = `= ${solution.split("\n").join("\n= ")}`;
@@ -358,7 +358,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           answerForDisplay = answerBody.replace("*10","{*10}");
           checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           answerType = ANSWER_TYPE.MATH_INPUT;
-          hintBody = `ถ้าเลขยกกำลังของ 10 เท่ากันแล้ว สามารถนำเลขข้างหน้า 10 มาบวกลบกันได้ จากนั้นค่อยนำเลขมาหารกัน แล้วจัดให้อยู่ในรูปสัญกรณ์วิทยาศาสตร์`;
+          hintBody = `ถ้า 10^[n] เท่ากันแล้ว สามารถนำจำนวนข้างหน้า 10^[n] มาบวกลบกันได้ จากนั้นค่อยนำผลลัพธ์มาหารกัน แล้วจัดให้อยู่ในรูปสัญกรณ์วิทยาศาสตร์`;
 
           //edit solution (add =)
           solution = `= ${solution.split("\n").join("\n= ")}`;
@@ -433,7 +433,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           answerForDisplay = answerBody.replace("*10","{*10}");
           checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           answerType = ANSWER_TYPE.MATH_INPUT;
-          hintBody = `ทำให้เลขยกกำลังของ 10 เท่ากันก่อน แล้วจึงนำเลขข้างหน้า 10 มาบวกลบกัน จากนั้นค่อยนำเลขมาหารกัน แล้วจัดให้อยู่ในรูปสัญกรณ์วิทยาศาสตร์`;
+          hintBody = `ทำให้ 10^[n] เท่ากันก่อน แล้วจึงนำจำนวนข้างหน้า 10^[n] มาบวกลบกัน จากนั้นค่อยนำผลลัพธ์มาหารกัน แล้วจัดให้อยู่ในรูปสัญกรณ์วิทยาศาสตร์`;
 
           //edit solution (add =)
           solution = `= ${solution.split("\n").join("\n= ")}`;
