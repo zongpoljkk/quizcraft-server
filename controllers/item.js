@@ -140,13 +140,21 @@ exports.useSkipItemForQuiz = async (req,res) => {
       });
     }
 
-    let levelUp, rankUp, earnedCoins, earnedExp;
-    [{ user, levelUp, rankUp, earnedCoins, earnedExp }] = await userController.updateCoinAndExp(user, GAME_MODE.QUIZ, problem.difficulty);
+    const updated = userController.updateCoinAndExp(user, GAME_MODE.QUIZ, problem.difficulty);
+    user = updated.user;
 
     //save to database
     await user.save();
     await problem.save();
-    return res.status(200).json({ success: true, data: { levelUp, rankUp, earnedCoins, earnedExp } }); 
+    return res.status(200).json({ 
+      success: true, 
+      data: { 
+        levelUp: updated.levelUp, 
+        rankUp: updated.levelUp, 
+        earnedCoins: updated.earnedCoins, 
+        earnedExp: updated.earnedExp 
+      } 
+    }); 
   } catch (err) {
     console.log(err)
     return res.status(500).json({ success: false, error: err.toString() });
