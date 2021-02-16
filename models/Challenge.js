@@ -48,7 +48,7 @@ const ChallengeSchema = new Schema({
   currentProblem: {
     type: Number,
     required: true,
-    enum: [0, 1, 2, 3, 4, 5],
+    enum: [-1, 0, 1, 2, 3, 4, 5],
     default: 0,
   },
   subtopicName: {
@@ -94,6 +94,11 @@ const ChallengeSchema = new Schema({
     type: Number,
     default: 0,
   },
+  lastUpdated: {
+    type: Date,
+    default: Date.now,
+    expires: '30d'
+  }
 });
 
 module.exports = mongoose.model("Challenge", ChallengeSchema);

@@ -4,6 +4,7 @@ const Hint = require("../models/Hint");
 const { mathGenerate } = require("./mathProblem/mathProblemGenerator");
 const { englishGenerate } = require("./englishProblem/englishProblemGenerator");
 const { ANSWER_TYPE, SUBJECT, DIFFICULTY } = require("../utils/const");
+const { ObjectId } = require("mongodb");
 
 exports.getAllProblems = (req, res, next) => {
   Problem.find().exec((err, problems) => {
@@ -22,32 +23,6 @@ exports.addProblem = (req, res, next) => {
     else if (!newProblem)
       return res.status(400).json({ success: false, error: "no data" });
     else return res.status(200).json({ success: true, data: newProblem });
-  });
-};
-
-exports.getProblems = (req, res, next) => {
-  const subtopicName = req.body.subtopicName;
-  const difficulty = req.body.difficulty;
-  Problem.aggregate([
-    {
-      $lookup: {
-        from: "subtopics",
-        localField: "subtopicName",
-        foreignField: "subtopicName",
-        as: "subtopic",
-      },
-    },
-    {
-      $match: {
-        difficulty: difficulty,
-        subtopicName: subtopicName,
-      },
-    },
-  ]).exec((err, problem) => {
-    if (err) return res.status(500).json({ success: false, error: err });
-    else if (!problem)
-      return res.status(400).json({ success: false, error: "no data" });
-    else return res.status(200).json({ success: true, data: problem });
   });
 };
 
@@ -297,4 +272,48 @@ exports.getProblemAnswerHint = async (req, res) => {
   } catch {
     return res.status(500).json({ success: false, error: err.toString() });
   }
+}
+
+exports.getProblems = async (subject, subtopicName, difficulty, numberOfProblem, userIdList) => {
+  let problem;
+  let problems = [];
+  let problemBodyList = [];
+
+  do {
+    problem = await Problem.aggregate([
+      {
+        $match: {
+          subtopicName: subtopicName,
+          difficulty: difficulty,
+          users: { $nin: userIdList },
+        },
+      },
+      { 
+        $sample: { size: 1 }
+      },
+    ]);
+
+    problem = problem[0];
+    
+    if (problem == null) {
+      //generate problem
+      switch (subject) {
+        case SUBJECT.MATH:
+          await mathGenerate({ subtopicName, difficulty });
+          break;
+        case SUBJECT.ENG:
+          await englishGenerate({ subtopicName, difficulty });
+          break;
+      }
+    } else {
+      problem = await Problem.findOneAndUpdate({ _id: problem._id }, { $addToSet: {users: userIdList} }, { new: true } );
+    }
+
+    if (problem && !problemBodyList.includes(problem.body)) {
+      problems.push(problem._id);
+      problemBodyList.push(problem.body);
+    }
+  } while (problems.length < numberOfProblem);
+
+  return problems;
 }

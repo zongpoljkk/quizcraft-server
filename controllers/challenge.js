@@ -4,9 +4,8 @@ const Problem = require("../models/Problem");
 const { NUMBER_OF_PROBLEM } = require("../utils/challenge");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
-const { mathGenerate } = require("./mathProblem/mathProblemGenerator");
-const { englishGenerate } = require("./englishProblem/englishProblemGenerator");
 const { ANSWER_TYPE, SUBJECT } = require("../utils/const");
+const { getProblems } = require("./problem");
 
 const randInt = (start, end) => {
   return Math.floor(Math.random() * (end - start + 1)) + start;
@@ -17,14 +16,13 @@ exports.randomChallenge = async (req, res) => {
   const subject = req.body.subject;
   const subtopicName = req.body.subtopicName;
   const difficulty = req.body.difficulty;
-  var problem,
-    problems = [];
+  var problems = [];
   try {
     //step1: random user2 that user2 != user1
     const user1 = await User.aggregate([
       {
         $match: {
-         _id: ObjectId(user1Id)
+          _id: ObjectId(user1Id),
         },
       },
       {
@@ -35,11 +33,11 @@ exports.randomChallenge = async (req, res) => {
           as: "photo",
         },
       },
-      { 
+      {
         $unwind: {
           path: "$photo",
-          "preserveNullAndEmptyArrays": true 
-        }
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
         $project: {
@@ -47,23 +45,17 @@ exports.randomChallenge = async (req, res) => {
           firstname: 1,
           lastname: 1,
           username: 1,
-          "photo.data":1
-        }
-      }
-    ]);
-    let count = await User.countDocuments({ _id: { $ne: user1Id } });
-    let random = randInt(0, count - 1);
-    const randomUser = await User.findOne(
-      { _id: { $ne: user1Id } },
-      { _id: 1, firstname: 1, lastname: 1, username: 1, photo: 1 }
-    ).skip(random);
-    const user2Id = randomUser._id;
-
-    const randomUserInfo = await User.aggregate([
-      {
-        $match: {
-          _id: ObjectId(user2Id)
+          "photo.data": 1,
         },
+      },
+    ]);
+    
+    const randomUser = await User.aggregate([
+      {
+        $match: { _id: { $ne: ObjectId(user1Id) } }
+      },
+      {
+        $sample: { size: 1 }
       },
       {
         $lookup: {
@@ -73,11 +65,11 @@ exports.randomChallenge = async (req, res) => {
           as: "photo",
         },
       },
-      { 
+      {
         $unwind: {
           path: "$photo",
-          "preserveNullAndEmptyArrays": true 
-        }
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
         $project: {
@@ -85,45 +77,16 @@ exports.randomChallenge = async (req, res) => {
           firstname: 1,
           lastname: 1,
           username: 1,
-          "photo.data":1
-        }
-      }
+          "photo.data": 1,
+        },
+      },
     ]);
+    
+    const user2Id = randomUser[0]._id;
 
     //step2: get <NUMBER_OF_PROBLEM> question for both user (both user should never seen all questions before)
-    do {
-      problem = await Problem.findOneAndUpdate(
-        {
-          subtopicName: subtopicName,
-          difficulty: difficulty,
-          users: { $nin: [user1Id, user2Id] },
-        },
-        { $addToSet: { users: [user1Id, user2Id] } },
-        { projection: { _id: 1 } }
-      );
-      if (problem == null) {
-        //generate problem
-        switch (subject) {
-          case SUBJECT.MATH:
-            await mathGenerate({ subtopicName, difficulty });
-            break;
-          case SUBJECT.ENG:
-            await englishGenerate({ subtopicName, difficulty });
-            break;
-        }
-        problem = await Problem.findOneAndUpdate(
-          {
-            subtopicName: subtopicName,
-            difficulty: difficulty,
-            users: { $nin: [user1Id, user2Id] },
-          },
-          { $addToSet: { users: [user1Id, user2Id] } },
-          { projection: { _id: 1 } }
-        );
-      }
-      if (problem) problems.push(problem._id);
-    } while (problems.length < NUMBER_OF_PROBLEM);
-
+    problems = await getProblems(subject, subtopicName, difficulty, NUMBER_OF_PROBLEM, [ObjectId(user1Id), ObjectId(user2Id)]);
+    
     //step3: create challenge
     const challenge = new Challenge({
       user1Id: user1Id,
@@ -137,7 +100,7 @@ exports.randomChallenge = async (req, res) => {
     await challenge.save();
     return res.status(200).json({
       success: true,
-      data: { challengeId: challenge._id, user1, user2: randomUserInfo },
+      data: { challengeId: challenge._id, user1, user2: randomUser },
     });
   } catch (err) {
     return res.status(400).json({ success: false, error: err.toString() });
@@ -150,8 +113,7 @@ exports.specificChallenge = async (req, res) => {
   const subject = req.body.subject;
   const subtopicName = req.body.subtopicName;
   const difficulty = req.body.difficulty;
-  var problem,
-    problems = [];
+  var problems = [];
   try {
     //step1: check if username is exist and not same as user1
     const user1 = await User.findOne(
@@ -173,39 +135,8 @@ exports.specificChallenge = async (req, res) => {
     const user2Id = user2._id;
 
     //step2: get <NUMBER_OF_PROBLEM> question for both user (both user should never seen all questions before)
-    do {
-      problem = await Problem.findOneAndUpdate(
-        {
-          subtopicName: subtopicName,
-          difficulty: difficulty,
-          users: { $nin: [user1Id, user2Id] },
-        },
-        { $addToSet: { users: [user1Id, user2Id] } },
-        { projection: { _id: 1 } }
-      );
-      if (problem == null) {
-        //generate problem
-        switch (subject) {
-          case SUBJECT.MATH:
-            await mathGenerate({ subtopicName, difficulty });
-            break;
-          case SUBJECT.ENG:
-            await englishGenerate({ subtopicName, difficulty });
-            break;
-        }
-        problem = await Problem.findOneAndUpdate(
-          {
-            subtopicName: subtopicName,
-            difficulty: difficulty,
-            users: { $nin: [user1Id, user2Id] },
-          },
-          { $addToSet: { users: [user1Id, user2Id] } },
-          { projection: { _id: 1 } }
-        );
-      }
-      if (problem) problems.push(problem._id);
-    } while (problems.length < NUMBER_OF_PROBLEM);
-
+    problems = await getProblems(subject, subtopicName, difficulty, NUMBER_OF_PROBLEM, [ObjectId(user1Id), ObjectId(user2Id)]);
+    
     //step3: create challenge
     const challenge = new Challenge({
       user1Id: user1Id,
@@ -243,9 +174,8 @@ exports.getProblemByChallengeId = (req, res) => {
 
         // ? Handle user lost connection by skip user's current problem and mark as incorrect  ? //
         if (challenge.currentProblem === NUMBER_OF_PROBLEM) {
-          challenge.whoTurn === 1
-            ? (challenge.user1IsRead = false)
-            : (challenge.user2IsRead = false);
+          challenge.user1IsRead = false;
+          challenge.user2IsRead = false;
           challenge.whoTurn === 1
             ? (challenge.whoTurn = 2)
             : (challenge.whoTurn = 1);
@@ -279,14 +209,19 @@ exports.getProblemByChallengeId = (req, res) => {
               body: problem.body,
               answerType: problem.answerType,
               title: problem.title,
-            } 
+            };
             if (problem.answerType === ANSWER_TYPE.MATH_INPUT) {
-              return res.status(200).json({ 
-                success: true, 
-                data: { problem: problemOut, correct_answer: problem.answerForDisplay } 
+              return res.status(200).json({
+                success: true,
+                data: {
+                  problem: problemOut,
+                  correct_answer: problem.answerForDisplay,
+                },
               });
             }
-            return res.status(200).json({ success: true, data: { problem: problemOut } });
+            return res
+              .status(200)
+              .json({ success: true, data: { problem: problemOut } });
           });
       });
   } catch (err) {
@@ -370,11 +305,11 @@ exports.getChallengeInfo = async (req, res) => {
           as: "fromUser1Photo",
         },
       },
-      { 
+      {
         $unwind: {
           path: "$fromUser1Photo",
-          "preserveNullAndEmptyArrays": true 
-        }
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
         $lookup: {
@@ -393,11 +328,11 @@ exports.getChallengeInfo = async (req, res) => {
           as: "fromUser2Photo",
         },
       },
-      { 
+      {
         $unwind: {
           path: "$fromUser2Photo",
-          "preserveNullAndEmptyArrays": true 
-        }
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
         $addFields: {
@@ -419,8 +354,8 @@ exports.getChallengeInfo = async (req, res) => {
           "user2Photo.n": 0,
           "user2Photo.files_id": 0,
           "user2Photo._id": 0,
-        }
-      }
+        },
+      },
     ]);
 
     challenge = challenge[0];
@@ -493,6 +428,7 @@ exports.readChallenge = async (req, res) => {
         .json({ success: false, error: "Challenge not exist" });
     if (challenge.user1Id == userId) challenge.user1IsRead = true;
     else challenge.user2IsRead = true;
+    challenge.lastUpdated = Date.now();
     challenge.save((err, newChallenge) => {
       if (err) return res.status(500).json({ success: false, error: err });
       else if (!newChallenge)
@@ -505,12 +441,13 @@ exports.readChallenge = async (req, res) => {
           newChallenge.user1Id == userId
             ? newChallenge.user1IsRead
             : newChallenge.user2IsRead,
+        lastUpdated: newChallenge.lastUpdated
       });
     });
   });
 };
 
-exports.getAllMyChallenges = async (req, res) => {
+exports.getAllMyChallengesByDifficultyAndSubtopic = async (req, res) => {
   const userId = req.query.userId;
   const subtopicName = req.query.subtopicName;
   const difficulty = req.query.difficulty;
@@ -540,11 +477,11 @@ exports.getAllMyChallenges = async (req, res) => {
           as: "user1Photo",
         },
       },
-      { 
+      {
         $unwind: {
           path: "$user1Photo",
-          "preserveNullAndEmptyArrays": true 
-        }
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
         $lookup: {
@@ -563,10 +500,10 @@ exports.getAllMyChallenges = async (req, res) => {
           as: "user2Photo",
         },
       },
-      { 
+      {
         $unwind: {
-          path: "$user2Photo" ,
-          "preserveNullAndEmptyArrays": true 
+          path: "$user2Photo",
+          preserveNullAndEmptyArrays: true,
         },
       },
       {
@@ -689,11 +626,11 @@ exports.getFinalChallengeResult = async (req, res) => {
           as: "user1Photo",
         },
       },
-      { 
+      {
         $unwind: {
           path: "$user1Photo",
-          "preserveNullAndEmptyArrays": true 
-        }
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
         $lookup: {
@@ -712,11 +649,11 @@ exports.getFinalChallengeResult = async (req, res) => {
           as: "user2Photo",
         },
       },
-      { 
+      {
         $unwind: {
           path: "$user2Photo",
-          "preserveNullAndEmptyArrays": true 
-        }
+          preserveNullAndEmptyArrays: true,
+        },
       },
       {
         $project: {
@@ -726,8 +663,8 @@ exports.getFinalChallengeResult = async (req, res) => {
           "user2Photo._id": 0,
           "user2Photo.files_id": 0,
           "user2Photo.n": 0,
-        }
-      }
+        },
+      },
     ]);
 
     challenge = challenge[0];
@@ -787,6 +724,176 @@ exports.getFinalChallengeResult = async (req, res) => {
         .json({ success: false, error: "Cannot find the challenge" });
     else if (err)
       return res.status(500).json({ success: false, error: err.toString() });
+    else
+      return res
+        .status(400)
+        .json({ succes: false, error: "Something went wrong" });
+  }
+};
+
+exports.getAllMyChallenges = async (req, res) => {
+  const userId = req.query.userId;
+  try {
+    const challenges = await Challenge.aggregate([
+      {
+        $match: {
+          $or: [{ user1Id: ObjectId(userId) }, { user2Id: ObjectId(userId) }],
+        },
+      },
+      {
+        $lookup: {
+          from: "subtopics",
+          localField: "subtopicName",
+          foreignField: "subtopicName",
+          as: "subtopic",
+        },
+      },
+      { $unwind: "$subtopic" },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user1Id",
+          foreignField: "_id",
+          as: "user1",
+        },
+      },
+      { $unwind: "$user1" },
+      {
+        $lookup: {
+          from: "uploads.chunks",
+          localField: "user1.photo.id",
+          foreignField: "files_id",
+          as: "user1Photo",
+        },
+      },
+      {
+        $unwind: {
+          path: "$user1Photo",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "user2Id",
+          foreignField: "_id",
+          as: "user2",
+        },
+      },
+      { $unwind: "$user2" },
+      {
+        $lookup: {
+          from: "uploads.chunks",
+          localField: "user2.photo.id",
+          foreignField: "files_id",
+          as: "user2Photo",
+        },
+      },
+      {
+        $unwind: {
+          path: "$user2Photo",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          subtopic: {
+            subject: 1,
+            topic: 1,
+          },
+          subtopicName: 1,
+          difficulty: 1,
+          whoTurn: 1,
+          user1Score: 1,
+          user2Score: 1,
+          user1Id: 1,
+          user2Id: 1,
+          user1Result: 1,
+          user2Result: 1,
+          user1IsRead: 1,
+          user2IsRead: 1,
+          user1: {
+            photo: "$user1Photo",
+            firstname: 1,
+            lastname: 1,
+            username: 1,
+          },
+          user2: {
+            photo: "$user2Photo",
+            firstname: 1,
+            lastname: 1,
+            username: 1,
+          },
+        },
+      },
+    ]);
+
+    var myTurn = [];
+    var theirTurn = [];
+    var result = [];
+    var temp;
+    for (challenge of challenges) {
+      if (challenge.user1Id == userId) {
+        temp = {
+          challengeId: challenge._id,
+          userId: challenge.user2Id,
+          firstname: challenge.user2.firstname,
+          lastname: challenge.user2.lastname,
+          username: challenge.user2.username,
+          photo: challenge.user2.photo,
+          myScore: challenge.user1Score,
+          theirScore: challenge.user2Score,
+          isRead: challenge.user1IsRead,
+          subject: challenge.subtopic.subject,
+          topic: challenge.subtopic.topic,
+          subtopicName: challenge.subtopicName,
+          difficulty: challenge.difficulty,
+        };
+        if (
+          challenge.user1Result.length >= NUMBER_OF_PROBLEM &&
+          challenge.user2Result.length >= NUMBER_OF_PROBLEM
+        ) {
+          result.push(temp);
+        } else if (challenge.whoTurn == 1) {
+          myTurn.push(temp);
+        } else if (challenge.whoTurn == 2) {
+          theirTurn.push(temp);
+        }
+      } else if (challenge.user2Id == userId) {
+        temp = {
+          challengeId: challenge._id,
+          userId: challenge.user1Id,
+          firstname: challenge.user1.firstname,
+          lastname: challenge.user1.lastname,
+          username: challenge.user1.username,
+          photo: challenge.user1.photo,
+          myScore: challenge.user2Score,
+          theirScore: challenge.user1Score,
+          isRead: challenge.user2IsRead,
+          subject: challenge.subtopic.subject,
+          topic: challenge.subtopic.topic,
+          subtopicName: challenge.subtopicName,
+          difficulty: challenge.difficulty,
+        };
+        if (
+          challenge.user1Result.length >= NUMBER_OF_PROBLEM &&
+          challenge.user2Result.length >= NUMBER_OF_PROBLEM
+        ) {
+          result.push(temp);
+        } else if (challenge.whoTurn == 1) {
+          theirTurn.push(temp);
+        } else if (challenge.whoTurn == 2) {
+          myTurn.push(temp);
+        }
+      }
+    }
+    return res
+      .status(200)
+      .json({ succes: true, data: { myTurn, theirTurn, result } });
+  } catch (err) {
+    if (err)
+      return res.status(500).json({ succes: false, error: err.toString() });
     else
       return res
         .status(400)

@@ -25,7 +25,11 @@ const updateGroupScore = async (res, groupId, userId, correct, usedTime, correct
       group.members.find(member => member.userId.toString() === userId).score++;
       group.members.find(member => member.userId.toString() === userId).point += calculatePoints(usedTime, group.timePerProblem, POINTS_POSSIBLE / group.problems.length);
     }
-    group.answersNumber++;
+
+    if (group.members.some(e => e.userId == userId)) {
+      group.answersNumber++;
+    }
+
     group.save();
     res.status(200).json({ success: true, data: {correct: correct, correctAnswer: correctAnswer} });
     sendEventToUser(group.creatorId, SSE_TOPIC.SEND_ANSWER);
@@ -78,7 +82,7 @@ const updateChallengeScore = async (
             challenge.whoTurn = 1;
         }
         // It will get increment by one when clicking next
-        challenge.currentProblem = -1;
+        challenge.currentProblem = 0;
         challenge.user1IsRead = false;
         challenge.user2IsRead = false;
       }
@@ -148,11 +152,15 @@ exports.checkAnswer = async (req, res, next) => {
             } catch {
               user_answer_math_able = RANDOM_MATH;
             }
+            if (typeof user_answer_math_able === 'undefined' || user_answer_math_able === null) {
+              user_answer_math_able = RANDOM_MATH;
+            }
             if (
               math.evaluate(user_answer_math_able) === math.evaluate(tempAnswerBody2)
             ) {
               correctFlag = true;
             }
+            break;
           }
           case CHECK_ANSWER_TYPE.POWER_OVER_ONE: {
             let tempUserAnswer2;
@@ -181,6 +189,7 @@ exports.checkAnswer = async (req, res, next) => {
                 correctFlag = true;
               }
             }
+            break;
           }
         }
 

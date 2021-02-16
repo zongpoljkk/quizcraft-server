@@ -41,11 +41,8 @@ const moveThePoint = (a, n) => {
       } else break;
     }
   }
-  if (out[0] == 0 && out.indexOf(".") != 1) {
-    old = out.indexOf(".");
-    for (i = 0; i < old - 1; i++) {
-      out = out.substring(1, out.length);
-    }
+  while (out[0] == 0 && out.indexOf(".") != 1) {
+    out = out.substring(1, out.length);
   }
   if (out.indexOf(".") >= 0 && out[out.length - 1] == 0) {
     do {
