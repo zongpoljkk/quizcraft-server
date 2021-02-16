@@ -25,7 +25,11 @@ const updateGroupScore = async (res, groupId, userId, correct, usedTime, correct
       group.members.find(member => member.userId.toString() === userId).score++;
       group.members.find(member => member.userId.toString() === userId).point += calculatePoints(usedTime, group.timePerProblem, POINTS_POSSIBLE / group.problems.length);
     }
-    group.answersNumber++;
+
+    if (group.members.some(e => e.userId == userId)) {
+      group.answersNumber++;
+    }
+
     group.save();
     res.status(200).json({ success: true, data: {correct: correct, correctAnswer: correctAnswer} });
     sendEventToUser(group.creatorId, SSE_TOPIC.SEND_ANSWER);

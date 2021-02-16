@@ -4,9 +4,8 @@ const Problem = require("../models/Problem");
 const { NUMBER_OF_PROBLEM } = require("../utils/challenge");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
-const { mathGenerate } = require("./mathProblem/mathProblemGenerator");
-const { englishGenerate } = require("./englishProblem/englishProblemGenerator");
 const { ANSWER_TYPE, SUBJECT } = require("../utils/const");
+const { getProblems } = require("./problem");
 
 const randInt = (start, end) => {
   return Math.floor(Math.random() * (end - start + 1)) + start;
@@ -17,8 +16,7 @@ exports.randomChallenge = async (req, res) => {
   const subject = req.body.subject;
   const subtopicName = req.body.subtopicName;
   const difficulty = req.body.difficulty;
-  var problem,
-    problems = [];
+  var problems = [];
   try {
     //step1: random user2 that user2 != user1
     const user1 = await User.aggregate([
@@ -51,19 +49,13 @@ exports.randomChallenge = async (req, res) => {
         },
       },
     ]);
-    let count = await User.countDocuments({ _id: { $ne: user1Id } });
-    let random = randInt(0, count - 1);
-    const randomUser = await User.findOne(
-      { _id: { $ne: user1Id } },
-      { _id: 1, firstname: 1, lastname: 1, username: 1, photo: 1 }
-    ).skip(random);
-    const user2Id = randomUser._id;
-
-    const randomUserInfo = await User.aggregate([
+    
+    const randomUser = await User.aggregate([
       {
-        $match: {
-          _id: ObjectId(user2Id),
-        },
+        $match: { _id: { $ne: ObjectId(user1Id) } }
+      },
+      {
+        $sample: { size: 1 }
       },
       {
         $lookup: {
@@ -89,41 +81,12 @@ exports.randomChallenge = async (req, res) => {
         },
       },
     ]);
+    
+    const user2Id = randomUser[0]._id;
 
     //step2: get <NUMBER_OF_PROBLEM> question for both user (both user should never seen all questions before)
-    do {
-      problem = await Problem.findOneAndUpdate(
-        {
-          subtopicName: subtopicName,
-          difficulty: difficulty,
-          users: { $nin: [user1Id, user2Id] },
-        },
-        { $addToSet: { users: [user1Id, user2Id] } },
-        { projection: { _id: 1 } }
-      );
-      if (problem == null) {
-        //generate problem
-        switch (subject) {
-          case SUBJECT.MATH:
-            await mathGenerate({ subtopicName, difficulty });
-            break;
-          case SUBJECT.ENG:
-            await englishGenerate({ subtopicName, difficulty });
-            break;
-        }
-        problem = await Problem.findOneAndUpdate(
-          {
-            subtopicName: subtopicName,
-            difficulty: difficulty,
-            users: { $nin: [user1Id, user2Id] },
-          },
-          { $addToSet: { users: [user1Id, user2Id] } },
-          { projection: { _id: 1 } }
-        );
-      }
-      if (problem) problems.push(problem._id);
-    } while (problems.length < NUMBER_OF_PROBLEM);
-
+    problems = await getProblems(subject, subtopicName, difficulty, NUMBER_OF_PROBLEM, [ObjectId(user1Id), ObjectId(user2Id)]);
+    
     //step3: create challenge
     const challenge = new Challenge({
       user1Id: user1Id,
@@ -137,7 +100,7 @@ exports.randomChallenge = async (req, res) => {
     await challenge.save();
     return res.status(200).json({
       success: true,
-      data: { challengeId: challenge._id, user1, user2: randomUserInfo },
+      data: { challengeId: challenge._id, user1, user2: randomUser },
     });
   } catch (err) {
     return res.status(400).json({ success: false, error: err.toString() });
@@ -150,8 +113,7 @@ exports.specificChallenge = async (req, res) => {
   const subject = req.body.subject;
   const subtopicName = req.body.subtopicName;
   const difficulty = req.body.difficulty;
-  var problem,
-    problems = [];
+  var problems = [];
   try {
     //step1: check if username is exist and not same as user1
     const user1 = await User.findOne(
@@ -173,39 +135,8 @@ exports.specificChallenge = async (req, res) => {
     const user2Id = user2._id;
 
     //step2: get <NUMBER_OF_PROBLEM> question for both user (both user should never seen all questions before)
-    do {
-      problem = await Problem.findOneAndUpdate(
-        {
-          subtopicName: subtopicName,
-          difficulty: difficulty,
-          users: { $nin: [user1Id, user2Id] },
-        },
-        { $addToSet: { users: [user1Id, user2Id] } },
-        { projection: { _id: 1 } }
-      );
-      if (problem == null) {
-        //generate problem
-        switch (subject) {
-          case SUBJECT.MATH:
-            await mathGenerate({ subtopicName, difficulty });
-            break;
-          case SUBJECT.ENG:
-            await englishGenerate({ subtopicName, difficulty });
-            break;
-        }
-        problem = await Problem.findOneAndUpdate(
-          {
-            subtopicName: subtopicName,
-            difficulty: difficulty,
-            users: { $nin: [user1Id, user2Id] },
-          },
-          { $addToSet: { users: [user1Id, user2Id] } },
-          { projection: { _id: 1 } }
-        );
-      }
-      if (problem) problems.push(problem._id);
-    } while (problems.length < NUMBER_OF_PROBLEM);
-
+    problems = await getProblems(subject, subtopicName, difficulty, NUMBER_OF_PROBLEM, [ObjectId(user1Id), ObjectId(user2Id)]);
+    
     //step3: create challenge
     const challenge = new Challenge({
       user1Id: user1Id,

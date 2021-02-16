@@ -28,20 +28,20 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
   switch (difficulty) {
     case DIFFICULTY.EASY:
       problemTitle = PROBLEM_TITLE.SIMPLE_EXPO;
-      opt = randInt(1, 4);
+      opt = await randInt(1, 4);
       switch (opt) {
         case 1: // 3^[2]*3^[3] = 3^[5]
-          termNum = randInt(2, 4);
-          allPos = randInt(0, 1);
+          termNum = await randInt(2, 4);
+          allPos = await randInt(0, 1);
           baseList = [];
           degreeList = [];
           problemBody = "";
-          base = randInt(2, 10);
+          base = await randInt(2, 10);
           for (i = 0; i < termNum; i++) {
             if (allPos) {
-              degree = randInt(1, 5);
+              degree = await randInt(1, 5);
             } else {
-              degree = randInt(1, 5, true);
+              degree = await randInt(1, 5, true);
             }
             degreeList.push(degree);
             baseList.push(base);
@@ -60,8 +60,8 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           solution = `= ${solution.split("\n").join("\n= ")}`;
           break;
         case 2: //(3^[5])/(3^[2]) = 3^[3]
-          base = randInt(2, 10);
-          allPos = randInt(0, 1);
+          base = await randInt(2, 10);
+          allPos = await randInt(0, 1);
           if (allPos) {
             degreeList = Array.from({ length: 2 }, () => randInt(1, 5));
           } else {
@@ -89,7 +89,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           break;
         case 3: //3^[0] = 1;
           problemTitle = PROBLEM_TITLE.FIND_VALUE_EXPO;
-          base = randInt(2, 200, true);
+          base = await randInt(2, 200, true);
           expo = base < 0 ? `(${base})^[0]` : `${base}^[0]`;
           // answerType = randInt(0,1)? ANSWER_TYPE.MATH_INPUT : ANSWER_TYPE.RADIO_CHOICE;
           answerType = ANSWER_TYPE.MATH_INPUT;
@@ -104,8 +104,8 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           solution = `= ${solution.split("\n").join("\n= ")}`;
           break;
         case 4: //3^[-2] = 1/(3^[2]) or 1/9
-          base = randInt(2, 10);
-          degree = -1 * randInt(2, 10);
+          base = await randInt(2, 10);
+          degree = -1 * await randInt(2, 10);
           // answerType = randInt(0,1)? ANSWER_TYPE.MATH_INPUT : ANSWER_TYPE.RADIO_CHOICE;
           answerType = ANSWER_TYPE.MATH_INPUT;
           problemBody =
@@ -127,11 +127,11 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
     case DIFFICULTY.MEDIUM:
       problemTitle = PROBLEM_TITLE.SIMPLE_EXPO;
       problemBody = "";
-      opt = randInt(1, 5);
+      opt = await randInt(1, 5);
       switch (opt) {
         case 1: //49*7^[2]
-          termNum = randInt(3, 4);
-          base = randInt(2, 25, true); //random (+-)[2,25]
+          termNum = await randInt(3, 4);
+          base = await randInt(2, 25, true); //random (+-)[2,25]
           positiveBase = Math.abs(base);
           [{ randList, termNum }] = diverse(termNum);
           degreeList = [];
@@ -141,14 +141,14 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           for (i = 0; i < termNum; i++) {
             if (randList[i]) {
               if (1 <= positiveBase && positiveBase <= 7) {
-                degree = randInt(2, 4);
+                degree = await randInt(2, 4);
               } else if (7 < positiveBase && positiveBase <= 11) {
-                degree = randInt(2, 3);
+                degree = await randInt(2, 3);
               } else if (11 < positiveBase) {
                 degree = 2;
               }
             } else {
-              degree = randInt(0, 10, true);
+              degree = await randInt(0, 10, true);
             }
             degreeList.push(degree);
             baseList.push(base);
@@ -168,7 +168,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
 
           // create hint
-          hintBody = `ลองเปลี่ยนเลขธรรมดาให้เป็นเลขยกกำลังที่ฐานเท่ากับเลขยกกำลังตัวอื่นดูสิ`;
+          hintBody = `ลองเปลี่ยนบางจำนวนให้เป็นเลขยกกำลังที่ฐานเท่ากับเลขยกกำลังตัวอื่นดูสิ`;
 
           //edit solution (add =)
           solution = `= ${solution.split("\n").join("\n= ")}`;
@@ -176,21 +176,21 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
         case 2: //(1/2)^2*(0.5)^[3]
           let bList = [2, 4, 5, 10, 20, 25, 50, 100];
           let b = bList[randInt(0, bList.length - 1)];
-          let a = randInt(1, 99, true); //random (+-)[1,99]
+          let a = await randInt(1, 99, true); //random (+-)[1,99]
           let fraction = `(${a}/${b})`;
           let decimal = math.divide(math.bignumber(a), math.bignumber(b));
-          termNum = randInt(3, 4);
+          termNum = await randInt(3, 4);
           [{ randList, termNum }] = diverse(termNum);
           temp = "";
           degreeList = [];
           baseList = Array.from({ length: termNum }, () => decimal);
-          allPos = randInt(0, 1);
+          allPos = await randInt(0, 1);
           for (i = 0; i < termNum; i++) {
             base = randList[i] ? fraction : decimal;
             if (allPos) {
-              degree = randInt(0, 10);
+              degree = await randInt(0, 10);
             } else {
-              degree = randInt(0, 10, true);
+              degree = await randInt(0, 10, true);
             }
             degreeList.push(degree);
             problemBody += multipleConcat(base, degree, i);
@@ -212,7 +212,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           solution = `= ${solution.split("\n").join("\n= ")}`;
           break;
         case 3: //similar to easy but harder and base is not int -> multiply
-          termNum = randInt(2, 4);
+          termNum = await randInt(2, 4);
           baseList = [];
           degreeList = [];
           problemBody = "";
@@ -223,7 +223,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
             checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           }
           for (i = 0; i < termNum; i++) {
-            degree = randInt(1, 10, true);
+            degree = await randInt(1, 10, true);
             degreeList.push(degree);
             baseList.push(base);
             problemBody += multipleConcat(base, degree, i);
@@ -269,20 +269,20 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           break;
         case 5:
           problemTitle = PROBLEM_TITLE.FIND_VALUE_EXPO;
-          termNum = randInt(2, 3);
-          base = baseSelector();
+          termNum = await randInt(2, 3);
+          base = await baseSelector();
           baseList = [];
           degreeList = [];
           degreeSum = 0;
           buttom = "";
           for (i = 0; i < termNum; i++) {
-            degree = randInt(2, 10);
+            degree = await randInt(2, 10);
             degreeSum += degree;
             degreeList.push(degree);
             baseList.push(base);
             problemBody += multipleConcat(base, degree, i);
           }
-          termNum = randInt(1, 2);
+          termNum = await randInt(1, 2);
           if (termNum == 1) {
             baseList2 = [base];
             degreeList2 = [degreeSum];
@@ -317,29 +317,29 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
     case DIFFICULTY.HARD:
       problemTitle = PROBLEM_TITLE.SIMPLE_EXPO;
       problemBody = "";
-      opt = randInt(1,3);
+      opt = await randInt(1,3);
       switch (opt) {
         case 1: // (a^[-3]*a^[2]) / (a^[-1]*a^[5]) = a^[-5]
-          base = baseSelector();
-          termNum = randInt(2, 5);
+          base = await baseSelector();
+          termNum = await randInt(2, 5);
           problemBody = buttom = "";
           baseList = [];
           baseList2 = [];
           degreeList = [];
           degreeList2 = [];
-          allPos = randInt(0, 1);
+          allPos = await randInt(0, 1);
           for (i = 0; i < termNum; i++) {
             if (allPos) {
-              degree = randInt(0, 15);
+              degree = await randInt(0, 15);
             } else {
-              degree = randInt(0, 15, true);
+              degree = await randInt(0, 15, true);
             }
             degreeList.push(degree);
             baseList.push(base);
             problemBody += multipleConcat(base, degree, i);
           }
           for (i = 0; i < termNum; i++) {
-            degree = randInt(0, 15, true);
+            degree = await randInt(0, 15, true);
             degreeList2.push(degree);
             baseList2.push(base);
             buttom += multipleConcat(base, degree, i);
@@ -366,12 +366,12 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           solution = `= ${solution.split("\n").join("\n= ")}`;
           break;
         case 2: // (-3)^[2]*3^[1] = 3^[3]
-          base1 = randInt(2, 25, false); //random [2,25]
+          base1 = await randInt(2, 25, false); //random [2,25]
           base2 = -1 * base1; //(-base1)
           isLessThanZero = 0;
-          isDivided = randInt(0, 1);
-          termNum = randInt(2, 4);
-          allPos = randInt(0, 1);
+          isDivided = await randInt(0, 1);
+          termNum = await randInt(2, 4);
+          allPos = await randInt(0, 1);
           [{ randList, termNum }] = diverse(termNum);
           degreeList = [];
           baseList = [];
@@ -380,9 +380,9 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
             base = randList[i] ? base1 : base2;
             baseList.push(base);
             if (allPos) {
-              degree = randInt(1, 15);
+              degree = await randInt(1, 15);
             } else {
-              degree = randInt(1, 15, true);
+              degree = await randInt(1, 15, true);
             }
             degreeList.push(degree);
             if ((base < 0) & (degree % 2 != 0)) {
@@ -394,7 +394,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           }
 
           if (isDivided) {
-            termNum = randInt(1, 3);
+            termNum = await randInt(1, 3);
             [{ randList, termNum }] = diverse(termNum);
             degreeList2 = [];
             baseList2 = [];
@@ -404,9 +404,9 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
               base = randList[i] ? base1 : base2;
               baseList2.push(base);
               if (allPos) {
-                degree = randInt(1, 15);
+                degree = await randInt(1, 15);
               } else {
-                degree = randInt(1, 15, true);
+                degree = await randInt(1, 15, true);
               }
               degreeList2.push(degree);
               if ((base < 0) & (degree % 2 != 0)) {
@@ -464,33 +464,33 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           }
 
           //create hint
-          hintBody = `ถ้าเลขติดลบยกกำลังด้วยเลขคู่จะกลายเป็นค่าบวก เช่น (-3)^[2] = 9 = 3^[2]`;
-          hintBody += `\nแต่ถ้าเลขติดลบยกกำลังด้วยเลขคี่จะกลายเป็นค่าลบ เช่น (-3)^[3] = -27 = -(3^[3])`;
-          hintBody += `\n${PROPERTY_EXPO.MULTIPLY}`;
+          hintBody = `ถ้าจำนวนลบทั้งหมดยกกำลังด้วยเลขคู่จะได้ค่าเป็นบวก เช่น (-3)^[2] = 9 = 3^[2]`;
+          hintBody += `\nแต่ถ้าจำนวนลบทั้งหมดยกกำลังด้วยเลขคี่จะได้ค่าเป็นลบ เช่น (-3)^[3] = -27 = -(3^[3])`;
+          hintBody += `\nใช้${PROPERTY_EXPO.MULTIPLY}`;
           if (isDivided) hintBody += `\nและ ${PROPERTY_EXPO.DIVIDE}`;
 
           //edit solution (add =)
           solution = `= ${solution.split("\n").join("\n= ")}`;
           break;
         case 3: // (-5)^[2]*25*5^[7] = 5^[2]*5^[2]*5^[7] = 5^[(2+2+7)] = 5^[11]
-          base1 = randInt(2, 25);
+          base1 = await randInt(2, 25);
           base2 = -1 * base1; //(-base1)
           isLessThanZero = 0;
-          isDivided = randInt(0, 1);
-          termNum = randInt(3, 5);
+          isDivided = await randInt(0, 1);
+          termNum = await randInt(3, 5);
           temp = "";
           degreeList = [];
           baseList = [];
           randList = [0, 1, 2];
           while (randList.length < termNum) {
-            randList.push(randInt(0, 2));
+            randList.push(await randInt(0, 2));
           }
           randList = await shuffle(randList);
           degreeSum = 0;
           for (i = 0; i < termNum; i++) {
             if (randList[i] == 1) {
               //-5 base2
-              degree = randInt(1, 15, true);
+              degree = await randInt(1, 15, true);
               degreeList.push(degree);
               baseList.push(base2);
               degreeSum += degree;
@@ -503,9 +503,9 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
             } else if (randList[i] == 2) {
               //25
               if (1 <= base1 && base1 <= 7) {
-                degree = randInt(2, 4);
+                degree = await randInt(2, 4);
               } else if (7 < base1 && base1 <= 11) {
-                degree = randInt(2, 3);
+                degree = await randInt(2, 3);
               } else if (11 < base1) {
                 degree = 2;
               }
@@ -522,7 +522,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
               temp += multipleConcat(base, degree, i);
             } else {
               //5
-              degree = randInt(1, 15, true);
+              degree = await randInt(1, 15, true);
               degreeList.push(degree);
               baseList.push(base1);
               degreeSum += degree;
@@ -532,7 +532,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           }
 
           if (isDivided) {
-            termNum = randInt(1, 3);
+            termNum = await randInt(1, 3);
             randList = [];
             while (randList.length < termNum) {
               randList.push(randInt(0, 2));
@@ -545,7 +545,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
             for (i = 0; i < termNum; i++) {
               if (randList[i] == 1) {
                 //-5 base2
-                degree = randInt(1, 15, true);
+                degree = await randInt(1, 15, true);
                 degreeList2.push(degree);
                 baseList2.push(base2);
                 degreeSum2 += degree;
@@ -560,7 +560,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
                 if (1 <= base1 && base1 <= 7) {
                   degree = randInt(2, 4);
                 } else if (7 < base1 && base1 <= 11) {
-                  degree = randInt(2, 3);
+                  degree = await randInt(2, 3);
                 } else if (11 < base1) {
                   degree = 2;
                 }
@@ -577,7 +577,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
                 temp2 += multipleConcat(base, degree, i);
               } else {
                 //5
-                degree = randInt(1, 15, true);
+                degree = await randInt(1, 15, true);
                 degreeList2.push(degree);
                 baseList2.push(base1);
                 degreeSum2 += degree;
@@ -634,10 +634,10 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           solution += `\n${answerBody}`;
 
           // create hint 
-          hintBody = `ลองเปลี่ยนเลขธรรมดาให้เป็นเลขยกกำลังที่ฐานเท่ากับเลขยกกำลังตัวอื่นดูสิ`;
-          hintBody += `\nถ้าเลขติดลบยกกำลังด้วยเลขคู่จะกลายเป็นค่าบวก เช่น (-3)^[2] = 9 = 3^[2]`;
-          hintBody += `\nแต่ถ้าเลขติดลบยกกำลังด้วยเลขคี่จะกลายเป็นค่าลบ เช่น (-3)^[3] = -27 = -(3^[3])`;
-          hintBody += `\n${PROPERTY_EXPO.MULTIPLY}`;
+          hintBody = `ลองเปลี่ยนบางจำนวนให้เป็นเลขยกกำลังที่ฐานเท่ากับเลขยกกำลังตัวอื่นดูสิ`;
+          hintBody += `\nถ้าจำนวนลบทั้งหมดยกกำลังด้วยเลขคู่จะได้ค่าเป็นบวก เช่น (-3)^[2] = 9 = 3^[2]`;
+          hintBody += `\nแต่ถ้าจำนวนลบทั้งหมดยกกำลังด้วยเลขคี่จะได้ค่าเป็นลบ เช่น (-3)^[3] = -27 = -(3^[3])`;
+          hintBody += `\nแล้วใช้${PROPERTY_EXPO.MULTIPLY}`;
           if (isDivided) hintBody += `\nและ ${PROPERTY_EXPO.DIVIDE}`;
 
           //edit solution (add =)

@@ -20,7 +20,7 @@ const AchievementSchema = new Schema({
   type: {
     type: String,
     required: true,
-    enum: ["STREAKS", "QUESTIONS", "OTHER"],
+    enum: ["STREAKS", "QUESTIONS", "ITEM", "REPORT", "OTHER"],
   },
   image: {
     type: Object,

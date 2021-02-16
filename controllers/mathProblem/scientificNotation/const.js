@@ -3,6 +3,8 @@ exports.PROBLEM_TITLE = {
   FIND_VALUE_STN: "จงหาผลลัพธ์ของเลขต่อไปนี้ แล้วตอบในรูปสัญกรณ์วิทยาศาสตร์",
 };
 
+exports.STN_FORMAT = "รูปสัญกรณ์วิทยาศาสตร์ | a*10^[n] โดยที่ 1 <= a < 10 และ n เป็นจำนวนเต็มใดๆ";
+
 exports.SUFFIX = {
   THOUSAND: {
     STR: "พัน",
