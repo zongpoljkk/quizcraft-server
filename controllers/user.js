@@ -356,6 +356,7 @@ const deleteProfilePicture = (name, query) => {
 
 exports.changeProfilePicture = (req, res, next) => {
   const userId = req.body.userId;
+  console.log(req.file)
   User.findById(userId)
     .select("_id photo")
     .exec((err, user) => {
