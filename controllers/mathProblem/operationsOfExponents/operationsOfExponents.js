@@ -63,9 +63,9 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           base = await randInt(2, 10);
           allPos = await randInt(0, 1);
           if (allPos) {
-            degreeList = Array.from({ length: 2 }, () => randInt(1, 5));
+            degreeList = Array.from({ length: 2 }, async() => await randInt(1, 5));
           } else {
-            degreeList = Array.from({ length: 2 }, () => randInt(1, 5, true));
+            degreeList = Array.from({ length: 2 }, async() => await randInt(1, 5, true));
           }
           problemBody =
             base < 0
@@ -91,7 +91,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           problemTitle = PROBLEM_TITLE.FIND_VALUE_EXPO;
           base = await randInt(2, 200, true);
           expo = base < 0 ? `(${base})^[0]` : `${base}^[0]`;
-          // answerType = randInt(0,1)? ANSWER_TYPE.MATH_INPUT : ANSWER_TYPE.RADIO_CHOICE;
+          // answerType = await randInt(0,1)? ANSWER_TYPE.MATH_INPUT : ANSWER_TYPE.RADIO_CHOICE;
           answerType = ANSWER_TYPE.MATH_INPUT;
           problemBody = expo;
           answerBody = 1;
@@ -106,7 +106,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
         case 4: //3^[-2] = 1/(3^[2]) or 1/9
           base = await randInt(2, 10);
           degree = -1 * await randInt(2, 10);
-          // answerType = randInt(0,1)? ANSWER_TYPE.MATH_INPUT : ANSWER_TYPE.RADIO_CHOICE;
+          // answerType = await randInt(0,1)? ANSWER_TYPE.MATH_INPUT : ANSWER_TYPE.RADIO_CHOICE;
           answerType = ANSWER_TYPE.MATH_INPUT;
           problemBody =
             base < 0 ? `(${base})^[${degree}` : `${base}^[${degree}]`;
@@ -175,7 +175,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           break;
         case 2: //(1/2)^2*(0.5)^[3]
           let bList = [2, 4, 5, 10, 20, 25, 50, 100];
-          let b = bList[randInt(0, bList.length - 1)];
+          let b = bList[await randInt(0, bList.length - 1)];
           let a = await randInt(1, 99, true); //random (+-)[1,99]
           let fraction = `(${a}/${b})`;
           let decimal = math.divide(math.bignumber(a), math.bignumber(b));
@@ -246,7 +246,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
             problemTitle += ` เมื่อ ${base} ไม่เท่ากับ 0`;
             checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           }
-          degreeList = Array.from({ length: 2 }, () => randInt(1, 5, true));
+          degreeList = Array.from({ length: 2 }, async() => await randInt(1, 5, true));
           problemBody =
             base < 0
               ? `((${base})^[${degreeList[0]}])/((${base})^[${degreeList[1]}])`
@@ -288,7 +288,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
             degreeList2 = [degreeSum];
             buttom += multipleConcat(base, degreeSum, 0);
           } else if (termNum == 2) {
-            temp = randInt(1, degreeSum - 1);
+            temp = await randInt(1, degreeSum - 1);
             baseList2 = [base, base];
             degreeList2 = [temp, degreeSum - temp];
             buttom += multipleConcat(base, temp, 0);
@@ -535,7 +535,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
             termNum = await randInt(1, 3);
             randList = [];
             while (randList.length < termNum) {
-              randList.push(randInt(0, 2));
+              randList.push(await randInt(0, 2));
             }
             degreeList2 = [];
             baseList2 = [];
@@ -558,7 +558,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
               } else if (randList[i] == 2) {
                 //25
                 if (1 <= base1 && base1 <= 7) {
-                  degree = randInt(2, 4);
+                  degree = await randInt(2, 4);
                 } else if (7 < base1 && base1 <= 11) {
                   degree = await randInt(2, 3);
                 } else if (11 < base1) {
