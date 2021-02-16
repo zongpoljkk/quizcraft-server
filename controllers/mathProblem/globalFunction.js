@@ -1,6 +1,6 @@
 const { ALPHABET } = require("../../utils/const");
 
-const randInt = (start, end, haveNegative) => {
+const randInt = async (start, end, haveNegative) => {
   if (haveNegative) {
     return (
       (Math.floor(Math.random() * (end - start + 1)) + start) *
