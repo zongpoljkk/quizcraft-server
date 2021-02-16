@@ -77,7 +77,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
               }
             }
             while (choices.length < 4) {
-              temp = `${math.multiply(math.bignumber(answerBody),randInt(2,4))}`;
+              temp = `${math.multiply(math.bignumber(answerBody),await randInt(2,4))}`;
               if (!choices.includes(temp)) {
                 choices.push(temp);
               }
@@ -120,7 +120,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
             a = await randInt(2,99,true);
             n = await randInt(2,5);
           } else {
-            a = await randInt(0,1)? randInt(2,99,true) : ALPHABET[randInt(0,ALPHABET.length)];
+            a = await randInt(0,1)? await randInt(2,99,true) : ALPHABET[await randInt(0,ALPHABET.length)];
             n = await randInt(2,7);
           }
           problemBody = await multiplicationTerm(a,n);
@@ -145,13 +145,13 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
                 if (!choices.includes(temp)) {
                   choices.push(temp);
                 }
-                temp = await multiplicationTerm(n, randInt(1,Math.abs(a)+2));
+                temp = await multiplicationTerm(n, await randInt(1,Math.abs(a)+2));
                 if (!choices.includes(temp)) {
                   choices.push(temp);
                 }
               }
               do {
-                temp = await multiplicationTerm(a, randInt(n-1,n+2));
+                temp = await multiplicationTerm(a, await randInt(n-1,n+2));
                 if (!choices.includes(temp)) {
                   choices.push(temp);
                 }
@@ -162,13 +162,13 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
                 choices.push(temp);
               }
               if (!ALPHABET.includes(a)) {
-                temp = n<0? `(${n})^[${randInt(a-1,a+2)}]` : `${n}^[${randInt(a-1,a+2)}]`;
+                temp = n<0? `(${n})^[${await randInt(a-1,a+2)}]` : `${n}^[${await randInt(a-1,a+2)}]`;
                 if (!choices.includes(temp)) {
                   choices.push(temp);
                 }
               } 
               do {
-                temp = a<0? `(${a})^[${randInt(n-1,n+2)}]` : `${a}^[${randInt(n-1,n+2)}]`;
+                temp = a<0? `(${a})^[${await randInt(n-1,n+2)}]` : `${a}^[${await randInt(n-1,n+2)}]`;
                 if (!choices.includes(temp)) {
                   choices.push(temp);
                 }
@@ -241,7 +241,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
         case 2:
           problemTitle = "จงเขียนจำนวนต่อไปนี้ ให้อยู่ในรูปเลขยกกำลังที่มีฐานเป็นจำนวนเฉพาะ"
           primeList = [2,3,5,7,11,13,17,19,23];
-          a = primeList[randInt(0,primeList.length-1)];
+          a = primeList[await randInt(0,primeList.length-1)];
           positiveBase = Math.abs(a);
           if (2 <= positiveBase && positiveBase <= 3) { // 2 3
             n = await randInt(2,10);

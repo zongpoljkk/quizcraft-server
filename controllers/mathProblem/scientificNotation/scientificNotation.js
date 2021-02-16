@@ -110,7 +110,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           baseList = [];
           nList = [];
           baseOut = 0;
-          randList = Array.from({ length: termNum }, () => randInt(0, 1));
+          randList = Array.from({ length: termNum }, async() => await randInt(0, 1));
           n = await randInt(3, 10, true);
           solution = "";
           for (i = 0; i < termNum; i++) {
@@ -159,7 +159,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
             if (allInt) {
               a = await randInt(2,10);
             } else {
-              a = await randInt(0,1) ? randInt(2,10) : randFloat(10);
+              a = await randInt(0,1) ? await randInt(2,10) : randFloat(10);
             }
             baseList.push(a);
             baseOut = math.multiply(math.bignumber(baseOut),math.bignumber(a));
@@ -169,7 +169,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           termNum = await randInt(1,2);
           let degreeOut = 0;
           for (i=0; i<termNum; i++) {
-            n = randInt(2, 10, true);
+            n = await randInt(2, 10, true);
             nList.push(n);
             problemBody += `*10^[${n}]`
             degreeOut += n;
@@ -199,8 +199,8 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           problemTitle = PROBLEM_TITLE.FIND_STN;
           let suffixList = [SUFFIX.THOUSAND,SUFFIX.TEN_THOUSAND,SUFFIX.HUNDRED_THOUSAND,SUFFIX.MILLION]
           let suffix = SUFFIX.MILLION;
-          a = randInt(2,1000);
-          rand = randInt(0,1);
+          a = await randInt(2,1000);
+          rand = await randInt(0,1);
           if (rand) {
             let suffixIndex = await randInt(0,suffixList.length-1);
             let preSuffix = suffixList[suffixIndex];
@@ -261,7 +261,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
     case DIFFICULTY.HARD:
       problemTitle = PROBLEM_TITLE.FIND_VALUE_STN;
       problemBody = "";
-      opt = randInt(1,3);
+      opt = await randInt(1,3);
       switch (opt) {
         case 1:
           termNum = await randInt(2,4);
