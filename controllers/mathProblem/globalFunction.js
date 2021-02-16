@@ -45,7 +45,7 @@ const baseSelector = async () => {
       a = `(${b}/${c})`;
       break;
     case 4: //alphabet
-      a = ALPHABET[Math.floor(Math.random() * ALPHABET.length)];
+      a = ALPHABET[Math.floor(Math.random() * (ALPHABET.length - 1))];
       break;
   }
   return a;
