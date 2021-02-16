@@ -120,7 +120,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
             a = await randInt(2,99,true);
             n = await randInt(2,5);
           } else {
-            a = await randInt(0,1)? await randInt(2,99,true) : ALPHABET[await randInt(0,ALPHABET.length)];
+            a = await randInt(0,1)? await randInt(2,99,true) : ALPHABET[await randInt(0,ALPHABET.length-1)];
             n = await randInt(2,7);
           }
           problemBody = await multiplicationTerm(a,n);
