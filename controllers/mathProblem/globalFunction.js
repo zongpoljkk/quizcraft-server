@@ -26,12 +26,12 @@ const shuffle = async (array) => {
   return array;
 }
 
-const baseSelector = () => {
+const baseSelector = async () => {
   let rand = Math.floor(Math.random() * 4) + 1; //choose base
   let a, b, c;
   switch (rand) {
     case 1: //int
-      a = randInt(2, 10, true); //random (+-)[2,10]
+      a = await randInt(2, 10, true); //random (+-)[2,10]
       break;
     case 2: //float
       a =
@@ -39,8 +39,8 @@ const baseSelector = () => {
         (-1) ** Math.floor(Math.random() * 2); //random (+-)[1.01,10.00)
       break;
     case 3: //fraction
-      b = randInt(1, 10, true); //random (+-)[1,10]
-      c = randInt(2, 10, false); //random [2,10]
+      b = await randInt(1, 10, true); //random (+-)[1,10]
+      c = await randInt(2, 10, false); //random [2,10]
       c = c == b ? c + 1 : c;
       a = `(${b}/${c})`;
       break;

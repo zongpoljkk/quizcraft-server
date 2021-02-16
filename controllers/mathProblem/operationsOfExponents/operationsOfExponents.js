@@ -216,7 +216,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           baseList = [];
           degreeList = [];
           problemBody = "";
-          base = baseSelectorNoInt();
+          base = await baseSelectorNoInt();
           checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
           if (ALPHABET.includes(base)) {
             problemTitle += ` เมื่อ ${base} ไม่เท่ากับ 0`;
@@ -240,7 +240,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           solution = `= ${solution.split("\n").join("\n= ")}`;
           break;
         case 4: //similar to easy but harder and base is not int -> divided
-          base = baseSelectorNoInt();
+          base = await baseSelectorNoInt();
           checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
           if (ALPHABET.includes(base)) {
             problemTitle += ` เมื่อ ${base} ไม่เท่ากับ 0`;
