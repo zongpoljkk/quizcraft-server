@@ -63,9 +63,9 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           base = await randInt(2, 10);
           allPos = await randInt(0, 1);
           if (allPos) {
-            degreeList = Array.from({ length: 2 }, async() => await randInt(1, 5));
+            degreeList = [await randInt(1,5),await randInt(1,5)]
           } else {
-            degreeList = Array.from({ length: 2 }, async() => await randInt(1, 5, true));
+            degreeList = [await randInt(1,5,true),await randInt(1,5,true)]
           }
           problemBody =
             base < 0
@@ -216,7 +216,7 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           baseList = [];
           degreeList = [];
           problemBody = "";
-          base = baseSelectorNoInt();
+          base = await baseSelectorNoInt();
           checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
           if (ALPHABET.includes(base)) {
             problemTitle += ` เมื่อ ${base} ไม่เท่ากับ 0`;
@@ -240,13 +240,13 @@ const generateOperationsOfExponents = async (subtopicName, difficulty) => {
           solution = `= ${solution.split("\n").join("\n= ")}`;
           break;
         case 4: //similar to easy but harder and base is not int -> divided
-          base = baseSelectorNoInt();
+          base = await baseSelectorNoInt();
           checkAnswerType = CHECK_ANSWER_TYPE.MATH_EVALUATE;
           if (ALPHABET.includes(base)) {
             problemTitle += ` เมื่อ ${base} ไม่เท่ากับ 0`;
             checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           }
-          degreeList = Array.from({ length: 2 }, async() => await randInt(1, 5, true));
+          degreeList = [await randInt(1, 5, true),await randInt(1, 5, true)];
           problemBody =
             base < 0
               ? `((${base})^[${degreeList[0]}])/((${base})^[${degreeList[1]}])`

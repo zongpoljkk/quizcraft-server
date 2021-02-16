@@ -306,7 +306,7 @@ exports.getProblems = async (subject, subtopicName, difficulty, numberOfProblem,
           break;
       }
     } else {
-      await Problem.findOneAndUpdate({ _id: problem._id }, { $addToSet: {users: userIdList} });
+      problem = await Problem.findOneAndUpdate({ _id: problem._id }, { $addToSet: {users: userIdList} }, { new: true } );
     }
 
     if (problem && !problemBodyList.includes(problem.body)) {
