@@ -14,7 +14,7 @@ const getPin = async (date) => {
   let prefix = moment(date).format('DDMMYY');
   var pin = await Pin.findOneAndUpdate(
     { prefix: prefix },
-    { $inc: { count: 1 } },
+    { $inc: { count: 1 }, lastUpdated: Date.now() },
     { upsert: true, new: true}
   )
   let newPin = parseInt(pin.prefix) + parseInt(pin.count);

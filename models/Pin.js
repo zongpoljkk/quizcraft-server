@@ -10,10 +10,10 @@ const PinSchema = new Schema({
     type: Number,
     default: 1,
   },
-  createdAt: {
+  lastUpdated: {
     type: Date,
     default: Date.now,
-    expires: '2d', //2 days 
+    expires: '1d', //1 day 
   }
 })
 
