@@ -1,3 +1,5 @@
+const mongoose = require("mongoose");
+const { ObjectId } = require("mongodb");
 const User = require("../models/User");
 const Item = require("../models/Item");
 const jwt = require("jsonwebtoken");
@@ -346,6 +348,12 @@ exports.usedItem = async (req, res) => {
   );
 };
 
+const deleteProfilePicture = (name, query) => { 
+  mongoose.connection.db.collection(name, function (err, collection) {
+    collection.findOneAndDelete(query)
+});
+}
+
 exports.changeProfilePicture = (req, res, next) => {
   const userId = req.body.userId;
   User.findById(userId)
@@ -361,6 +369,10 @@ exports.changeProfilePicture = (req, res, next) => {
           error: "Unable to find user with the given ID",
         });
       }
+
+      deleteProfilePicture('uploads.files', { _id: ObjectId(user.photo.id)});
+      deleteProfilePicture('uploads.chunks', { files_id: ObjectId(user.photo.id)});
+
       user.photo = req.file;
       user.save();
       res.status(200).send({ success: true, data: "Upload succeeded" });
