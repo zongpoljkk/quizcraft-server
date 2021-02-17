@@ -32,8 +32,7 @@ const updateGroupScore = async (res, groupId, userId, correct, usedTime, correct
 
     group.save();
     res.status(200).json({ success: true, data: {correct: correct, correctAnswer: correctAnswer} });
-    sendEventToUser(group.creatorId, SSE_TOPIC.SEND_ANSWER);
-    return;
+    return sendEventToUser(group.creatorId, SSE_TOPIC.SEND_ANSWER);
   })
 };
 

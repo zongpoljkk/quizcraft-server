@@ -98,7 +98,7 @@ exports.deleteGroup = async (req, res) => {
         return res.status(400).json({ success: false, error: "no data" });
       }
       res.status(200).json({ success: true, data: "delete group success!" });
-      sendEventToGroupMember(body.groupId, SSE_TOPIC.DELETE_GROUP);
+      return sendEventToGroupMember(body.groupId, SSE_TOPIC.DELETE_GROUP);
     }
   );
 };
@@ -127,7 +127,7 @@ exports.leaveGroup = async (req, res) => {
         return res.status(400).json({ success: false, error: "no data" });
       }
       res.status(200).json({ success: true, data: "leave group success!" });
-      sendEventToGroupMember(body.groupId, SSE_TOPIC.UPDATE_MEMBER);
+      return sendEventToGroupMember(body.groupId, SSE_TOPIC.UPDATE_MEMBER);
     }
   );
 };
@@ -155,7 +155,7 @@ exports.genProblemsWhenGroupStart = async (req, res) => {
         return res.status(400).json({ success: false, error: "Cannot generate problem and add into Group" });
       } else {
         res.status(200).json({ success: true, data: { problems: newGroup.problems, numberOfProblem: newGroup.numberOfProblem } });
-        sendEventToGroupMember(groupId, SSE_TOPIC.START_GAME);
+        return sendEventToGroupMember(groupId, SSE_TOPIC.START_GAME);
       }
     });
   } catch (err) {
@@ -265,7 +265,7 @@ exports.joinGroup = async (req, res) => {
               } 
             } 
           });
-          sendEventToGroupMember(group._id, SSE_TOPIC.UPDATE_MEMBER);
+          return sendEventToGroupMember(group._id, SSE_TOPIC.UPDATE_MEMBER);
         }
       );
     }
@@ -381,7 +381,7 @@ exports.resetAfterGameEnd = async (req, res) => {
         return res.status(400).json({ success: false, error: "no data" });
       }
       res.status(200).json({ success: true, data: "reset group success!" });
-      sendEventToGroupMember(body.groupId, SSE_TOPIC.RESTART_GAME);
+      return sendEventToGroupMember(body.groupId, SSE_TOPIC.RESTART_GAME);
     }
   );
 };
@@ -399,7 +399,7 @@ exports.nextProblem = async (req, res) => {
       else if (!group) return res.status(400).json({ success: false, error: "Cannot do next problem" });
       res.status(200).json({ success: true, data: { currentIndex: group.currentIndex }});
       // Server-sent-event
-      sendEventToGroupMember(groupId, SSE_TOPIC.NEXT_PROBLEM);
+      return sendEventToGroupMember(groupId, SSE_TOPIC.NEXT_PROBLEM);
     }
   );
 };
@@ -414,6 +414,8 @@ exports.getNumberOfAnswer = (req, res) => {
 }
 
 exports.showAnswer = (req, res) => {
+  console.log("front request show answer")
   const groupId = req.query.groupId;
-  sendEventToGroupMember(groupId, SSE_TOPIC.SHOW_ANSWER);
+  res.status(200).json({ succes: true });
+  return sendEventToGroupMember(groupId, SSE_TOPIC.SHOW_ANSWER);
 }
