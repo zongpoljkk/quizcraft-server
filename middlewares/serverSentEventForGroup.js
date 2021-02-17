@@ -58,13 +58,15 @@ exports.groupEventsHandler = (req, res, next) => {
   //for debug
   console.log("init",this.subscribers.length,userId)
   console.log(this.test)
+  
   // When process closes connection we update the subscriber list
   // avoiding the disconnected one
   req.on("close", () => {
-    // for debug
-    console.log(`${userId} connection closed on close`);
     this.subscribers = this.subscribers.filter(s => s.processId !== processId);
+
+    // for debug
     this.test = this.test.filter(s => s.processId !== processId);
+    console.log(`${userId} connection closed on close`);
   });
 }
 
@@ -72,7 +74,7 @@ exports.sendEventToGroupMember = async (groupId, sseTopic) => {
   num++;
   const message = `${num}`;
 
-  //for debig
+  //for debug
   console.log(this.subscribers.length)
   console.log(this.test)
 
@@ -86,9 +88,13 @@ exports.sendEventToGroupMember = async (groupId, sseTopic) => {
   this.subscribers.forEach(s => {
     if(s.groupId == groupId) {
       s.res.write(`data: ${JSON.stringify(event)}\n\n`)
+      
+      //for debug
       console.log("send to group",s.userId,sseTopic,message)
     }
   });
+
+  //for debug
   console.log("Send-Event-To-Group", groupId, sseTopic,message,"\n");
 }
 
@@ -106,18 +112,27 @@ exports.sendEventToUser = async (userId, sseTopic) => {
   this.subscribers.forEach(s => {
     if(s.userId == userId) {
       s.res.write(`data: ${JSON.stringify(event)}\n\n`)
+      
+      //for debug
       console.log("send to user",s.userId,sseTopic,message)
     }
   });
+
+  //for debug
   console.log("Send-Event-To-User", userId, sseTopic,message,"\n");
 }
 
 exports.closeConnection = async (req, res) => {
   const userId = req.userId;
+
   // for debug
   console.log(`${userId} connection closed`);
+
   this.subscribers = this.subscribers.filter(s => s.userId !== userId);
+
+  //for debug
   this.test = this.test.filter(s => s.userId !== userId);
+
   res.status(200).json({
     status: 200,
     message: `Close connection on user id : ${userId} success`
