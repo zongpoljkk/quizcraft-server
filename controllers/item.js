@@ -298,7 +298,7 @@ exports.useFreezeItem = async (req, res) => {
 }
 
 exports.useDoubleItem = async (req, res) => {
-  //coin x2 in 1 hr
+  //exp x2 in 1 hr
   try {
     if (req.body.userId != req.userId) {
       return res.status(400).json({ success: false, error: "Unauthorized!" });

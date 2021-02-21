@@ -356,6 +356,7 @@ const deleteProfilePicture = (name, query) => {
 
 exports.changeProfilePicture = (req, res, next) => {
   const userId = req.body.userId;
+  console.log(req.file)
   User.findById(userId)
     .select("_id photo")
     .exec((err, user) => {
@@ -370,8 +371,10 @@ exports.changeProfilePicture = (req, res, next) => {
         });
       }
 
-      deleteProfilePicture('uploads.files', { _id: ObjectId(user.photo.id)});
-      deleteProfilePicture('uploads.chunks', { files_id: ObjectId(user.photo.id)});
+      if (user.photo) {
+        deleteProfilePicture('uploads.files', { _id: ObjectId(user.photo.id)});
+        deleteProfilePicture('uploads.chunks', { files_id: ObjectId(user.photo.id)});
+      }
 
       user.photo = req.file;
       user.save();

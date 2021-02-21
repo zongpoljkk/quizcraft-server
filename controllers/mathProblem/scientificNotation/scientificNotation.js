@@ -110,7 +110,10 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
           baseList = [];
           nList = [];
           baseOut = 0;
-          randList = Array.from({ length: termNum }, async() => await randInt(0, 1));
+          randList = [];
+          while (randList.length < termNum) {
+            randList.push(await randInt(0, 1));
+          }
           n = await randInt(3, 10, true);
           solution = "";
           for (i = 0; i < termNum; i++) {
