@@ -1,10 +1,9 @@
 const Group = require("../models/Group");
 const Pin = require("../models/Pin");
 const User = require("../models/User");
-const Problem = require("../models/Problem");
 const moment = require("moment");
 const { MIN_PROBLEM, MAX_PROBLEM } = require("../utils/group");
-const { SUBJECT, SSE_TOPIC } = require("../utils/const");
+const { SSE_TOPIC } = require("../utils/const");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 const { sendEventToGroupMember, sendEventToUser } = require("../middlewares");
@@ -148,7 +147,7 @@ exports.genProblemsWhenGroupStart = async (req, res) => {
 
     problems = await getProblems(subject, subtopicName, difficulty, numberOfProblem, memberIdList);
 
-    await Group.findOneAndUpdate({ _id:groupId }, { problems: problems }, { new: true },(err, newGroup) => {
+    await Group.findOneAndUpdate({ _id:groupId }, { problems: problems, startCurrentProblemTime: Date.now() }, { new: true },(err, newGroup) => {
       if (err) {
         return res.status(500).json({ success: false, error: err.toString() });
       } else if (!newGroup) {
@@ -276,6 +275,7 @@ exports.getGroupGame = async (req, res) => {
   const groupId = req.query.groupId;
   const userId = req.query.userId;
   try {
+    console.log("start get from",req.userId);
     var group = await Group.aggregate([
       {
         $match: {
@@ -302,6 +302,7 @@ exports.getGroupGame = async (req, res) => {
           currentIndex: 1,
           numberOfProblem: 1,
           timePerProblem: 1,
+          startCurrentProblemTime: 1,
           creatorId: 1,
           user: {
             $filter: {
@@ -323,11 +324,16 @@ exports.getGroupGame = async (req, res) => {
     ]);
 
     group = group[0];
+    let time = Math.ceil(group.timePerProblem - (Date.now() - group.startCurrentProblemTime)/1000);
+    if (time < 0) {
+      time = 0;
+    }
+    
     var groupGame = {
       _id: group._id,
       currentIndex: group.currentIndex,
       numberOfProblem: group.numberOfProblem,
-      timePerProblem: parseFloat(group.timePerProblem),
+      timePerProblem: time,
       isCreator: userId == group.creatorId,
       user: group.user[0],
       problem: {
@@ -339,6 +345,7 @@ exports.getGroupGame = async (req, res) => {
         correctAnswer: group.problem.answerForDisplay
       }
     };
+    console.log("finish get from",req.userId);
     return res.status(200).json({ success: true, data: groupGame });
   } catch (err) {
     if (!group)
@@ -392,8 +399,8 @@ exports.nextProblem = async (req, res) => {
 
   Group.findOneAndUpdate(
     { _id: groupId, creatorId: userId },
-    { $inc: { currentIndex: 1 } , answersNumber: 0},
-    { new: true},
+    { $inc: { currentIndex: 1 } , answersNumber: 0, startCurrentProblemTime: Date.now() },
+    { new: true },
     (err, group) => {
       if (err) return res.status(500).json({ success: false, error: err.toString() });
       else if (!group) return res.status(400).json({ success: false, error: "Cannot do next problem" });
