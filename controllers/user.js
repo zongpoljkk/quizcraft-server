@@ -5,10 +5,15 @@ const Item = require("../models/Item");
 const jwt = require("jsonwebtoken");
 const config = require("../config/keys");
 const { GAME_MODE, DIFFICULTY } = require("../utils/const");
-const { DIFFICULTY_EXP, DIFFICULTY_COIN, MODE_SURPLUS } = require("../utils/gameConfig");
+const {
+  DIFFICULTY_EXP,
+  DIFFICULTY_COIN,
+  MODE_SURPLUS,
+} = require("../utils/gameConfig");
 const { levelSystem, rankSystem, MAX_LEVEL } = require("../utils/level");
 const { findActiveItem } = require("./item");
-const { ITEM_NAME } = require("../utils/const"); 
+const { ITEM_NAME } = require("../utils/const");
+const { IMAGE_FILE_TYPES } = require("../utils/const");
 
 //Add user for testing
 exports.addUser = (req, res, next) => {
@@ -146,7 +151,7 @@ exports.getProfileByUID = async (req, res) => {
           level: { $first: "$level" },
           maxExp: { $first: "$maxExp" },
           itemInfoWithoutImgs: { $push: "$itemInfoWithoutImgs" },
-          itemImages: { $first: "$itemImages"}
+          itemImages: { $first: "$itemImages" },
         },
       },
       {
@@ -164,7 +169,9 @@ exports.getProfileByUID = async (req, res) => {
                         $filter: {
                           input: "$itemImages",
                           as: "image",
-                          cond: { $eq: ["$$image.files_id", "$$item.image.id"] },
+                          cond: {
+                            $eq: ["$$image.files_id", "$$item.image.id"],
+                          },
                         },
                       },
                       0,
@@ -183,7 +190,7 @@ exports.getProfileByUID = async (req, res) => {
           "itemInfos.image": 0,
           "itemInfos._id": 0,
           "itemInfos.files_id": 0,
-          "itemInfos.n": 0
+          "itemInfos.n": 0,
         },
       },
     ],
@@ -281,7 +288,7 @@ exports.editUsername = async (req, res) => {
   });
 };
 
-exports.usedItem = async (req, res) => {  
+exports.usedItem = async (req, res) => {
   const body = req.body;
   if (!body) {
     return res.status(400).json({
@@ -348,15 +355,20 @@ exports.usedItem = async (req, res) => {
   );
 };
 
-const deleteProfilePicture = (name, query) => { 
+const deleteProfilePicture = (name, query) => {
   mongoose.connection.db.collection(name, function (err, collection) {
-    collection.findOneAndDelete(query)
-});
-}
+    collection.findOneAndDelete(query);
+  });
+};
 
 exports.changeProfilePicture = (req, res, next) => {
   const userId = req.body.userId;
-  console.log(req.file)
+  var path = require("path");
+  if (!IMAGE_FILE_TYPES.includes(path.extname(req.file.originalname).toLowerCase())) {
+    return res
+      .status(422)
+      .send({ success: false, error: "Unsupported Media type" });
+  }
   User.findById(userId)
     .select("_id photo")
     .exec((err, user) => {
@@ -372,8 +384,12 @@ exports.changeProfilePicture = (req, res, next) => {
       }
 
       if (user.photo) {
-        deleteProfilePicture('uploads.files', { _id: ObjectId(user.photo.id)});
-        deleteProfilePicture('uploads.chunks', { files_id: ObjectId(user.photo.id)});
+        deleteProfilePicture("uploads.files", {
+          _id: ObjectId(user.photo.id),
+        });
+        deleteProfilePicture("uploads.chunks", {
+          files_id: ObjectId(user.photo.id),
+        });
       }
 
       user.photo = req.file;
@@ -454,13 +470,13 @@ exports.updateStreak = async (userId) => {
 };
 
 exports.buyItem = async (req, res) => {
-  if(req.userId !== req.body.userId){
+  if (req.userId !== req.body.userId) {
     return res.status(400).json({
       success: false,
       error: "userId not match userId that decoded from token!",
     });
   }
-  
+
   const body = req.body;
   if (!body) {
     return res.status(400).json({
@@ -547,10 +563,12 @@ exports.buyItem = async (req, res) => {
   );
 };
 
-exports.updateCoinAndExp = (user, gameMode, difficulty) => {  
+exports.updateCoinAndExp = (user, gameMode, difficulty) => {
   const levelDictionary = levelSystem();
   const rankDictionary = rankSystem();
-  let earnedCoins = 0, earnedExp = 0, modeSurplus = 1;
+  let earnedCoins = 0,
+    earnedExp = 0,
+    modeSurplus = 1;
 
   // ------ Handle mode surplus ------ //
   switch (gameMode) {
@@ -580,7 +598,7 @@ exports.updateCoinAndExp = (user, gameMode, difficulty) => {
       break;
     case DIFFICULTY.HARD:
       earnedCoins = DIFFICULTY_COIN.HARD * modeSurplus;
-      earnedExp = DIFFICULTY_EXP.HARD * modeSurplus;  
+      earnedExp = DIFFICULTY_EXP.HARD * modeSurplus;
       break;
   }
 
@@ -610,5 +628,11 @@ exports.updateCoinAndExp = (user, gameMode, difficulty) => {
       }
     }
   }
-  return { user: user, levelUp: levelUp, rankUp: rankUp, earnedCoins: earnedCoins, earnedExp: earnedExp };
+  return {
+    user: user,
+    levelUp: levelUp,
+    rankUp: rankUp,
+    earnedCoins: earnedCoins,
+    earnedExp: earnedExp,
+  };
 };

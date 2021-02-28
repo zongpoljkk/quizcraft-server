@@ -1,7 +1,7 @@
 exports.levelSystem = () => {
   const levels = 40;
   const exp_for_first_level = 100;
-  const exp_for_last_level = 100000;
+  const exp_for_last_level = 800000;
 
   const B = Math.log(exp_for_last_level / exp_for_first_level) / (levels - 1);
   const A = exp_for_first_level / (Math.exp(B) - 1.0);

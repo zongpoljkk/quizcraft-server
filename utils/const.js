@@ -22,15 +22,15 @@ exports.GAME_MODE = {
   QUIZ: "QUIZ",
   CHALLENGE: "CHALLENGE",
   GROUP: "GROUP",
-}
+};
 
 exports.ITEM_NAME = {
   SKIP: "Skip",
   HINT: "Hint",
   DOUBLE: "Double",
   REFRESH: "Refresh",
-  FREEZE: "Freeze"
-}
+  FREEZE: "Freeze",
+};
 
 exports.CHECK_ANSWER_TYPE = {
   MATH_EVALUATE: "MATH_EVALUATE",
@@ -49,7 +49,43 @@ exports.SSE_TOPIC = {
   SEND_ANSWER: "SEND_ANSWER",
   DELETE_GROUP: "DELETE_GROUP",
   SHOW_ANSWER: "SHOW_ANSWER",
-}
-
+};
 
 exports.RANDOM_MATH = "0.123454321";
+
+exports.IMAGE_FILE_TYPES = [
+  ".jpg",
+  ".jpeg",
+  ".jpe",
+  ".jif",
+  ".jfif",
+  ".jfi",
+  ".png",
+  ".gif",
+  ".webp",
+  ".tiff",
+  ".tif",
+  ".psd",
+  ".raw",
+  ".arw",
+  ".cr2",
+  ".nrw",
+  ".k25",
+  ".bmp",
+  ".dib",
+  ".heif",
+  ".heic",
+  ".ind",
+  ".indd",
+  ".indt",
+  ".jp2",
+  ".j2k",
+  ".jpf",
+  ".jpx",
+  ".jpm",
+  ".mj2",
+  ".svg",
+  ".svgz",
+  ".ai",
+  "eps",
+];
