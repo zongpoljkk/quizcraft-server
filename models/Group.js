@@ -1,3 +1,4 @@
+const { boolean } = require("mathjs");
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
@@ -93,6 +94,11 @@ const GroupSchema = new Schema({
   },
   startCurrentProblemTime: {
     type: Date,
+  },
+  isFirst: {
+    type: Boolean,
+    default: true,
+    required: true,
   }
 });
 

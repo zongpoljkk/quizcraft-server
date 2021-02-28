@@ -147,7 +147,7 @@ exports.genProblemsWhenGroupStart = async (req, res) => {
 
     problems = await getProblems(subject, subtopicName, difficulty, numberOfProblem, memberIdList);
 
-    await Group.findOneAndUpdate({ _id:groupId }, { problems: problems, startCurrentProblemTime: Date.now() }, { new: true },(err, newGroup) => {
+    await Group.findOneAndUpdate({ _id:groupId }, { problems: problems, isFirst: true }, { new: true },(err, newGroup) => {
       if (err) {
         return res.status(500).json({ success: false, error: err.toString() });
       } else if (!newGroup) {
@@ -303,6 +303,7 @@ exports.getGroupGame = async (req, res) => {
           numberOfProblem: 1,
           timePerProblem: 1,
           startCurrentProblemTime: 1,
+          isFirst: 1,
           creatorId: 1,
           user: {
             $filter: {
@@ -324,9 +325,16 @@ exports.getGroupGame = async (req, res) => {
     ]);
 
     group = group[0];
-    let time = Math.ceil(group.timePerProblem - (Date.now() - group.startCurrentProblemTime)/1000);
-    if (time < 0) {
-      time = 0;
+    
+    let time;
+    if (group.isFirst) {
+      time = parseFloat(group.timePerProblem);
+      await Group.findOneAndUpdate({ _id: group._id }, { isFirst: false, startCurrentProblemTime: Date.now() });
+    } else {
+      time = Math.ceil(group.timePerProblem - (Date.now() - group.startCurrentProblemTime)/1000);
+      if (time < 0) {
+        time = 0;
+      }
     }
     
     var groupGame = {
@@ -399,7 +407,7 @@ exports.nextProblem = async (req, res) => {
 
   Group.findOneAndUpdate(
     { _id: groupId, creatorId: userId },
-    { $inc: { currentIndex: 1 } , answersNumber: 0, startCurrentProblemTime: Date.now() },
+    { $inc: { currentIndex: 1 } , answersNumber: 0, isFirst: true },
     { new: true },
     (err, group) => {
       if (err) return res.status(500).json({ success: false, error: err.toString() });
