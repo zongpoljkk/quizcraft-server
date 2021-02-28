@@ -88,5 +88,4 @@ exports.IMAGE_FILE_TYPES = [
   ".svgz",
   ".ai",
   "eps",
-  ".pdf",
 ];
