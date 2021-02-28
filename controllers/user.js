@@ -363,7 +363,6 @@ const deleteProfilePicture = (name, query) => {
 
 exports.changeProfilePicture = (req, res, next) => {
   const userId = req.body.userId;
-  console.log(req.file);
   var path = require("path");
   if (!IMAGE_FILE_TYPES.includes(path.extname(req.file.originalname))) {
     return res
