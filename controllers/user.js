@@ -240,7 +240,7 @@ exports.editUsername = async (req, res) => {
   }
 
   const regex = RegExp(
-    "^(?=[a-zA-Zก-๛_dS]*[a-zA-Zก-๛S])[-a-zA-Zก-๛0-9_dS]{5,12}$"
+    "^(?=[a-zA-Zก-๛_d\S]*[a-zA-Zก-๛\S])[-a-zA-Zก-๛0-9_d\S]{5,12}$"
   );
   const usernameValidate = regex.test(body.username);
 
@@ -367,7 +367,7 @@ exports.changeProfilePicture = (req, res, next) => {
   if (!IMAGE_FILE_TYPES.includes(path.extname(req.file.originalname))) {
     return res
       .status(422)
-      .send({ success: false, data: "Unsupported Media type" });
+      .send({ success: false, error: "Unsupported Media type" });
   }
   User.findById(userId)
     .select("_id photo")
