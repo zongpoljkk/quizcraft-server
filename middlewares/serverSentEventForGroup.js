@@ -5,6 +5,8 @@ exports.subscribers = [];
 
 exports.test = [];
 
+global.usersStreams = {};
+
 var num = 0;
 
 // Middleware for GET /api/group/event endpoint
@@ -27,10 +29,10 @@ exports.groupEventsHandler = (req, res, next) => {
   const userId = req.userId;
   const processId = uuidv4().substring(0, 8);
   
-  this.subscribers = this.subscribers.filter(s => s.userId !== userId);
+  // this.subscribers = this.subscribers.filter(s => s.userId !== userId);
   
   //for debug
-  this.test = this.test.filter(s => s.userId !== userId);
+  // this.test = this.test.filter(s => s.userId !== userId);
 
   const initSubscribeData = {
     processId,
@@ -56,22 +58,52 @@ exports.groupEventsHandler = (req, res, next) => {
     groupId,
     userId,
   };
+
+   // Stores this connection
+  global.usersStreams[userId] = {
+    res,
+    lastInteraction: null,
+  }
+
   this.test.push(newTest);
 
   this.subscribers.push(newSubscriber);
+  
+  // Note: Heatbeat for avoidance of client's request timeout of first time (30 sec)
+  const heartbeat = {type: 'heartbeat'};
+  res.write(`data: ${JSON.stringify(heartbeat)}\n\n`);
+  res.flush();
+  global.usersStreams[userId].lastInteraction = Date.now();
+
+  // Interval loop
+  const maxInterval = 20000;
+  const interval = 3000;
+  let intervalId = setInterval(() => {
+    if (!global.usersStreams[userId]) return;
+    if (Date.now() - global.usersStreams[userId].lastInteraction < maxInterval) return;
+    res.write(`data: ${JSON.stringify(heartbeat)}\n\n`);
+    res.flush();
+    console.log("heart beat",userId)
+    global.usersStreams[userId].lastInteraction = Date.now()
+  }, interval);
 
   //for debug
   console.log("init",this.subscribers.length,userId)
-  console.log(this.test)
+  // console.log(this.test)
   
   // When process closes connection we update the subscriber list
   // avoiding the disconnected one
   req.on("close", () => {
     this.subscribers = this.subscribers.filter(s => s.processId !== processId);
-
+    clearInterval(intervalId);
     // for debug
     this.test = this.test.filter(s => s.processId !== processId);
     console.log(`${userId} connection closed on close`);
+  });
+
+  req.on("end", () => {
+    clearInterval(intervalId);
+    delete global.usersStreams[userId];
   });
 }
 
@@ -80,8 +112,8 @@ exports.sendEventToGroupMember = async (groupId, sseTopic) => {
   const message = `${num}`;
 
   //for debug
-  console.log(this.subscribers.length)
-  console.log(this.test)
+  // console.log(this.subscribers.length)
+  // console.log(this.test)
 
   // Create message to send data.
   const event = {
@@ -92,10 +124,10 @@ exports.sendEventToGroupMember = async (groupId, sseTopic) => {
   //send to people in group
   this.subscribers.forEach(s => {
     if(s.groupId == groupId) {
-      s.res.write(`data: ${JSON.stringify(event)}\n\n`)
+      s.res.write(`data: ${JSON.stringify(event)}\n\n`);
       
       //for debug
-      console.log("send to group",s.userId,sseTopic,message)
+      console.log("send to group",s.userId,sseTopic,message);
     }
   });
 
@@ -116,7 +148,7 @@ exports.sendEventToUser = async (userId, sseTopic) => {
   //send to user
   this.subscribers.forEach(s => {
     if(s.userId == userId) {
-      s.res.write(`data: ${JSON.stringify(event)}\n\n`)
+      s.res.write(`data: ${JSON.stringify(event)}\n\n`);
       
       //for debug
       console.log("send to user",s.userId,sseTopic,message)
@@ -137,6 +169,8 @@ exports.closeConnection = async (req, res) => {
 
   //for debug
   this.test = this.test.filter(s => s.userId !== userId);
+
+  delete global.usersStreams[userId];
 
   res.status(200).json({
     status: 200,

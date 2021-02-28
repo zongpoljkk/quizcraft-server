@@ -1,5 +1,5 @@
-
-const mongoose = require('mongoose');
+const { boolean } = require("mathjs");
+const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const GroupSchema = new Schema({
@@ -8,31 +8,43 @@ const GroupSchema = new Schema({
     required: true,
     unique: true,
   },
-  creatorId : {
+  creatorId: {
     type: Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
-  members: [{
-    _id: false,
-    userId: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+  members: [
+    {
+      _id: false,
+      userId: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+      },
+      username: {
+        type: String,
+        require: true,
+      },
+      score: {
+        type: Number,
+        default: 0,
+      },
+      point: {
+        type: Number,
+        default: 0,
+      },
+      state: {
+        type: String,
+        enum: [
+          "PROBLEM",
+          "ANSWERED",
+          "SHOW_ANSWER_CORRECT",
+          "SHOW_ANSWER_WRONG",
+        ],
+        default: "PROBLEM",
+      },
     },
-    username: {
-      type: String,
-      require: true,
-    },
-    score: {
-      type: Number,
-      default: 0,
-    },
-    point: {
-      type: Number,
-      default: 0,
-    }
-  }],
+  ],
   subject: {
     type: String,
     required: true,
@@ -60,11 +72,13 @@ const GroupSchema = new Schema({
     type: Schema.Types.Decimal128,
     required: true,
   },
-  problems: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Problem',
-    required: true,
-  }],
+  problems: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Problem",
+      required: true,
+    },
+  ],
   currentIndex: {
     type: Number,
     default: 0,
@@ -76,8 +90,16 @@ const GroupSchema = new Schema({
   createdAt: {
     type: Date,
     default: Date.now,
-    expires: '2d', //2 days
+    expires: "2d", //2 days
+  },
+  startCurrentProblemTime: {
+    type: Date,
+  },
+  isFirst: {
+    type: Boolean,
+    default: true,
+    required: true,
   }
-})
+});
 
-module.exports = mongoose.model('Group', GroupSchema);
+module.exports = mongoose.model("Group", GroupSchema);
