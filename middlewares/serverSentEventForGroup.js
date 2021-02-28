@@ -16,6 +16,11 @@ exports.groupEventsHandler = (req, res, next) => {
     "Cache-Control": "no-cache"
   };
   res.writeHead(200, headers);
+  // res.connection.setTimeout(0);
+  // Note: Heatbeat for avoidance of client's request timeout of first time (30 sec)
+  const heartbeat = {type: 'heartbeat'}
+  res.write(`data: ${JSON.stringify(heartbeat)}\n\n`);
+  global.usersStreams[userId].lastInteraction = Date.now()
 
   // After client opens connection send init data
   const groupId = req.query.groupId;
