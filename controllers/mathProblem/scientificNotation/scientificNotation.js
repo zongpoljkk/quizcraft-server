@@ -26,7 +26,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
   let solution, answerType, answerForDisplay, checkAnswerType;
   let a, n, stn, num, opt, nn, ff, allInt, rand, n2;
   let i, baseOut, positiveBase, solutionList;
-  let problem, answer, newProblem;
+  let problem, answer, newProblem, source;
   let termNum, baseList, nList, randList;
   let baseList2, nList2, randList2, temp, top, buttom;
   switch (difficulty) {
@@ -67,6 +67,9 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
 
           ///edit solution (add =)
           solution = `= ${solution.split("\n").join("\n= ")}`;
+
+          //add source
+          source = "Quizcraft Generator case1";
           break;
         case 2:
           problemTitle = "จงเขียนตัวเลขแทนจำนวนต่อไปนี้โดยไม่ใช้เลขยกกำลัง";
@@ -96,6 +99,9 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
 
           //edit solution (add =)
           solution = `= ${solution.split("\n").join("\n= ")}`;
+
+          //add source
+          source = "Quizcraft Generator case2";
           break;
       }
       break;
@@ -150,6 +156,9 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
 
           //edit solution (add =)
           solution = `= ${solution.split("\n").join("\n= ")}`;
+
+          //add source
+          source = "Quizcraft Generator case1";
           break;
         case 2://1.5*2*10^[2] = 3*10^[2] → ตัวเลขคูณกับสัญกรณ์ → ตอบเป็นสัญกรณ์วิทยาศาสตร์ 
           problemTitle = PROBLEM_TITLE.FIND_VALUE_STN;
@@ -197,6 +206,9 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
 
           //edit solution (add =)
           solution = `= ${solution.split("\n").join("\n= ")}`;
+
+          //add source
+          source = "Quizcraft Generator case2";
           break;
         case 3:
           problemTitle = PROBLEM_TITLE.FIND_STN;
@@ -232,6 +244,9 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
 
           //edit solution (add =)
           solution = `= ${solution.split("\n").join("\n= ")}`;
+
+          //add source
+          source = "Quizcraft Generator case3";
           break;
         case 4: //การหารง่ายๆ → หารลงตัว
           n = await randInt(2,10,true); 
@@ -258,6 +273,9 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
 
           //edit solution (add =)
           solution = `= ${solution.split("\n").join("\n= ")}`;
+
+          //add source
+          source = "Quizcraft Generator case4";
           break;
       }
       break;
@@ -284,6 +302,9 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
 
           //edit solution (add =)
           solution = `= ${solution.split("\n").join("\n= ")}`;
+
+          //add source
+          source = "Quizcraft Generator case1";
           break;
         case 2: //add sub div equalDegree top buttom
           answer = await randInt(1,50,true);
@@ -365,6 +386,9 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
 
           //edit solution (add =)
           solution = `= ${solution.split("\n").join("\n= ")}`;
+
+          //add source
+          source = "Quizcraft Generator case2";
           break;
         case 3: //add sub div non-equalDegree top buttom
           answer = await randInt(1,50,true);
@@ -440,6 +464,9 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
 
           //edit solution (add =)
           solution = `= ${solution.split("\n").join("\n= ")}`;
+
+          //add source
+          source = "Quizcraft Generator case3";
           break;
       }
       break;
@@ -457,6 +484,7 @@ const generateScientificNotation = async (subtopicName, difficulty) => {
     checkAnswerType: checkAnswerType,
     answerForDisplay: answerForDisplay,
     hintBody: hintBody,
+    source: source,
   });
   
   // save to database
