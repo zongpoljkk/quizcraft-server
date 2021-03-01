@@ -2,7 +2,7 @@ const Group = require("../models/Group");
 const Pin = require("../models/Pin");
 const User = require("../models/User");
 const moment = require("moment");
-const { MIN_PROBLEM, MAX_PROBLEM } = require("../utils/group");
+const { MIN_PROBLEM, MAX_PROBLEM, STATE } = require("../utils/group");
 const { SSE_TOPIC } = require("../utils/const");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
@@ -383,6 +383,7 @@ exports.resetAfterGameEnd = async (req, res) => {
       $set: {
         "members.$[].score": 0,
         "members.$[].point": 0,
+        "members.$[].state": STATE.PROBLEM,
         problems: [],
         currentIndex: 0,
       },
@@ -407,7 +408,7 @@ exports.nextProblem = async (req, res) => {
 
   Group.findOneAndUpdate(
     { _id: groupId, creatorId: userId },
-    { $inc: { currentIndex: 1 } , answersNumber: 0, isFirst: true },
+    { $inc: { currentIndex: 1 } , answersNumber: 0, isFirst: true, "members.$[].state": STATE.PROBLEM },
     { new: true },
     (err, group) => {
       if (err) return res.status(500).json({ success: false, error: err.toString() });
@@ -428,9 +429,24 @@ exports.getNumberOfAnswer = (req, res) => {
   })
 }
 
-exports.showAnswer = (req, res) => {
-  console.log("front request show answer")
+exports.showAnswer = async (req, res) => {
   const groupId = req.query.groupId;
+  
+  //update state of member
+  await Group.findOneAndUpdate(
+    { _id: groupId },
+    {
+      "members.$[correct].state": STATE.SHOW_ANSWER_CORRECT,
+      "members.$[wrong].state": STATE.SHOW_ANSWER_WRONG,
+    },
+    {
+      arrayFilters: [
+        { "correct.state": STATE.ANSWERED_CORRECT },
+        { "wrong.state": { $in: [STATE.ANSWERED_WRONG, STATE.PROBLEM] } },
+      ],
+      new: true,
+    }
+  );
   res.status(200).json({ succes: true });
   return sendEventToGroupMember(groupId, SSE_TOPIC.SHOW_ANSWER);
 }
