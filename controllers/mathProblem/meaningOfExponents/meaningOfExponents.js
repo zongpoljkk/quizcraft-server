@@ -372,6 +372,23 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           answerForDisplay = answerBody;
           checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
           choices = ["จำนวนเต็มบวก","จำนวนเต็มลบ"];
+          // create solution
+          switch (rand) {
+            case 0:
+              if (n==0) {
+                solution = `เนื่องจาก ${problemBody} = 1\nดังนั้น ${problemBody} จึงเป็นจำนวนเต็มบวก`;
+              }
+              break;
+            case 1: //(-3)^[2]
+              temp = (n % 2 == 0);
+              solution = `ถ้าจำนวนลบทั้งหมดยกกำลังด้วยเลข${temp? `คู่`:`คี่`}จะได้ค่าเป็นจำนวนเต็ม${temp? `บวก`:`ลบ`}`
+                          + `\nดังนั้น ${problemBody} จึงเป็นจำนวนเต็ม${temp? `บวก`:`ลบ`}`;
+              break;
+            case 2: // -3^[2]
+              solution = `เนื่องจาก ${problemBody} = -(${a}^[${n}])\nและ ${a}^[${n}] เป็นจำนวนเต็มบวก \nดังนั้น ${problemBody} จึงเป็น${answerBody}`;
+              break;
+          }
+
           //create hint
           hintBody = `ถ้าจำนวนลบทั้งหมดยกกำลังด้วยเลขคู่จะได้ค่าเป็นบวก`
                   +`\nแต่ถ้าจำนวนลบทั้งหมดยกกำลังด้วยเลขคี่จะได้ค่าเป็นลบ`
