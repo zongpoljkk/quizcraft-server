@@ -632,7 +632,92 @@ exports.getFriendProfileByUsername = async (req, res) => {
         },
       },
       {
+        $addFields: {
+          achievementWithoutImgs: {
+            $map: {
+              input: "$achievements",
+              as: "achievement",
+              in: {
+                $mergeObjects: [
+                  "$$achievement",
+                  {
+                    $arrayElemAt: [
+                      {
+                        $filter: {
+                          input: "$fromAchievements",
+                          as: "fromAchievement",
+                          cond: { $eq: ["$$fromAchievement.name", "$$achievement.achievementName"] },
+                        },
+                      },
+                      0,
+                    ],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $unwind: {
+          path: "$achievementWithoutImgs",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $unwind: {
+          path: "$achievementWithoutImgs.image",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $group: {
+          _id: "$_id",
+          school: { $first: "$school" },
+          class: { $first: "$class" },
+          rank: { $first: "$rank" },
+          streak: { $first: "$streak" },
+          firstname: { $first: "$firstname" },
+          lastname: { $first: "$lastname" },
+          username: { $first: "$username" },
+          exp: { $first: "$exp" },
+          level: { $first: "$level" },
+          achievementWithoutImgs: { $push: "$achievementWithoutImgs" },
+          achievementImages: { $first: "$achievementImages" },
+        },
+      },
+      {
+        $addFields: {
+          achievements: {
+            $map: {
+              input: "$achievementWithoutImgs",
+              as: "achievement",
+              in: {
+                $mergeObjects: [
+                  "$$achievement",
+                  {
+                    $arrayElemAt: [
+                      {
+                        $filter: {
+                          input: "$achievementImages",
+                          as: "image",
+                          cond: {
+                            $eq: ["$$image.files_id", "$$achievement.image.id"],
+                          },
+                        },
+                      },
+                      0,
+                    ],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
         $project: {
+          _id: 1,
           firstname: 1,
           lastname: 1,
           username: 1,
@@ -640,10 +725,11 @@ exports.getFriendProfileByUsername = async (req, res) => {
           class: 1,
           rank: 1,
           level: 1,
+          exp: 1,
           streak: 1,
           achievements: {
             achievementName: 1,
-            achievementImage: "$achievementImages"
+            achievementImage: "$achievements.data"
           },
         },
       },
