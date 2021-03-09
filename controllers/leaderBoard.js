@@ -25,6 +25,7 @@ exports.getLeaderBoard = async (req, res, next) => {
         username: 1,
         profileImage: { $ifNull: [ "$profileImage", null ] },
         level: 1,
+        exp: 1,
         class: 1
       }
     }
@@ -41,6 +42,9 @@ exports.getLeaderBoard = async (req, res, next) => {
 
       let copyUsers = users.slice(0);
       const byAll = copyUsers.sort((a, b) => {
+        if (b.level === a.level) {
+          return b.exp - a.exp;
+        }
         return b.level - a.level;
       });
       const indexGlobal = byAll.findIndex((user) => {
@@ -89,6 +93,7 @@ exports.getLeaderBoard = async (req, res, next) => {
                 username: 1,
                 profileImage: { $ifNull: [ "$profileImage", null ] },
                 level: 1,
+                exp: 1,
                 class: 1
               }
             }
@@ -108,6 +113,9 @@ exports.getLeaderBoard = async (req, res, next) => {
 
               let copyUsers = users.slice(0);
               const bySchool = copyUsers.sort((a, b) => {
+                if (b.level === a.level) {
+                  return b.exp - a.exp;
+                }
                 return b.level - a.level;
               });
 
@@ -120,6 +128,9 @@ exports.getLeaderBoard = async (req, res, next) => {
               });
 
               const byClassroom = classroomUsers.sort((a, b) => {
+                if (b.level === a.level) {
+                  return b.exp - a.exp;
+                }
                 return b.level - a.level;
               });
 
