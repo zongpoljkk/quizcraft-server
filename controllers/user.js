@@ -468,83 +468,52 @@ exports.buyItem = async (req, res) => {
       error: "You must provide a body to update",
     });
   }
-
-  const item = await Item.findOne({ name: req.body.itemName }, (err, item) => {
-    if (err) {
-      return res.status(500).json({ success: false, error: err });
-    }
-    if (!item) {
-      return res.status(400).json({ success: false, error: "no items" });
-    }
-    return item;
-  });
-
-  const priceOfItem = item.price;
-  const nameOfItem = item.name;
-
-  function buyItemAfterCheckMoney() {
-    User.findOneAndUpdate(
-      {
-        _id: req.body.userId,
-        "items.itemName": nameOfItem,
-        coin: { $gte: priceOfItem },
-      },
-      { $inc: { "items.$.amount": 1, coin: -priceOfItem } },
-      { new: true },
-      (err, user) => {
-        if (err) {
-          return res.status(500).json({ success: false, error: err });
-        }
-        if (!user) {
-          return res.status(400).json({ success: false, error: "no data" });
-        }
-        let items = user.items;
-        let index = items.findIndex((x) => x.itemName === body.itemName);
-        return res.status(200).json({ success: true, data: user.items[index] });
-      }
-    );
-  }
-
-  User.findOne(
-    {
-      _id: req.body.userId,
-      coin: { $lt: priceOfItem },
-    },
-    (err, user) => {
+  try {
+    const item = await Item.findOne({ name: req.body.itemName }, (err, item) => {
       if (err) {
-        return res.status(500).json({ success: false, error: err });
+        return res.status(500).json({ success: false, error: err.toString() });
       }
-      if (!user) {
-        User.findOneAndUpdate(
-          {
-            _id: req.body.userId,
-            "items.itemName": { $ne: nameOfItem },
-          },
-          {
-            $addToSet: {
-              items: { $each: [{ itemName: nameOfItem }] },
-            },
-          },
-          { new: true },
-          (err, user) => {
-            if (err) {
-              return res.status(500).json({ success: false, error: err });
-            }
-            if (!user) {
-              return buyItemAfterCheckMoney();
-            } else {
-              return buyItemAfterCheckMoney();
-            }
-          }
-        );
-      } else {
+      if (!item) {
+        return res.status(400).json({ success: false, error: "no items" });
+      }
+      return item;
+    });
+    
+    const priceOfItem = item.price;
+    const nameOfItem = item.name;
+  
+    const user = await User.findById(body.userId);
+  
+    if (user.coin < priceOfItem) {
+      return res.status(400).json({
+        success: false,
+        error: "You don't have enough money to buy this item!",
+      });
+    }
+    let userItem = user.items.find(item => item.itemName == nameOfItem);
+  
+    if (!userItem) {
+      userItem = {
+        itemName: nameOfItem,
+        amount: 1,
+      }
+      user.items.push(userItem);
+    } else {
+      if (userItem.amount >= 999) {
         return res.status(400).json({
           success: false,
-          error: "You don't have enough money to buy this item!",
+          error: "Number of item cannot exceed 999",
         });
       }
+      userItem.amount++;
     }
-  );
+    user.coin -= priceOfItem;
+  
+    await user.save();
+    return res.status(200).json({ success: true, data: userItem });
+  } catch (err) {
+    return res.status(500).json({ success: false, error: err.toString() });
+  }
 };
 
 exports.updateCoinAndExp = (user, gameMode, difficulty) => {  
