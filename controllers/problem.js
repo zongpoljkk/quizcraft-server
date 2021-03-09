@@ -213,13 +213,14 @@ exports.getProblemForUser = async (req, res, next) => {
       answerType: problem.answerType,
       title: problem.title,
       haveHint: haveHint,
+      correctAnswer: problem.answerBody,
     } 
     if (problem.answerType == ANSWER_TYPE.MATH_INPUT) {
       return res.status(200).json({ 
         success: true, 
         data: { 
           problem: problemOut, 
-          correctAnswer: problem.answerForDisplay 
+          correctAnswerForDisplay: problem.answerForDisplay 
         } 
       });
     } else {
