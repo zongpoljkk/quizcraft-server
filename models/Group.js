@@ -37,7 +37,8 @@ const GroupSchema = new Schema({
         type: String,
         enum: [
           "PROBLEM",
-          "ANSWERED",
+          "ANSWERED_CORRECT",
+          "ANSWERED_WRONG",
           "SHOW_ANSWER_CORRECT",
           "SHOW_ANSWER_WRONG",
         ],

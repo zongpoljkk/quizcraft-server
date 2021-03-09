@@ -13,3 +13,11 @@ exports.calculatePoints = (usedTime, timeGiven, maxPointsPerProblem) => {
   const finalStep = Math.round(fourthStep);
   return finalStep;
 }
+
+exports.STATE = {
+  PROBLEM: "PROBLEM",
+  ANSWERED_CORRECT: "ANSWERED_CORRECT",
+  ANSWERED_WRONG: "ANSWERED_WRONG",
+  SHOW_ANSWER_CORRECT: "SHOW_ANSWER_CORRECT",
+  SHOW_ANSWER_WRONG: "SHOW_ANSWER_WRONG"
+}

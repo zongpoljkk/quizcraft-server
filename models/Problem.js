@@ -1,3 +1,4 @@
+const { string } = require("mathjs");
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
@@ -68,6 +69,10 @@ const ProblemSchema = new Schema({
   },
   hintBody: {
     type: String,
+  },
+  source: {
+    type: String,
+    default: "Quizcraft Generator"
   }
 });
 

@@ -7,7 +7,7 @@ const { multiplicationTerm } = require("./meaningOfExponentsFunction");
 
 const generateMeaningOfExponents = async (subtopicName, difficulty) => {
   var problemTitle,problemBody,answerBody,hintBody,solution,answerType,answerForDisplay, checkAnswerType ;
-  var expo, num,a ,n, rand, positiveBase, opt, selectedExpo, expoList, numList, choices;
+  var expo, num,a ,n, rand, positiveBase, opt, selectedExpo, expoList, numList, choices, source;
   let problem, newProblem;
   let i,temp,primeList;
   switch (difficulty) {
@@ -112,6 +112,9 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
 
           //edit solution (add =)
           solution = `= ${solution.split("\n").join("\n= ")}`;
+
+          //add source
+          source = "Quizcraft Generator case1";
           break;
         case 2: // 3*3*3*3 = 3^[4] or 3^[4] = 3*3*3*3
           rand = await randInt(0,1);
@@ -183,6 +186,9 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           //create hint
           hintBody = rand? "a^[n] = a คูณกัน n ตัว\nเช่น 3^[4] = 3*3*3*3 -> 3 คูณกัน 4 ตัว" 
                     : "a*a*a = a^[3]\n-> a คูณกันสามตัว เท่ากับ a ยกกำลัง 3";
+          
+          //add source
+          source = "Quizcraft Generator case2";
           break;
         case 3: 
           a = await baseSelector();
@@ -203,6 +209,9 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
 
           //create hint
           hintBody = "จาก a^[n]\nจะได้ว่า a คือ ฐาน และ n คือ เลขชี้กำลัง";
+
+          //add source
+          source = "Quizcraft Generator case3";
           break;
       }
       break;
@@ -237,6 +246,9 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           //create hint 
           hintBody = `ถ้า a^[n] = a^[m] โดยที่ a ไม่เท่ากับ 0 จะได้ว่า n = m`;
           hintBody += `\nเช่น ถ้า 3^[x] = 81 = 3^[4] จะได้ว่า x = 4`;
+
+          //add source
+          source = "Quizcraft Generator case1";
           break;
         case 2:
           problemTitle = "จงเขียนจำนวนต่อไปนี้ ให้อยู่ในรูปเลขยกกำลังที่มีฐานเป็นจำนวนเฉพาะ"
@@ -268,7 +280,10 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           checkAnswerType = CHECK_ANSWER_TYPE.EQUAL_STRING;
 
           //create hint
-          hintBody = "ลองแยกตัวประกอบของฐานให้อยู่ในรูปจำนวนเฉพาะคูณกัน เช่น ให้ a เป็นจำนวนเฉพาะใดๆ และ a*a*a = a^[3]"
+          hintBody = "ลองแยกตัวประกอบของฐานให้อยู่ในรูปจำนวนเฉพาะคูณกัน เช่น ให้ a เป็นจำนวนเฉพาะใดๆ และ a*a*a = a^[3]";
+
+          //add source
+          source = "Quizcraft Generator case2";
           break;
         case 3:
           problemTitle = "จงเขียนจำนวนต่อไปนี้ให้อยู่ในรูปเลขยกกำลังที่มีเลขชี้กำลังมากกว่า 1";
@@ -297,6 +312,9 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           answerForDisplay = `${expo}`;
           checkAnswerType = CHECK_ANSWER_TYPE.POWER_OVER_ONE;
           answerType = ANSWER_TYPE.MATH_INPUT;
+
+          //add source
+          source = "Quizcraft Generator case3";
           break;
       }
       break;
@@ -347,6 +365,9 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           hintBody = `ถ้าจำนวนลบทั้งหมดยกกำลังด้วยเลขคู่จะได้ค่าเป็นบวก`
                     +`\nแต่ถ้าจำนวนลบทั้งหมดยกกำลังด้วยเลขคี่จะได้ค่าเป็นลบ`
                     +`\nเช่น (-${a})^[2] = (-${a})*(-${a}) และ (-${a})^[3] = (-${a})*(-${a})*(-${a}) แต่ -${a}^[2] = -(${a}*${a})`;
+            
+          //add source
+          source = "Quizcraft Generator case1";
           break;
         case 2:
           problemTitle = "จงหาว่าเลขยกกำลังต่อไปนี้เป็นจำนวนเต็มประเภทใด";
@@ -376,6 +397,9 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
           hintBody = `ถ้าจำนวนลบทั้งหมดยกกำลังด้วยเลขคู่จะได้ค่าเป็นบวก`
                   +`\nแต่ถ้าจำนวนลบทั้งหมดยกกำลังด้วยเลขคี่จะได้ค่าเป็นลบ`
                   +`\nเช่น (-${a})^[2] = (-${a})*(-${a}) และ (-${a})^[3] = (-${a})*(-${a})*(-${a}) แต่ -${a}^[2] = -(${a}*${a})`;
+
+          //add source
+          source = "Quizcraft Generator case2";
           break;
         case 3:
           a = await randInt(2,50,true);
@@ -416,6 +440,9 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
             solution += a<0? `\n${expo} = (${a})^[${n}]` : `\n${expo} = ${a}^[${n}]`;
           }
           solution += `\nx = ${answerForDisplay}`;
+
+          //add source
+          source = "Quizcraft Generator case3";
           break;
       }
       break;
@@ -434,6 +461,7 @@ const generateMeaningOfExponents = async (subtopicName, difficulty) => {
     checkAnswerType: checkAnswerType,
     answerForDisplay: answerForDisplay,
     hintBody: hintBody,
+    source: source,
   });
 
   // save to database

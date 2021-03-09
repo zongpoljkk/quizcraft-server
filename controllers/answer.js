@@ -2,7 +2,7 @@ const math = require("mathjs");
 const { levelSystem } = require("../utils/level");
 const { rankSystem } = require("../utils/level");
 const { NUMBER_OF_PROBLEM } = require("../utils/challenge");
-const { calculatePoints, POINTS_POSSIBLE } = require("../utils/group");
+const { calculatePoints, POINTS_POSSIBLE, STATE } = require("../utils/group");
 
 const User = require("../models/User");
 const Challenge = require("../models/Challenge");
@@ -18,12 +18,17 @@ const { sendEventToGroupMember, sendEventToUser } = require("../middlewares");
 
 const updateGroupScore = async (res, groupId, userId, correct, usedTime, correctAnswer) => {
   await Group.findById(groupId).exec().then((group) => {
+    const user = group.members.find(member => member.userId.toString() === userId);
     // User either took too long or answer incorrectly or hit skip
     if (usedTime >= +group.timePerProblem.toString() || !correct) {
+      if (user.state == STATE.PROBLEM) {
+        user.state = STATE.ANSWERED_WRONG;
+      }
     }
     else {
-      group.members.find(member => member.userId.toString() === userId).score++;
-      group.members.find(member => member.userId.toString() === userId).point += calculatePoints(usedTime, group.timePerProblem, POINTS_POSSIBLE / group.problems.length);
+      user.score++;
+      user.point += calculatePoints(usedTime, group.timePerProblem, POINTS_POSSIBLE / group.problems.length);
+      user.state = STATE.ANSWERED_CORRECT;
     }
 
     if (group.members.some(e => e.userId == userId)) {
