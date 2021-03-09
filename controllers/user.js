@@ -716,6 +716,15 @@ exports.getFriendProfileByUsername = async (req, res) => {
         },
       },
       {
+        $lookup: {
+          from: "userprogresses",
+          localField: "_id",
+          foreignField: "userId",
+          as: "userProgressData",
+        },
+      },
+      { $unwind: "$userProgressData" },
+      {
         $project: {
           _id: 1,
           firstname: 1,
@@ -727,9 +736,10 @@ exports.getFriendProfileByUsername = async (req, res) => {
           level: 1,
           exp: 1,
           streak: 1,
+          totalQuestions: { $sum: "$userProgressData.problems.totalAmount"},
           achievements: {
             achievementName: 1,
-            achievementImage: "$achievements.data"
+            data: 1
           },
         },
       },
