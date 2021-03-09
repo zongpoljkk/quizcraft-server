@@ -3,6 +3,7 @@ const { levelSystem } = require("../utils/level");
 const { rankSystem } = require("../utils/level");
 const { NUMBER_OF_PROBLEM } = require("../utils/challenge");
 const { calculatePoints, POINTS_POSSIBLE, STATE } = require("../utils/group");
+const { updateNumberOfProblemofUser} = require("./userProgress");
 
 const User = require("../models/User");
 const Challenge = require("../models/Challenge");
@@ -127,6 +128,8 @@ exports.checkAnswer = async (req, res, next) => {
           .send("The answer with the given problem id was not found");
         return;
       } else {
+        //update user progress
+        updateNumberOfProblemofUser(userId, subtopic, answer.difficulty);
         let correctFlag = false;
         switch (answer.checkAnswerType) {
           case CHECK_ANSWER_TYPE.EQUAL_STRING:
