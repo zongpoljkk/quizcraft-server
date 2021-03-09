@@ -22,8 +22,11 @@ const updateGroupScore = async (res, groupId, userId, correct, usedTime, correct
     if (usedTime >= +group.timePerProblem.toString() || !correct) {
     }
     else {
-      group.members.find(member => member.userId.toString() === userId).score++;
-      group.members.find(member => member.userId.toString() === userId).point += calculatePoints(usedTime, group.timePerProblem, POINTS_POSSIBLE / group.problems.length);
+      // group.members.find(member => member.userId.toString() === userId).score++; 
+      // group.members.find(member => member.userId.toString() === userId).point += calculatePoints(usedTime, group.timePerProblem, POINTS_POSSIBLE / group.problems.length);
+      const user = group.members.find(member => member.userId.toString() === userId)
+      user.score++;
+      user.point += calculatePoints(usedTime, group.timePerProblem, POINTS_POSSIBLE / group.problems.length);
     }
 
     if (group.members.some(e => e.userId == userId)) {
