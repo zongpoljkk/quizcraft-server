@@ -723,7 +723,12 @@ exports.getFriendProfileByUsername = async (req, res) => {
           as: "userProgressData",
         },
       },
-      { $unwind: "$userProgressData" },
+      { 
+        $unwind: {
+        path: "$userProgressData",
+        preserveNullAndEmptyArrays: true,
+        },
+      },
       {
         $project: {
           _id: 1,
