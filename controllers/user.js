@@ -514,10 +514,10 @@ exports.buyItem = async (req, res) => {
       }
       user.items.push(userItem);
     } else {
-      if (userItem.amount >= 999) {
+      if (userItem.amount >= 99) {
         return res.status(400).json({
           success: false,
-          error: "Number of item cannot exceed 999",
+          error: "Number of item cannot exceed 99",
         });
       }
       userItem.amount++;
