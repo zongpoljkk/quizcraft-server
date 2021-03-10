@@ -46,5 +46,6 @@ router.put(
   [authJwt],
   userController.changeProfilePicture
 );
+router.get("/get-friend-profile", [authJwt], userController.getFriendProfileByUsername);
 
 module.exports = router;

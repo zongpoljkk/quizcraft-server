@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { ObjectId } = require("mongodb");
+const ObjectId = mongoose.Types.ObjectId;
 const User = require("../models/User");
 const Item = require("../models/Item");
 const jwt = require("jsonwebtoken");
@@ -39,13 +39,12 @@ exports.getAllUsers = async (req, res) => {
 };
 
 exports.getProfileByUID = async (req, res) => {
-  var mongoose = require("mongoose");
   const _id = req.query._id;
   await User.aggregate(
     [
       {
         $match: {
-          _id: mongoose.Types.ObjectId(_id),
+          _id: ObjectId(_id),
         },
       },
       {
@@ -604,4 +603,160 @@ exports.updateCoinAndExp = (user, gameMode, difficulty) => {
     earnedCoins: earnedCoins,
     earnedExp: earnedExp,
   };
+};
+
+exports.getFriendProfileByUsername = async (req, res) => {
+  const username = req.query.username;
+
+  await User.aggregate(
+    [
+      {
+        $match: {
+          username: username,
+        },
+      },
+      {
+        $lookup: {
+          from: "achievements",
+          localField: "achievements.achievementName",
+          foreignField: "name",
+          as: "fromAchievements",
+        },
+      },
+      {
+        $lookup: {
+          from: "media.chunks",
+          localField: "fromAchievements.image.id",
+          foreignField: "files_id",
+          as: "achievementImages",
+        },
+      },
+      {
+        $addFields: {
+          achievementWithoutImgs: {
+            $map: {
+              input: "$achievements",
+              as: "achievement",
+              in: {
+                $mergeObjects: [
+                  "$$achievement",
+                  {
+                    $arrayElemAt: [
+                      {
+                        $filter: {
+                          input: "$fromAchievements",
+                          as: "fromAchievement",
+                          cond: { $eq: ["$$fromAchievement.name", "$$achievement.achievementName"] },
+                        },
+                      },
+                      0,
+                    ],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $unwind: {
+          path: "$achievementWithoutImgs",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $unwind: {
+          path: "$achievementWithoutImgs.image",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $group: {
+          _id: "$_id",
+          school: { $first: "$school" },
+          class: { $first: "$class" },
+          rank: { $first: "$rank" },
+          streak: { $first: "$streak" },
+          firstname: { $first: "$firstname" },
+          lastname: { $first: "$lastname" },
+          username: { $first: "$username" },
+          exp: { $first: "$exp" },
+          level: { $first: "$level" },
+          achievementWithoutImgs: { $push: "$achievementWithoutImgs" },
+          achievementImages: { $first: "$achievementImages" },
+        },
+      },
+      {
+        $addFields: {
+          achievements: {
+            $map: {
+              input: "$achievementWithoutImgs",
+              as: "achievement",
+              in: {
+                $mergeObjects: [
+                  "$$achievement",
+                  {
+                    $arrayElemAt: [
+                      {
+                        $filter: {
+                          input: "$achievementImages",
+                          as: "image",
+                          cond: {
+                            $eq: ["$$image.files_id", "$$achievement.image.id"],
+                          },
+                        },
+                      },
+                      0,
+                    ],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "userprogresses",
+          localField: "_id",
+          foreignField: "userId",
+          as: "userProgressData",
+        },
+      },
+      { 
+        $unwind: {
+        path: "$userProgressData",
+        preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          firstname: 1,
+          lastname: 1,
+          username: 1,
+          school: 1,
+          class: 1,
+          rank: 1,
+          level: 1,
+          exp: 1,
+          streak: 1,
+          totalQuestions: { $sum: "$userProgressData.problems.totalAmount"},
+          achievements: {
+            achievementName: 1,
+            data: 1
+          },
+        },
+      },
+    ],
+    (err, friend) => {
+      if (err) {
+        return res.status(500).json({ success: false, error: err });
+      }
+      if (!friend.length) {
+        return res.status(400).json({ success: false, error: "do not have this friend" });
+      }
+      return res.status(200).json({ success: true, data: friend });
+    }
+  );
 };
