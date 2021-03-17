@@ -3,42 +3,42 @@ const User = require("../models/User");
 exports.getLeaderBoard = async (req, res, next) => {
   const userId = req.query.userId;
 
-  // ? Global ? //
-  User.aggregate([
-    {
-      $lookup: {
-        from: "uploads.chunks",
-        localField: "photo.id",
-        foreignField: "files_id",
-        as: "profileImage",
+  if (userId) {
+    // ? Global ? //
+    User.aggregate([
+      {
+        $lookup: {
+          from: "uploads.chunks",
+          localField: "photo.id",
+          foreignField: "files_id",
+          as: "profileImage",
+        },
       },
-    },
-    { 
-      $unwind: {
-        path: "$profileImage",
-        "preserveNullAndEmptyArrays": true 
+      {
+        $unwind: {
+          path: "$profileImage",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          username: 1,
+          profileImage: { $ifNull: ["$profileImage", null] },
+          level: 1,
+          exp: 1,
+          class: 1,
+        },
+      },
+    ]).exec((err, users) => {
+      if (err) {
+        res.status(500).send({ success: false, error: err });
+      } else if (!users) {
+        res
+          .status(400)
+          .send({ success: false, error: "Unable to get all users" });
+        return;
       }
-    },
-    {
-      $project: {
-        _id: 1,
-        username: 1,
-        profileImage: { $ifNull: [ "$profileImage", null ] },
-        level: 1,
-        exp: 1,
-        class: 1
-      }
-    }
-  ])
-  .exec((err, users) => {
-    if (err) {
-      res.status(500).send({ success: false, error: err });
-    } else if (!users) {
-      res
-        .status(400)
-        .send({ success: false, error: "Unable to get all users" });
-      return;
-    }
 
       let copyUsers = users.slice(0);
       const byAll = copyUsers.sort((a, b) => {
@@ -70,8 +70,8 @@ exports.getLeaderBoard = async (req, res, next) => {
           User.aggregate([
             {
               $match: {
-                school: school
-              }
+                school: school,
+              },
             },
             {
               $lookup: {
@@ -81,76 +81,74 @@ exports.getLeaderBoard = async (req, res, next) => {
                 as: "profileImage",
               },
             },
-            { 
+            {
               $unwind: {
                 path: "$profileImage",
-                "preserveNullAndEmptyArrays": true 
-              }
+                preserveNullAndEmptyArrays: true,
+              },
             },
             {
               $project: {
                 _id: 1,
                 username: 1,
-                profileImage: { $ifNull: [ "$profileImage", null ] },
+                profileImage: { $ifNull: ["$profileImage", null] },
                 level: 1,
                 exp: 1,
-                class: 1
-              }
+                class: 1,
+              },
+            },
+          ]).exec((err, users) => {
+            if (err) {
+              res.status(500).send({ success: false, error: err });
+            } else if (!user) {
+              res.status(400).send({
+                success: false,
+                error: "The user with the given school name was not found",
+              });
+              return;
             }
-          ])
-            .exec((err, users) => {
-              if (err) {
-                res.status(500).send({ success: false, error: err });
-              } else if (!user) {
-                res
-                  .status(400)
-                  .send({
-                    success: false,
-                    error: "The user with the given school name was not found",
-                  });
-                return;
+
+            let copyUsers = users.slice(0);
+            const bySchool = copyUsers.sort((a, b) => {
+              if (b.level === a.level) {
+                return b.exp - a.exp;
               }
-
-              let copyUsers = users.slice(0);
-              const bySchool = copyUsers.sort((a, b) => {
-                if (b.level === a.level) {
-                  return b.exp - a.exp;
-                }
-                return b.level - a.level;
-              });
-
-              const indexSchool = bySchool.findIndex((user) => {
-                return user._id == userId;
-              });
-
-              const classroomUsers = copyUsers.filter((user) => {
-                return user.class === classroom;
-              });
-
-              const byClassroom = classroomUsers.sort((a, b) => {
-                if (b.level === a.level) {
-                  return b.exp - a.exp;
-                }
-                return b.level - a.level;
-              });
-
-              const indexClassroom = byClassroom.findIndex((user) => {
-                return user._id == userId;
-              });
-
-              res.status(200).send({
-                success: true,
-                data: {
-                  byAll: byAll,
-                  bySchool: bySchool,
-                  byClassroom: byClassroom,
-                  indexGlobal: indexGlobal + 1,
-                  indexSchool: indexSchool + 1,
-                  indexClassroom: indexClassroom + 1,
-                },
-              });
-              next();
+              return b.level - a.level;
             });
+
+            const indexSchool = bySchool.findIndex((user) => {
+              return user._id == userId;
+            });
+
+            const classroomUsers = copyUsers.filter((user) => {
+              return user.class === classroom;
+            });
+
+            const byClassroom = classroomUsers.sort((a, b) => {
+              if (b.level === a.level) {
+                return b.exp - a.exp;
+              }
+              return b.level - a.level;
+            });
+
+            const indexClassroom = byClassroom.findIndex((user) => {
+              return user._id == userId;
+            });
+
+            res.status(200).send({
+              success: true,
+              data: {
+                byAll: byAll,
+                bySchool: bySchool,
+                byClassroom: byClassroom,
+                indexGlobal: indexGlobal + 1,
+                indexSchool: indexSchool + 1,
+                indexClassroom: indexClassroom + 1,
+              },
+            });
+            next();
+          });
         });
     });
+  }
 };
