@@ -32,9 +32,9 @@ exports.getLeaderBoard = async (req, res, next) => {
       },
     ]).exec((err, users) => {
       if (err) {
-        res.status(500).send({ success: false, error: err });
+        return res.status(500).send({ success: false, error: err });
       } else if (!users) {
-        res
+        return res
           .status(400)
           .send({ success: false, error: "Unable to get all users" });
         return;
@@ -55,9 +55,9 @@ exports.getLeaderBoard = async (req, res, next) => {
         .select("_id school class")
         .exec((err, user) => {
           if (err) {
-            res.status(500).send({ success: false, error: err });
+            return res.status(500).send({ success: false, error: err });
           } else if (!user) {
-            res.status(400).send({
+            return res.status(400).send({
               success: false,
               error: "The user with the given userId was not found",
             });
@@ -99,9 +99,9 @@ exports.getLeaderBoard = async (req, res, next) => {
             },
           ]).exec((err, users) => {
             if (err) {
-              res.status(500).send({ success: false, error: err });
+              return res.status(500).send({ success: false, error: err });
             } else if (!user) {
-              res.status(400).send({
+              return res.status(400).send({
                 success: false,
                 error: "The user with the given school name was not found",
               });
@@ -135,7 +135,7 @@ exports.getLeaderBoard = async (req, res, next) => {
               return user._id == userId;
             });
 
-            res.status(200).send({
+            return res.status(200).send({
               success: true,
               data: {
                 byAll: byAll,
