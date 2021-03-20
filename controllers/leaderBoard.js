@@ -37,7 +37,6 @@ exports.getLeaderBoard = async (req, res, next) => {
         return res
           .status(400)
           .send({ success: false, error: "Unable to get all users" });
-        return;
       }
 
       let copyUsers = users.slice(0);
