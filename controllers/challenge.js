@@ -173,6 +173,7 @@ exports.getProblemByChallengeId = (req, res) => {
         }
 
         // ? Handle user lost connection by skip user's current problem and mark as incorrect  ? //
+        // line 177 is unreachable code
         if (challenge.currentProblem === NUMBER_OF_PROBLEM) {
           challenge.user1IsRead = false;
           challenge.user2IsRead = false;
@@ -180,7 +181,7 @@ exports.getProblemByChallengeId = (req, res) => {
             ? (challenge.whoTurn = 2)
             : (challenge.whoTurn = 1);
           challenge.currentProblem = 0;
-        } else if (challenge.currentProblem < NUMBER_OF_PROBLEM) {
+        } else if (challenge.currentProblem < NUMBER_OF_PROBLEM - 1) {
           challenge.currentProblem++;
           if (challenge.whoTurn === 1) {
             // challenge.user1Result.push(0);
