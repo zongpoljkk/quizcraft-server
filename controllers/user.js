@@ -582,11 +582,11 @@ exports.updateCoinAndExp = (user, gameMode, difficulty) => {
   // Compare user exp if it exceeds the limit of his/her level
   let levelUp = false;
   let rankUp = false;
-  if (user.exp >= levelDictionary[parseInt(user.level)]) {
+  if (user.exp >= user.maxExp) {
     if (user.level == MAX_LEVEL) {
     } else {
       levelUp = true;
-      user.exp -= levelDictionary[parseInt(user.level)];
+      user.exp -= user.maxExp;
       user.maxExp = levelDictionary[parseInt(user.level + 1)];
       user.level += 1;
       // ? Handle Rank up ? //
